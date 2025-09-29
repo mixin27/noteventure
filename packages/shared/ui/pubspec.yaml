@@ -1,0 +1,28 @@
+name: ui
+description: "A new Flutter package project."
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.9.2
+  flutter: ">=1.17.0"
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Internal
+  core:
+    path: ../core
+
+  # UI/UX
+  flutter_animate: ^4.3.0
+  shimmer: ^3.0.0
+  lottie: ^3.0.0
+  flutter_svg: ^2.0.9
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0

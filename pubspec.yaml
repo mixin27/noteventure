@@ -1,0 +1,18 @@
+name: noteventure_workspace
+description: Noteventure monorepo workspace
+
+environment:
+  sdk: '^3.9.0'
+
+workspace:
+  - apps/mobile
+  - packages/shared/core
+  - packages/shared/ui
+  - packages/shared/database
+  - packages/features/notes
+  - packages/features/challenges
+  - packages/features/points
+  - packages/features/progress
+  - packages/features/achievements
+  - packages/features/chaos
+  - packages/features/themes
