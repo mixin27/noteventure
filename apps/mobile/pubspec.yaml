@@ -24,18 +24,18 @@ dependencies:
   # Feature packages
   notes:
     path: ../../packages/features/notes
-  # challenges:
-  #   path: ../../packages/features/challenges
-  # points:
-  #   path: ../../packages/features/points
-  # progress:
-  #   path: ../../packages/features/progress
-  # achievements:
-  #   path: ../../packages/features/achievements
-  # chaos:
-  #   path: ../../packages/features/chaos
-  # themes:
-  #   path: ../../packages/features/themes
+  challenges:
+    path: ../../packages/features/challenges
+  points:
+    path: ../../packages/features/points
+  progress:
+    path: ../../packages/features/progress
+  achievements:
+    path: ../../packages/features/achievements
+  chaos:
+    path: ../../packages/features/chaos
+  themes:
+    path: ../../packages/features/themes
 
   #  State management
   flutter_bloc: ^9.1.1

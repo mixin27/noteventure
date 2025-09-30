@@ -171,7 +171,9 @@ class AppTheme {
     chipTheme: ChipThemeData(
       backgroundColor: AppColors.surfaceLight2,
       deleteIconColor: AppColors.textSecondaryLight,
-      labelStyle: AppTextStyles.labelMedium,
+      labelStyle: AppTextStyles.labelMedium.copyWith(
+        color: AppColors.textPrimaryLight,
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
