@@ -1,5 +1,13 @@
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
+library;
+
+// Domain - Entities
+export 'src/domain/entities/note.dart';
+export 'src/domain/entities/category.dart';
+
+// Presentation - BLoC
+export 'src/presentation/bloc/notes_bloc.dart';
+export 'src/presentation/bloc/notes_event.dart';
+export 'src/presentation/bloc/notes_state.dart';
+
+// DI
+export 'src/di/notes_injection.dart' show initNotesFeature;

@@ -1,0 +1,17 @@
+import 'package:get_it/get_it.dart';
+import 'package:database/database.dart';
+import 'package:notes/notes.dart';
+
+final getIt = GetIt.instance;
+
+Future<void> configureDependencies() async {
+  // Initialize database
+  final database = AppDatabase();
+  getIt.registerSingleton<AppDatabase>(database);
+
+  // Register DAOs
+  getIt.registerSingleton<NotesDao>(NotesDao(database));
+
+  // Initialize features
+  initNotesFeature();
+}

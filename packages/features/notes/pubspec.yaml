@@ -27,11 +27,14 @@ dependencies:
   #   path: ../challenges
 
   # State Management
+  bloc: ^9.0.1
   flutter_bloc: ^9.1.1
   equatable: ^2.0.7
 
   # Navigation
   go_router: ^16.2.4
+
+  drift: ^2.28.2
 
   # DI
   get_it: ^8.2.0
@@ -41,6 +44,7 @@ dependencies:
   dartz: ^0.10.1
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
+
 
 dev_dependencies:
   flutter_test:
