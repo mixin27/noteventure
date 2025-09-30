@@ -10,4 +10,4 @@ export 'src/presentation/bloc/notes_event.dart';
 export 'src/presentation/bloc/notes_state.dart';
 
 // DI
-export 'src/di/notes_injection.dart';
+export 'src/di/notes_injection.dart' show initNotesFeature;
