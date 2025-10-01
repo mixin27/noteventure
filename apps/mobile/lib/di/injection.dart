@@ -1,3 +1,4 @@
+import 'package:challenges/challenges.dart';
 import 'package:get_it/get_it.dart';
 import 'package:database/database.dart';
 import 'package:notes/notes.dart';
@@ -18,4 +19,5 @@ Future<void> configureDependencies() async {
   // Initialize features
   initNotesFeature();
   initPointsFeature();
+  initChallengesFeature();
 }

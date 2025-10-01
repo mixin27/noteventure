@@ -117,7 +117,7 @@ class HomeView extends StatelessWidget {
                       Expanded(
                         child: CustomCard(
                           onTap: () {
-                            // todo(mixin27): Navigate to challenges
+                            context.push(RouteConstants.challenges);
                           },
                           child: Column(
                             children: [

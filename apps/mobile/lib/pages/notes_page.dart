@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:points/points.dart';
 import 'package:ui/ui.dart';
 import 'package:core/core.dart';
 import 'package:notes/notes.dart';
 
 import '../di/injection.dart';
+import '../routes/route_constants.dart';
 
 class NotesPage extends StatelessWidget {
   const NotesPage({super.key});
@@ -432,10 +434,7 @@ class NotesView extends StatelessWidget {
             text: 'Earn Points',
             onPressed: () {
               Navigator.of(dialogContext).pop();
-              // todo(mixin27): Navigate to challenges
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Challenge system coming soon!')),
-              );
+              context.push(RouteConstants.challenges);
             },
             icon: const Icon(
               Icons.psychology_outlined,

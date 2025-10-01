@@ -1,6 +1,10 @@
+import 'package:challenges/challenges.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:points/points.dart';
 
+import '../di/injection.dart';
 import '../pages/home_page.dart';
 import '../pages/notes_page.dart';
 import '../pages/splash_page.dart';
@@ -24,6 +28,21 @@ class AppRouter {
         path: RouteConstants.notes,
         name: RouteConstants.notesName,
         builder: (context, state) => const NotesPage(),
+      ),
+      GoRoute(
+        path: RouteConstants.challenges,
+        name: RouteConstants.challengesName,
+        builder: (context, state) {
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => getIt<PointsBloc>()..add(LoadPointBalance()),
+              ),
+              BlocProvider(create: (_) => getIt<ChallengeBloc>()),
+            ],
+            child: const ChallengesMenuPage(),
+          );
+        },
       ),
     ],
     errorBuilder: (context, state) =>
