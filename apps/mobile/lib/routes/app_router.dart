@@ -2,6 +2,7 @@ import 'package:challenges/challenges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:notes/notes.dart';
 import 'package:points/points.dart';
 
 import '../di/injection.dart';
@@ -28,6 +29,37 @@ class AppRouter {
         path: RouteConstants.notes,
         name: RouteConstants.notesName,
         builder: (context, state) => const NotesPage(),
+      ),
+      GoRoute(
+        path: '${RouteConstants.noteDetail}/:id',
+        name: RouteConstants.noteDetailName,
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => getIt<PointsBloc>()..add(LoadPointBalance()),
+              ),
+              BlocProvider(create: (_) => getIt<NotesBloc>()..add(NotesLoad())),
+            ],
+            child: NoteDetailPage(noteId: id),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteConstants.noteCreate,
+        name: RouteConstants.noteCreateName,
+        builder: (context, state) {
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => getIt<PointsBloc>()..add(LoadPointBalance()),
+              ),
+              BlocProvider(create: (_) => getIt<NotesBloc>()),
+            ],
+            child: const NoteEditorPage(),
+          );
+        },
       ),
       GoRoute(
         path: RouteConstants.challenges,

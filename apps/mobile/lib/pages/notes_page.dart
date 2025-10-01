@@ -172,7 +172,9 @@ class NotesView extends StatelessWidget {
                       delay: Duration(milliseconds: 50 * index),
                       child: CustomCard(
                         onTap: () {
-                          // todo(mixin27): Navigate to note detail
+                          context.push(
+                            '${RouteConstants.noteDetail}/${note.id}',
+                          );
                         },
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,63 +268,10 @@ class NotesView extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          _showCreateNoteDialog(context);
+          context.push(RouteConstants.noteCreate);
         },
         icon: const Icon(Icons.add),
         label: const Text('New Note'),
-      ),
-    );
-  }
-
-  void _showCreateNoteDialog(BuildContext context) {
-    final titleController = TextEditingController();
-    final contentController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Create Note'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: const InputDecoration(
-                labelText: 'Title',
-                hintText: 'Enter note title',
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            TextField(
-              controller: contentController,
-              decoration: const InputDecoration(
-                labelText: 'Content',
-                hintText: 'Enter note content',
-              ),
-              maxLines: 5,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
-          ),
-          CustomButton(
-            text: 'Create',
-            onPressed: () {
-              if (titleController.text.isNotEmpty) {
-                context.read<NotesBloc>().add(
-                  NoteCreate(
-                    title: titleController.text,
-                    content: contentController.text,
-                  ),
-                );
-                Navigator.of(dialogContext).pop();
-              }
-            },
-          ),
-        ],
       ),
     );
   }
