@@ -20,9 +20,9 @@ dependencies:
   database:
     path: ../../shared/database
 
-  # Other features (if needed)
-  # points:
-  #   path: ../points
+  # Other features
+  points:
+    path: ../points
   # challenges:
   #   path: ../challenges
 
