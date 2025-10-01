@@ -1,5 +1,6 @@
 import 'package:database/database.dart';
 import 'package:get_it/get_it.dart';
+import 'package:points/points.dart';
 
 import '../data/datasources/notes_local_datasource.dart';
 import '../data/repositories/notes_repository_impl.dart';
@@ -48,6 +49,7 @@ void initNotesFeature() {
       togglePinNote: getIt<TogglePinNote>(),
       toggleFavoriteNote: getIt<ToggleFavoriteNote>(),
       repository: getIt<NotesRepository>(),
+      pointsBloc: getIt<PointsBloc>(),
     ),
   );
 }

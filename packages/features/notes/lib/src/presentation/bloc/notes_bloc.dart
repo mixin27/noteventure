@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
+import 'package:points/points.dart';
 
 import '../../domain/repositories/notes_repository.dart';
 import '../../domain/usecases/create_note.dart';
@@ -21,6 +22,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   final TogglePinNote togglePinNote;
   final ToggleFavoriteNote toggleFavoriteNote;
   final NotesRepository repository;
+  final PointsBloc pointsBloc;
 
   NotesBloc({
     required this.getNotes,
@@ -31,6 +33,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     required this.togglePinNote,
     required this.toggleFavoriteNote,
     required this.repository,
+    required this.pointsBloc,
   }) : super(const NotesInitial()) {
     on<NotesLoad>(_onLoadNotes);
     on<NotesByCategoryLoad>(_onLoadNotesByCategory);
@@ -125,25 +128,71 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     NoteCreationRequest event,
     Emitter<NotesState> emit,
   ) async {
-    // Check if user has enough points
+    // Get point cost based on note type
     final pointCost = PointCosts.getCostForNoteType(event.noteType.name);
 
-    // This would normally get current points from PointsBloc or repository
-    // For now, we'll emit a challenge requirement
-    // In real implementation, this would check with points feature
+    // Check if user has enough points
+    pointsBloc.add(CheckPointsEvent(pointCost));
 
-    emit(
-      NoteActionRequiresChallenge(
-        action: 'create',
-        pointCost: pointCost,
-        currentPoints: 0, // todo(mixin27): Get from points feature
-      ),
-    );
+    // Wait for points check result
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    final pointsState = pointsBloc.state;
+
+    if (pointsState is PointsInsufficient) {
+      emit(
+        NoteActionRequiresChallenge(
+          action: 'create',
+          pointCost: pointCost,
+          currentPoints: pointsState.balance,
+        ),
+      );
+    } else if (pointsState is PointsSufficient) {
+      // User has enough points, but we still need them to spend
+      // We'll emit a state indicating they can proceed
+      emit(
+        NoteActionRequiresChallenge(
+          action: 'create',
+          pointCost: pointCost,
+          currentPoints: pointsState.balance,
+        ),
+      );
+    } else {
+      emit(const NotesError('Unable to check points'));
+    }
   }
 
   Future<void> _onCreateNote(NoteCreate event, Emitter<NotesState> emit) async {
     emit(NotesLoading());
 
+    // First, spend the points
+    final pointCost = PointCosts.getCostForNoteType(event.noteType.name);
+
+    pointsBloc.add(
+      SpendPointsEvent(
+        amount: pointCost,
+        reason: 'note_created',
+        description: 'Created ${event.noteType.displayName} note',
+      ),
+    );
+
+    // Wait for points to be spent
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    final pointsState = pointsBloc.state;
+
+    if (pointsState is PointsInsufficient) {
+      emit(
+        NoteActionRequiresChallenge(
+          action: 'create',
+          pointCost: pointCost,
+          currentPoints: pointsState.balance,
+        ),
+      );
+      return;
+    }
+
+    // Points spent successfully, create the note
     final params = CreateNoteParams(
       title: event.title,
       content: event.content,
@@ -173,19 +222,68 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   ) async {
     final pointCost = PointCosts.editNote;
 
-    emit(
-      NoteActionRequiresChallenge(
-        action: 'edit',
-        pointCost: pointCost,
-        currentPoints: 0, // todo(mixin27): Get from points feature
-        noteId: event.noteId,
-      ),
-    );
+    // Check if user has enough points
+    pointsBloc.add(CheckPointsEvent(pointCost));
+
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    final pointsState = pointsBloc.state;
+
+    if (pointsState is PointsInsufficient) {
+      emit(
+        NoteActionRequiresChallenge(
+          action: 'edit',
+          pointCost: pointCost,
+          currentPoints: pointsState.balance,
+          noteId: event.noteId,
+        ),
+      );
+    } else if (pointsState is PointsSufficient) {
+      emit(
+        NoteActionRequiresChallenge(
+          action: 'edit',
+          pointCost: pointCost,
+          currentPoints: pointsState.balance,
+          noteId: event.noteId,
+        ),
+      );
+    } else {
+      emit(const NotesError('Unable to check points'));
+    }
   }
 
   Future<void> _onUpdateNote(NoteUpdate event, Emitter<NotesState> emit) async {
     emit(NotesLoading());
 
+    // First, spend the points
+    final pointCost = PointCosts.editNote;
+
+    pointsBloc.add(
+      SpendPointsEvent(
+        amount: pointCost,
+        reason: 'note_edited',
+        description: 'Edited note',
+        relatedNoteId: event.id,
+      ),
+    );
+
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    final pointsState = pointsBloc.state;
+
+    if (pointsState is PointsInsufficient) {
+      emit(
+        NoteActionRequiresChallenge(
+          action: 'edit',
+          pointCost: pointCost,
+          currentPoints: pointsState.balance,
+          noteId: event.id,
+        ),
+      );
+      return;
+    }
+
+    // Points spent successfully, update the note
     final params = UpdateNoteParams(
       id: event.id,
       title: event.title,
@@ -212,15 +310,34 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     Emitter<NotesState> emit,
   ) async {
     final pointCost = PointCosts.previewNote;
+    // Check if user has enough points
+    pointsBloc.add(CheckPointsEvent(pointCost));
 
-    emit(
-      NoteActionRequiresChallenge(
-        action: 'preview',
-        pointCost: pointCost,
-        currentPoints: 0, // todo(mixin27): Get from points feature
-        noteId: event.noteId,
-      ),
-    );
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    final pointsState = pointsBloc.state;
+
+    if (pointsState is PointsInsufficient) {
+      emit(
+        NoteActionRequiresChallenge(
+          action: 'preview',
+          pointCost: pointCost,
+          currentPoints: pointsState.balance,
+          noteId: event.noteId,
+        ),
+      );
+    } else if (pointsState is PointsSufficient) {
+      emit(
+        NoteActionRequiresChallenge(
+          action: 'preview',
+          pointCost: pointCost,
+          currentPoints: pointsState.balance,
+          noteId: event.noteId,
+        ),
+      );
+    } else {
+      emit(const NotesError('Unable to check points'));
+    }
   }
 
   Future<void> _onRequestNoteDeletion(
@@ -229,19 +346,68 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   ) async {
     final pointCost = PointCosts.deleteNote;
 
-    emit(
-      NoteActionRequiresChallenge(
-        action: 'delete',
-        pointCost: pointCost,
-        currentPoints: 0, // todo(mixin27): Get from points feature
-        noteId: event.noteId,
-      ),
-    );
+    // Check if user has enough points
+    pointsBloc.add(CheckPointsEvent(pointCost));
+
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    final pointsState = pointsBloc.state;
+
+    if (pointsState is PointsInsufficient) {
+      emit(
+        NoteActionRequiresChallenge(
+          action: 'delete',
+          pointCost: pointCost,
+          currentPoints: pointsState.balance,
+          noteId: event.noteId,
+        ),
+      );
+    } else if (pointsState is PointsSufficient) {
+      emit(
+        NoteActionRequiresChallenge(
+          action: 'delete',
+          pointCost: pointCost,
+          currentPoints: pointsState.balance,
+          noteId: event.noteId,
+        ),
+      );
+    } else {
+      emit(const NotesError('Unable to check points'));
+    }
   }
 
   Future<void> _onDeleteNote(NoteDelete event, Emitter<NotesState> emit) async {
     emit(NotesLoading());
 
+    // First, spend the points
+    final pointCost = PointCosts.deleteNote;
+
+    pointsBloc.add(
+      SpendPointsEvent(
+        amount: pointCost,
+        reason: 'note_deleted',
+        description: 'Deleted note',
+        relatedNoteId: event.noteId,
+      ),
+    );
+
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    final pointsState = pointsBloc.state;
+
+    if (pointsState is PointsInsufficient) {
+      emit(
+        NoteActionRequiresChallenge(
+          action: 'delete',
+          pointCost: pointCost,
+          currentPoints: pointsState.balance,
+          noteId: event.noteId,
+        ),
+      );
+      return;
+    }
+
+    // Points spent successfully, delete the note
     final result = await deleteNoteUseCase(event.noteId);
 
     result.fold((failure) => emit(NotesError(failure.message)), (_) {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 /// Base class for all app events
 abstract class AppEvent {
@@ -21,11 +22,15 @@ class AppEventBus {
 
   /// Get typed event stream
   Stream<T> on<T extends AppEvent>() {
+    _controller.stream.last.then((value) {
+      log('Event received: ${value.timestamp} - last');
+    });
     return _controller.stream.where((event) => event is T).cast<T>();
   }
 
   /// Emit an event
   void emit(AppEvent event) {
+    log('Event emitted: ${event.timestamp}');
     if (!_controller.isClosed) {
       _controller.add(event);
     }
