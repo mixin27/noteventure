@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:points/points.dart';
 import 'package:ui/ui.dart';
 import 'package:core/core.dart';
 import 'package:notes/notes.dart';
 
 import '../di/injection.dart';
+import '../routes/route_constants.dart';
 
 class NotesPage extends StatelessWidget {
   const NotesPage({super.key});
@@ -170,7 +172,9 @@ class NotesView extends StatelessWidget {
                       delay: Duration(milliseconds: 50 * index),
                       child: CustomCard(
                         onTap: () {
-                          // todo(mixin27): Navigate to note detail
+                          context.push(
+                            '${RouteConstants.noteDetail}/${note.id}',
+                          );
                         },
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,63 +268,10 @@ class NotesView extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          _showCreateNoteDialog(context);
+          context.push(RouteConstants.noteCreate);
         },
         icon: const Icon(Icons.add),
         label: const Text('New Note'),
-      ),
-    );
-  }
-
-  void _showCreateNoteDialog(BuildContext context) {
-    final titleController = TextEditingController();
-    final contentController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Create Note'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: const InputDecoration(
-                labelText: 'Title',
-                hintText: 'Enter note title',
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            TextField(
-              controller: contentController,
-              decoration: const InputDecoration(
-                labelText: 'Content',
-                hintText: 'Enter note content',
-              ),
-              maxLines: 5,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
-          ),
-          CustomButton(
-            text: 'Create',
-            onPressed: () {
-              if (titleController.text.isNotEmpty) {
-                context.read<NotesBloc>().add(
-                  NoteCreate(
-                    title: titleController.text,
-                    content: contentController.text,
-                  ),
-                );
-                Navigator.of(dialogContext).pop();
-              }
-            },
-          ),
-        ],
       ),
     );
   }
@@ -432,10 +383,7 @@ class NotesView extends StatelessWidget {
             text: 'Earn Points',
             onPressed: () {
               Navigator.of(dialogContext).pop();
-              // todo(mixin27): Navigate to challenges
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Challenge system coming soon!')),
-              );
+              context.push(RouteConstants.challenges);
             },
             icon: const Icon(
               Icons.psychology_outlined,

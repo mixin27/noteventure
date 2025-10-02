@@ -7,12 +7,14 @@ import 'package:path/path.dart' as p;
 import 'package:injectable/injectable.dart';
 
 import 'daos/achievements_dao.dart';
+import 'daos/app_settings_dao.dart';
 import 'daos/notes_dao.dart';
 import 'daos/point_transactions_dao.dart';
 import 'daos/themes_dao.dart';
 import 'daos/user_progress_dao.dart';
 import 'tables/achievements_table.dart';
 import 'tables/active_effects_table.dart';
+import 'tables/app_settings_table.dart';
 import 'tables/categories_table.dart';
 import 'tables/challenge_history_table.dart';
 import 'tables/challenge_questions_table.dart';
@@ -39,6 +41,7 @@ part 'app_database.g.dart';
     ChallengeHistory,
     DailyChallenges,
     ChallengeQuestions,
+    AppSettings,
   ],
   daos: [
     NotesDao,
@@ -46,6 +49,7 @@ part 'app_database.g.dart';
     UserProgressDao,
     AchievementsDao,
     ThemesDao,
+    AppSettingsDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {

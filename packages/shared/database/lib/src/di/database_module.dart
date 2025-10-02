@@ -1,6 +1,7 @@
 import 'package:injectable/injectable.dart';
 
 import '../app_database.dart';
+import '../daos/app_settings_dao.dart';
 import '../daos/notes_dao.dart';
 import '../daos/user_progress_dao.dart';
 import '../daos/point_transactions_dao.dart';
@@ -27,4 +28,7 @@ abstract class DatabaseModule {
 
   @singleton
   ThemesDao themesDao(AppDatabase db) => ThemesDao(db);
+
+  @singleton
+  AppSettingsDao appSettingsDao(AppDatabase db) => AppSettingsDao(db);
 }

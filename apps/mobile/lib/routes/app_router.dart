@@ -1,6 +1,12 @@
+import 'package:challenges/challenges.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:notes/notes.dart';
+import 'package:points/points.dart';
+import 'package:progress/progress.dart';
 
+import '../di/injection.dart';
 import '../pages/home_page.dart';
 import '../pages/notes_page.dart';
 import '../pages/splash_page.dart';
@@ -24,6 +30,66 @@ class AppRouter {
         path: RouteConstants.notes,
         name: RouteConstants.notesName,
         builder: (context, state) => const NotesPage(),
+      ),
+      GoRoute(
+        path: '${RouteConstants.noteDetail}/:id',
+        name: RouteConstants.noteDetailName,
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => getIt<PointsBloc>()..add(LoadPointBalance()),
+              ),
+              BlocProvider(create: (_) => getIt<NotesBloc>()..add(NotesLoad())),
+            ],
+            child: NoteDetailPage(noteId: id),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteConstants.noteCreate,
+        name: RouteConstants.noteCreateName,
+        builder: (context, state) {
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => getIt<PointsBloc>()..add(LoadPointBalance()),
+              ),
+              BlocProvider(create: (_) => getIt<NotesBloc>()),
+            ],
+            child: const NoteEditorPage(),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteConstants.challenges,
+        name: RouteConstants.challengesName,
+        builder: (context, state) {
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => getIt<PointsBloc>()..add(LoadPointBalance()),
+              ),
+              BlocProvider(create: (_) => getIt<ChallengeBloc>()),
+            ],
+            child: const ChallengesMenuPage(),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteConstants.progress,
+        name: RouteConstants.progressName,
+        builder: (context, state) {
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => getIt<ProgressBloc>()..add(LoadUserProgress()),
+              ),
+            ],
+            child: const ProgressPage(),
+          );
+        },
       ),
     ],
     errorBuilder: (context, state) =>
