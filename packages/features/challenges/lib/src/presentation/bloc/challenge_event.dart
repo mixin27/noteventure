@@ -28,4 +28,13 @@ final class SubmitChallengeAnswer extends ChallengeEvent {
   List<Object?> get props => [answer];
 }
 
+final class UpdateTimeLimit extends ChallengeEvent {
+  final int timeLimit;
+
+  const UpdateTimeLimit(this.timeLimit);
+
+  @override
+  List<Object?> get props => [timeLimit];
+}
+
 final class ResetChallenge extends ChallengeEvent {}

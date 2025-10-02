@@ -237,3 +237,8 @@ class AppErrorEvent extends AppEvent {
 
   AppErrorEvent({required this.error, this.stackTrace});
 }
+
+class SettingsChangedEvent extends AppEvent {
+  final dynamic settings; // AppSettings from settings feature
+  SettingsChangedEvent(this.settings);
+}

@@ -1,13 +1,13 @@
-name: challenges
+name: settings
 description: "A new Flutter package project."
 version: 0.0.1
 publish_to: none
 
+resolution: workspace
+
 environment:
   sdk: ^3.9.2
   flutter: ">=1.17.0"
-
-resolution: workspace
 
 dependencies:
   flutter:
@@ -19,12 +19,6 @@ dependencies:
     path: ../../shared/ui
   database:
     path: ../../shared/database
-
-  # Other features
-  points:
-    path: ../points
-  settings:
-    path: ../settings
 
   # State Management
   bloc: ^9.0.1
@@ -43,6 +37,7 @@ dependencies:
   # Utilities
   dartz: ^0.10.1
   json_annotation: ^4.9.0
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

@@ -35,6 +35,30 @@ class Challenge extends Equatable {
     xpReward,
     timeLimit,
   ];
+
+  Challenge copyWith({
+    String? id,
+    ChallengeType? type,
+    String? difficulty,
+    String? question,
+    String? correctAnswer,
+    List<String>? options,
+    int? pointReward,
+    int? xpReward,
+    int? timeLimit,
+  }) {
+    return Challenge(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      difficulty: difficulty ?? this.difficulty,
+      question: question ?? this.question,
+      correctAnswer: correctAnswer ?? this.correctAnswer,
+      options: options ?? this.options,
+      pointReward: pointReward ?? this.pointReward,
+      xpReward: xpReward ?? this.xpReward,
+      timeLimit: timeLimit ?? this.timeLimit,
+    );
+  }
 }
 
 enum ChallengeType {

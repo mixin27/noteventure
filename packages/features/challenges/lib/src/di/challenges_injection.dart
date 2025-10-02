@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:points/points.dart';
+import 'package:settings/settings.dart';
 
 import '../domain/usecases/generate_challenge.dart';
 import '../domain/usecases/submit_answer.dart';
@@ -18,6 +19,7 @@ void initChallengesFeature() {
       generateChallenge: getIt<GenerateChallenge>(),
       submitAnswer: getIt<SubmitAnswer>(),
       pointsBloc: getIt<PointsBloc>(),
+      watchSettings: getIt<WatchSettings>(),
     ),
   );
 }

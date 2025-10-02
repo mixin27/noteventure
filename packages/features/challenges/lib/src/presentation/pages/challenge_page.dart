@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,6 +26,21 @@ class _ChallengePageState extends State<ChallengePage> {
   final TextEditingController _answerController = TextEditingController();
   Timer? _timer;
   int _secondsRemaining = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Generate initial challenge when page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ChallengeBloc>().add(
+        GenerateNewChallenge(
+          type: widget.challengeType,
+          difficulty: widget.difficulty,
+        ),
+      );
+    });
+  }
 
   @override
   void dispose() {
@@ -85,8 +101,10 @@ class _ChallengePageState extends State<ChallengePage> {
       ),
       body: BlocConsumer<ChallengeBloc, ChallengeState>(
         listener: (context, state) {
+          log('[ChallengePage]: ${state.toString()}');
           if (state is ChallengeReady) {
             _answerController.clear();
+            log('[ChallengePage]: timeLimit: ${state.challenge.timeLimit}');
             _startTimer(state.challenge.timeLimit);
           } else if (state is ChallengeCorrect || state is ChallengeIncorrect) {
             _timer?.cancel();
