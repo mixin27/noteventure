@@ -1,5 +1,14 @@
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
+library;
+
+// Domain - Entities
+export 'src/domain/entities/user_progress.dart';
+
+// Presentation - BLoC
+export 'src/presentation/bloc/progress_bloc.dart';
+export 'src/presentation/bloc/progress_event.dart';
+export 'src/presentation/bloc/progress_state.dart';
+export 'src/presentation/pages/progress_page.dart';
+export 'src/presentation/widgets/progress_view.dart';
+
+// DI
+export 'src/di/progress_injection.dart' hide getIt;

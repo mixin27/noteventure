@@ -8,6 +8,7 @@ class RouteConstants {
   static const String noteDetail = '/notes/detail';
   static const String noteCreate = '/notes/create';
   static const String challenges = '/challenges';
+  static const String progress = '/progress';
 
   // Route names
   static const String splashName = 'splash';
@@ -16,4 +17,5 @@ class RouteConstants {
   static const String noteDetailName = 'note_detail';
   static const String noteCreateName = 'note_create';
   static const String challengesName = 'challenges';
+  static const String progressName = 'progress';
 }

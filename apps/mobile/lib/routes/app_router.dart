@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:notes/notes.dart';
 import 'package:points/points.dart';
+import 'package:progress/progress.dart';
 
 import '../di/injection.dart';
 import '../pages/home_page.dart';
@@ -73,6 +74,20 @@ class AppRouter {
               BlocProvider(create: (_) => getIt<ChallengeBloc>()),
             ],
             child: const ChallengesMenuPage(),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteConstants.progress,
+        name: RouteConstants.progressName,
+        builder: (context, state) {
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => getIt<ProgressBloc>()..add(LoadUserProgress()),
+              ),
+            ],
+            child: const ProgressPage(),
           );
         },
       ),

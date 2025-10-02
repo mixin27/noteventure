@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:points/points.dart';
+import 'package:progress/progress.dart';
 import 'package:ui/ui.dart';
 import 'package:core/core.dart';
 import 'package:notes/notes.dart';
@@ -19,6 +20,9 @@ class HomePage extends StatelessWidget {
           create: (_) => getIt<PointsBloc>()..add(LoadPointBalance()),
         ),
         BlocProvider(create: (_) => getIt<NotesBloc>()..add(NotesLoad())),
+        BlocProvider(
+          create: (_) => getIt<ProgressBloc>()..add(LoadUserProgress()),
+        ),
       ],
       child: const HomeView(),
     );
@@ -81,9 +85,18 @@ class HomeView extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: AppSpacing.md),
-                            LevelDisplay(
-                              level: 1, // todo(mixin27): Get from ProgressBloc
-                              isCompact: false,
+                            BlocBuilder<ProgressBloc, ProgressState>(
+                              buildWhen: (previous, current) =>
+                                  current is ProgressLoaded,
+                              builder: (context, state) {
+                                final userProgress = state is ProgressLoaded
+                                    ? state.progress
+                                    : null;
+                                return LevelDisplay(
+                                  level: userProgress?.level ?? 0,
+                                  isCompact: false,
+                                );
+                              },
                             ),
                           ],
                         );
@@ -92,9 +105,17 @@ class HomeView extends StatelessWidget {
                     const SizedBox(height: AppSpacing.lg),
 
                     // XP Progress
-                    XpProgressBar(
-                      currentXp: 50, // todo(mixin27): Get from ProgressBloc
-                      xpToNextLevel: 100,
+                    BlocBuilder<ProgressBloc, ProgressState>(
+                      builder: (context, state) {
+                        final userProgress = state is ProgressLoaded
+                            ? state.progress
+                            : null;
+
+                        return XpProgressBar(
+                          currentXp: userProgress?.currentXp ?? 0,
+                          xpToNextLevel: userProgress?.xpToNextLevel ?? 0,
+                        );
+                      },
                     ),
                     const SizedBox(height: AppSpacing.lg),
 

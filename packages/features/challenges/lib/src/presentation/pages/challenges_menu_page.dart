@@ -6,7 +6,7 @@ import 'package:points/points.dart';
 import '../../domain/entities/challenge.dart';
 import '../bloc/challenge_bloc.dart';
 import '../bloc/challenge_event.dart';
-import 'challenge_screen.dart';
+import 'challenge_page.dart';
 
 class ChallengesMenuPage extends StatelessWidget {
   const ChallengesMenuPage({super.key});
@@ -393,7 +393,7 @@ class ChallengesMenuPage extends StatelessWidget {
           value: context.read<ChallengeBloc>(),
           child: BlocProvider.value(
             value: context.read<PointsBloc>(),
-            child: ChallengeScreen(challengeType: type, difficulty: difficulty),
+            child: ChallengePage(challengeType: type, difficulty: difficulty),
           ),
         ),
       ),

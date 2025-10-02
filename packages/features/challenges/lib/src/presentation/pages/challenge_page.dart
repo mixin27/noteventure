@@ -11,17 +11,17 @@ import '../bloc/challenge_bloc.dart';
 import '../bloc/challenge_event.dart';
 import '../bloc/challenge_state.dart';
 
-class ChallengeScreen extends StatefulWidget {
+class ChallengePage extends StatefulWidget {
   final ChallengeType? challengeType;
   final String? difficulty;
 
-  const ChallengeScreen({super.key, this.challengeType, this.difficulty});
+  const ChallengePage({super.key, this.challengeType, this.difficulty});
 
   @override
-  State<ChallengeScreen> createState() => _ChallengeScreenState();
+  State<ChallengePage> createState() => _ChallengePageState();
 }
 
-class _ChallengeScreenState extends State<ChallengeScreen> {
+class _ChallengePageState extends State<ChallengePage> {
   final TextEditingController _answerController = TextEditingController();
   Timer? _timer;
   int _secondsRemaining = 0;
