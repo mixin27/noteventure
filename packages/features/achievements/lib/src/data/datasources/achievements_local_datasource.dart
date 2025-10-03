@@ -54,12 +54,11 @@ class AchievementsLocalDataSourceImpl implements AchievementsLocalDataSource {
 
   @override
   Future<void> initializeAchievements() async {
-    // final count = await achievementsDao.getAchievementsCount();
-    // if (count == 0) {
-    //   // Insert default achievements
-    //   await achievementsDao.insertDefaultAchievements();
-    // }
-    throw UnimplementedError();
+    final count = await achievementsDao.getAchievementsCount();
+    if (count == 0) {
+      // Insert default achievements
+      await achievementsDao.insertDefaultAchievements();
+    }
   }
 
   @override

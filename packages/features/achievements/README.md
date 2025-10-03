@@ -1,39 +1,31 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Achievements
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
+## Achievement Keys Reference
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
+Challenge Achievements:
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+- first_challenge: Complete your first challenge (1)
+- challenge_master: Complete 100 challenges (100)
+- speed_demon: Solve 10 challenges in under 5 seconds (10)
+- risk_taker: Win 5 double-or-nothing challenges (5)
 
-## Features
+Note Achievements:
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- first_note: Create your first note (1)
+- note_hoarder: Create 50 notes (50)
+- deletion_king: Delete 20 notes (20)
 
-## Getting started
+Streak Achievements:
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+- streak_starter: Maintain a 3-day streak (3)
+- streak_master: Maintain a 30-day streak (30)
 
-## Usage
+Level Achievements:
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+- level_10: Reach level 10 (10)
+- level_50: Reach level 50 (50)
 
-```dart
-const like = 'sample';
-```
+Points Achievements:
 
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+- point_collector: Earn 1,000 total points (1000)
+- point_master: Earn 10,000 total points (10000)

@@ -36,9 +36,9 @@ class ProgressBloc extends Bloc<ProgressEvent, ProgressState> {
 
   void _listenToEvents() {
     // Listen for XP gains
-    _xpEventSubscription = AppEventBus().on<XpGainedEvent>().listen((event) {
-      add(AddXpEvent(event.amount));
-    });
+    // _xpEventSubscription = AppEventBus().on<XpGainedEvent>().listen((event) {
+    //   add(AddXpEvent(event.amount));
+    // });
 
     // Listen for note events to update stats
     _noteEventSubscription = AppEventBus().on<NoteCreatedEvent>().listen((_) {
@@ -49,13 +49,17 @@ class ProgressBloc extends Bloc<ProgressEvent, ProgressState> {
     // Listen for challenge events
     _challengeEventSubscription = AppEventBus()
         .on<ChallengeCompletedEvent>()
-        .listen((event) {
+        .listen((event) async {
           if (event.wasCorrect) {
-            repository.incrementChallengesSolved();
-            add(UpdateStreakEvent(true));
+            await repository.incrementChallengesSolved();
+            await addXp(event.xpEarned);
+
+            // Then reload once
+            add(LoadUserProgress());
           } else {
-            repository.incrementChallengesFailed();
-            add(UpdateStreakEvent(false));
+            await repository.incrementChallengesFailed();
+            // Then reload once
+            add(LoadUserProgress());
           }
         });
   }

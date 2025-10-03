@@ -27,8 +27,9 @@ class NoteventureApp extends StatelessWidget {
           create: (context) => getIt<ProgressBloc>()..add(LoadUserProgress()),
         ),
         BlocProvider(
-          create: (context) =>
-              getIt<AchievementsBloc>()..add(LoadAchievements()),
+          create: (context) => getIt<AchievementsBloc>()
+            ..add(InitializeAchievementsEvent())
+            ..add(LoadAchievements()),
         ),
         BlocProvider(
           create: (context) => getIt<SettingsBloc>()..add(LoadSettings()),

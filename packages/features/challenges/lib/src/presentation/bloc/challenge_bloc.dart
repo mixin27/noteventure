@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
@@ -34,7 +33,6 @@ class ChallengeBloc extends Bloc<ChallengeEvent, ChallengeState> {
     // Subscribe to settings stream directly - NO EventBus!
     _settingsSubscription = watchSettings().listen((settings) {
       _currentTimeLimit = settings.challengeTimeLimit;
-      log('[ChallengeBloc]: timeLimit: $_currentTimeLimit');
 
       if (!isClosed) {
         add(UpdateTimeLimit(_currentTimeLimit));
@@ -123,6 +121,13 @@ class ChallengeBloc extends Bloc<ChallengeEvent, ChallengeState> {
             pointsEarned: challenge.pointReward,
             xpEarned: challenge.xpReward,
             challengeType: challenge.type.name,
+          ),
+        );
+
+        AppEventBus().emit(
+          XpGainedEvent(
+            amount: challenge.xpReward,
+            source: 'challenge_completed',
           ),
         );
       } else {

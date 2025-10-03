@@ -132,7 +132,10 @@ class AchievementsBloc extends Bloc<AchievementsEvent, AchievementsState> {
       // Update various challenge-related achievements
       _checkAndUpdateAchievement('first_challenge', 1);
       _checkAndUpdateAchievement('challenge_master', 1);
-      _checkAndUpdateAchievement('speed_demon', 1); // Need to check time
+      _checkAndUpdateAchievement(
+        'speed_demon',
+        1,
+      ); // todo(mixin27): Need to check time within 10sec
     }
   }
 

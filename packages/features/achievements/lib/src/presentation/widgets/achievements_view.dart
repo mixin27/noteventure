@@ -6,6 +6,7 @@ import '../../domain/entities/achievement.dart';
 import '../bloc/achievements_bloc.dart';
 import '../bloc/achievements_event.dart';
 import '../bloc/achievements_state.dart';
+import 'achievement_card.dart';
 
 class AchievementsView extends StatefulWidget {
   const AchievementsView({super.key});
@@ -85,7 +86,8 @@ class _AchievementsViewState extends State<AchievementsView>
   }
 
   Widget _buildProgressHeader(BuildContext context, AchievementsLoaded state) {
-    // final theme = Theme.of(context);
+    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
@@ -102,13 +104,50 @@ class _AchievementsViewState extends State<AchievementsView>
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [Text("TEST LEFT")],
+                children: [
+                  Text(
+                    'Your Progress',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.9),
+                    ),
+                  ),
+                  Text(
+                    '${state.unlockedCount} / ${state.totalAchievements}',
+                    style: theme.textTheme.displaySmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [Text("TEST RIGHT")],
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.2),
+                ),
+                child: Center(
+                  child: Text(
+                    '${state.completionPercentage.toInt()}%',
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
             ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+            child: LinearProgressIndicator(
+              value: state.completionPercentage / 100,
+              minHeight: 12,
+              backgroundColor: Colors.white.withValues(alpha: 0.3),
+              valueColor: const AlwaysStoppedAnimation(Colors.white),
+            ),
           ),
         ],
       ),
@@ -116,6 +155,25 @@ class _AchievementsViewState extends State<AchievementsView>
   }
 
   Widget _buildAchievementsList(List<Achievement> achievements) {
-    return Center(child: Text("achievements list"));
+    if (achievements.isEmpty) {
+      return const Center(
+        child: EmptyState(
+          icon: Icons.emoji_events,
+          title: 'No achievements here',
+          message: 'Keep playing to unlock achievements!',
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      itemCount: achievements.length,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+          child: AchievementCard(achievement: achievements[index]),
+        );
+      },
+    );
   }
 }
