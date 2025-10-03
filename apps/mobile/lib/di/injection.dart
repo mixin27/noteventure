@@ -1,9 +1,11 @@
+import 'package:achievements/achievements.dart';
 import 'package:challenges/challenges.dart';
 import 'package:get_it/get_it.dart';
 import 'package:database/database.dart';
 import 'package:notes/notes.dart';
 import 'package:points/points.dart';
 import 'package:progress/progress.dart';
+import 'package:settings/settings.dart';
 
 final getIt = GetIt.instance;
 
@@ -16,10 +18,14 @@ Future<void> configureDependencies() async {
   getIt.registerSingleton<NotesDao>(NotesDao(database));
   getIt.registerSingleton<UserProgressDao>(UserProgressDao(database));
   getIt.registerSingleton<PointTransactionsDao>(PointTransactionsDao(database));
+  getIt.registerSingleton<AchievementsDao>(AchievementsDao(database));
+  getIt.registerSingleton<AppSettingsDao>(AppSettingsDao(database));
 
   // Initialize features
   initNotesFeature();
   initPointsFeature();
   initChallengesFeature();
   initProgressFeature();
+  initAchievementsFeature();
+  initSettingsDependencies();
 }

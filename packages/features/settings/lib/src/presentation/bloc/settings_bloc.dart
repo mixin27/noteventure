@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 
+import '../../domain/entities/app_settings.dart';
 import '../../domain/usecases/get_settings.dart';
 import '../../domain/usecases/reset_settings.dart';
 import '../../domain/usecases/update_settings.dart';
@@ -33,7 +34,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     // Watch for settings changes
     watchSettings().listen((settings) {
-      add(SettingsUpdated(settings));
+      if (!isClosed) {
+        add(SettingsUpdated(settings));
+      }
     });
   }
 
@@ -164,7 +167,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   }
 
   Future<void> _updateAndEmit(
-    dynamic newSettings,
+    AppSettings newSettings,
     Emitter<SettingsState> emit,
   ) async {
     final result = await updateSettings(newSettings);

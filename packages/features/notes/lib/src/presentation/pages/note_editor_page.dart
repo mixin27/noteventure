@@ -89,7 +89,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
       },
       child: PopScope(
         onPopInvokedWithResult: (didPop, result) {
-          if (didPop) {
+          if (!didPop) {
             _onWillPop(context);
           }
         },

@@ -36,6 +36,8 @@ dependencies:
     path: ../../packages/features/chaos
   themes:
     path: ../../packages/features/themes
+  settings:
+    path: ../../packages/features/settings
 
   #  State management
   flutter_bloc: ^9.1.1

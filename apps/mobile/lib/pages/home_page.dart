@@ -6,31 +6,11 @@ import 'package:progress/progress.dart';
 import 'package:ui/ui.dart';
 import 'package:core/core.dart';
 import 'package:notes/notes.dart';
+
 import '../routes/route_constants.dart';
-import '../di/injection.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (_) => getIt<PointsBloc>()..add(LoadPointBalance()),
-        ),
-        BlocProvider(create: (_) => getIt<NotesBloc>()..add(NotesLoad())),
-        BlocProvider(
-          create: (_) => getIt<ProgressBloc>()..add(LoadUserProgress()),
-        ),
-      ],
-      child: const HomeView(),
-    );
-  }
-}
-
-class HomeView extends StatelessWidget {
-  const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +38,7 @@ class HomeView extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.settings),
                   onPressed: () {
-                    // todo(mixin27): Implement settings
+                    context.push(RouteConstants.settings);
                   },
                 ),
               ],
@@ -173,7 +153,7 @@ class HomeView extends StatelessWidget {
                         Expanded(
                           child: CustomCard(
                             onTap: () {
-                              // todo(mixin27): Navigate to achievements
+                              context.push(RouteConstants.achievements);
                             },
                             child: Column(
                               children: [
