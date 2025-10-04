@@ -1,5 +1,6 @@
 import 'package:achievements/achievements.dart';
 import 'package:challenges/challenges.dart';
+import 'package:chaos/chaos.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notes/notes.dart';
@@ -31,6 +32,10 @@ class NoteventureApp extends StatelessWidget {
           create: (context) => getIt<AchievementsBloc>()
             ..add(InitializeAchievementsEvent())
             ..add(LoadAchievements()),
+        ),
+        BlocProvider(
+          create: (context) =>
+              getIt<ChaosBloc>()..add(const LoadRecentEvents(limit: 20)),
         ),
         BlocProvider(
           create: (context) => getIt<ThemesBloc>()

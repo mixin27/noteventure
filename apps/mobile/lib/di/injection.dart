@@ -1,5 +1,6 @@
 import 'package:achievements/achievements.dart';
 import 'package:challenges/challenges.dart';
+import 'package:chaos/chaos.dart';
 import 'package:get_it/get_it.dart';
 import 'package:database/database.dart';
 import 'package:notes/notes.dart';
@@ -20,6 +21,7 @@ Future<void> configureDependencies() async {
   getIt.registerSingleton<UserProgressDao>(UserProgressDao(database));
   getIt.registerSingleton<PointTransactionsDao>(PointTransactionsDao(database));
   getIt.registerSingleton<AchievementsDao>(AchievementsDao(database));
+  getIt.registerSingleton<ChaosEventsDao>(ChaosEventsDao(database));
   getIt.registerSingleton<ThemesDao>(ThemesDao(database));
   getIt.registerSingleton<AppSettingsDao>(AppSettingsDao(database));
 
@@ -29,6 +31,7 @@ Future<void> configureDependencies() async {
   initChallengesFeature();
   initProgressFeature();
   initAchievementsFeature();
+  initChaosDependencies();
   initThemesFeature();
   initSettingsDependencies();
 }

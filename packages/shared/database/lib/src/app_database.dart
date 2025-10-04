@@ -8,6 +8,7 @@ import 'package:injectable/injectable.dart';
 
 import 'daos/achievements_dao.dart';
 import 'daos/app_settings_dao.dart';
+import 'daos/chaos_events_dao.dart';
 import 'daos/notes_dao.dart';
 import 'daos/point_transactions_dao.dart';
 import 'daos/themes_dao.dart';
@@ -48,6 +49,7 @@ part 'app_database.g.dart';
     PointTransactionsDao,
     UserProgressDao,
     AchievementsDao,
+    ChaosEventsDao,
     ThemesDao,
     AppSettingsDao,
   ],
