@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:notes/notes.dart';
 import 'package:progress/progress.dart';
 import 'package:settings/settings.dart';
+import 'package:themes/themes.dart';
 
 import '../pages/home_page.dart';
 import '../pages/notes_page.dart';
@@ -57,6 +58,11 @@ class AppRouter {
         path: RouteConstants.achievements,
         name: RouteConstants.achievementsName,
         builder: (context, state) => const AchievementsPage(),
+      ),
+      GoRoute(
+        path: RouteConstants.themes,
+        name: RouteConstants.themesName,
+        builder: (context, state) => const ThemesPage(),
       ),
       GoRoute(
         path: RouteConstants.settings,

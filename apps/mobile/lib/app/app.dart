@@ -6,7 +6,8 @@ import 'package:notes/notes.dart';
 import 'package:points/points.dart';
 import 'package:progress/progress.dart';
 import 'package:settings/settings.dart';
-import 'package:ui/ui.dart';
+import 'package:themes/themes.dart';
+import 'package:ui/ui.dart' as ui;
 
 import '../di/injection.dart';
 import '../routes/app_router.dart';
@@ -32,39 +33,61 @@ class NoteventureApp extends StatelessWidget {
             ..add(LoadAchievements()),
         ),
         BlocProvider(
+          create: (context) => getIt<ThemesBloc>()
+            ..add(InitializeThemesEvent())
+            ..add(LoadThemes()),
+        ),
+        BlocProvider(
           create: (context) => getIt<SettingsBloc>()..add(LoadSettings()),
         ),
       ],
 
       child: BlocBuilder<SettingsBloc, SettingsState>(
-        builder: (context, state) {
-          // Determine theme mode from settings
-          ThemeMode themeMode = ThemeMode.system;
+        builder: (context, settingsState) {
+          return BlocBuilder<ThemesBloc, ThemesState>(
+            builder: (context, themesState) {
+              // Get theme mode from settings
+              ThemeMode themeMode = ThemeMode.system;
+              if (settingsState is SettingsLoaded) {
+                themeMode = _parseThemeMode(settingsState.settings.themeMode);
+              }
 
-          if (state is SettingsLoaded) {
-            switch (state.settings.themeMode) {
-              case 'light':
-                themeMode = ThemeMode.light;
-                break;
-              case 'dark':
-                themeMode = ThemeMode.dark;
-                break;
-              case 'system':
-                themeMode = ThemeMode.system;
-                break;
-            }
-          }
+              // Get active theme colors
+              ThemeData customLightTheme = ui.AppTheme.lightTheme;
+              ThemeData customDarkTheme = ui.AppTheme.darkTheme;
 
-          return MaterialApp.router(
-            title: 'Noteventure',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeMode,
-            routerConfig: AppRouter.router,
+              if (themesState is ThemesLoaded &&
+                  themesState.activeTheme != null) {
+                final activeTheme = themesState.activeTheme!;
+                customLightTheme = activeTheme.toCustomLightTheme();
+                customDarkTheme = activeTheme.toCustomDarkTheme();
+              }
+
+              return MaterialApp.router(
+                title: 'Noteventure',
+                debugShowCheckedModeBanner: false,
+                theme: customLightTheme,
+                darkTheme: customDarkTheme,
+                themeMode: themeMode,
+                routerConfig: AppRouter.router,
+              );
+            },
           );
         },
       ),
     );
+  }
+
+  ThemeMode _parseThemeMode(String mode) {
+    switch (mode) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      case 'system':
+        return ThemeMode.system;
+      default:
+        return ThemeMode.system;
+    }
   }
 }

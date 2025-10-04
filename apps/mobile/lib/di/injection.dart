@@ -6,6 +6,7 @@ import 'package:notes/notes.dart';
 import 'package:points/points.dart';
 import 'package:progress/progress.dart';
 import 'package:settings/settings.dart';
+import 'package:themes/themes.dart';
 
 final getIt = GetIt.instance;
 
@@ -19,6 +20,7 @@ Future<void> configureDependencies() async {
   getIt.registerSingleton<UserProgressDao>(UserProgressDao(database));
   getIt.registerSingleton<PointTransactionsDao>(PointTransactionsDao(database));
   getIt.registerSingleton<AchievementsDao>(AchievementsDao(database));
+  getIt.registerSingleton<ThemesDao>(ThemesDao(database));
   getIt.registerSingleton<AppSettingsDao>(AppSettingsDao(database));
 
   // Initialize features
@@ -27,5 +29,6 @@ Future<void> configureDependencies() async {
   initChallengesFeature();
   initProgressFeature();
   initAchievementsFeature();
+  initThemesFeature();
   initSettingsDependencies();
 }

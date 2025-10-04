@@ -75,7 +75,7 @@ class CustomButton extends StatelessWidget {
                 icon!,
                 const SizedBox(width: AppSpacing.sm),
               ],
-              Expanded(child: Text(text, textAlign: TextAlign.center)),
+              Text(text, overflow: TextOverflow.ellipsis),
             ],
           );
 

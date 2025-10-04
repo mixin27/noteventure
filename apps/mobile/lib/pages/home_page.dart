@@ -48,6 +48,7 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.all(AppSpacing.md),
               sliver: SliverToBoxAdapter(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Points and Level Display
                     BlocBuilder<PointsBloc, PointsState>(
@@ -175,7 +176,7 @@ class HomePage extends StatelessWidget {
                         Expanded(
                           child: CustomCard(
                             onTap: () {
-                              // todo(mixin27): Navigate to themes
+                              context.push(RouteConstants.themes);
                             },
                             child: Column(
                               children: [
