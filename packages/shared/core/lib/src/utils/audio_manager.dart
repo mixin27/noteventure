@@ -1,93 +1,95 @@
+import 'dart:developer';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 
 /// Utility class for managing audio in the app
-/// Note: Actual implementation will use audioplayers/just_audio
 class AudioManager {
-  // Prevent instantiation
-  AudioManager._();
+  static final AudioManager _instance = AudioManager._internal();
+  factory AudioManager() => _instance;
+  AudioManager._internal();
 
-  static bool _soundEnabled = true;
-  static double _volume = 0.7;
+  final AudioPlayer _player = AudioPlayer();
+  bool _soundEnabled = true;
+  double _volume = 0.7;
+  bool _isInitialized = false;
 
-  // Sound file paths
-  static const String correctSound = 'assets/sounds/correct.mp3';
-  static const String incorrectSound = 'assets/sounds/incorrect.mp3';
-  static const String pointsEarnedSound = 'assets/sounds/points_earned.mp3';
-  static const String pointsSpentSound = 'assets/sounds/points_spent.mp3';
-  static const String levelUpSound = 'assets/sounds/level_up.mp3';
-  static const String achievementSound = 'assets/sounds/achievement.mp3';
-  static const String chaosEventSound = 'assets/sounds/chaos_event.mp3';
-  static const String buttonClickSound = 'assets/sounds/button_click.mp3';
-  static const String noteCreatedSound = 'assets/sounds/note_created.mp3';
-  static const String errorSound = 'assets/sounds/error.mp3';
+  /// Initialize the audio manager
+  Future<void> initialize() async {
+    if (_isInitialized) return;
 
-  /// Initialize audio manager
-  static Future<void> initialize() async {
-    // todo(mixin27): Initialize audio players
-    // This will be implemented when we add audioplayers package
+    try {
+      await _player.setVolume(_volume);
+      await _player.setReleaseMode(ReleaseMode.stop);
+      _isInitialized = true;
+      debugPrint('AudioManager initialized');
+    } catch (e) {
+      debugPrint('AudioManager initialization failed: $e');
+    }
   }
 
   /// Enable or disable sound
-  static void setSoundEnabled(bool enabled) {
+  void setSoundEnabled(bool enabled) {
     _soundEnabled = enabled;
   }
 
   /// Check if sound is enabled
-  static bool get isSoundEnabled => _soundEnabled;
+  bool get isSoundEnabled => _soundEnabled;
 
   /// Set volume (0.0 to 1.0)
-  static void setVolume(double volume) {
+  Future<void> setVolume(double volume) async {
     _volume = volume.clamp(0.0, 1.0);
+    await _player.setVolume(_volume);
   }
 
   /// Get current volume
-  static double get volume => _volume;
+  double get volume => _volume;
 
   /// Play a sound effect
-  static Future<void> playSound(String soundPath) async {
-    if (!_soundEnabled) return;
+  Future<void> playSound(AppSound sound) async {
+    log('enabled_sound: $_soundEnabled');
+    if (!_soundEnabled || !_isInitialized) return;
 
     try {
-      // todo(mixin27): Implement with audioplayers/just_audio
-      // For now, just log
-      debugPrint('Playing sound: $soundPath at volume $_volume');
+      await _player.play(AssetSource(sound.path));
     } catch (e) {
-      debugPrint('Error playing sound: $e');
+      // SystemSound.play(SystemSoundType.click);
+      debugPrint('Error playing sound ${sound.path}: $e');
     }
   }
 
-  /// Play correct answer sound
-  static Future<void> playCorrect() => playSound(correctSound);
+  /// Convenience methods
+  Future<void> playCorrect() => playSound(AppSound.correct);
+  Future<void> playIncorrect() => playSound(AppSound.incorrect);
+  Future<void> playPointsEarned() => playSound(AppSound.pointsEarned);
+  Future<void> playPointsSpent() => playSound(AppSound.pointsSpent);
+  Future<void> playLevelUp() => playSound(AppSound.levelUp);
+  Future<void> playAchievement() => playSound(AppSound.achievement);
+  Future<void> playChaosEvent() => playSound(AppSound.chaosEvent);
+  Future<void> playButtonClick() => playSound(AppSound.buttonClick);
+  Future<void> playNoteCreated() => playSound(AppSound.noteCreated);
+  Future<void> playError() => playSound(AppSound.error);
 
-  /// Play incorrect answer sound
-  static Future<void> playIncorrect() => playSound(incorrectSound);
-
-  /// Play points earned sound
-  static Future<void> playPointsEarned() => playSound(pointsEarnedSound);
-
-  /// Play points spent sound
-  static Future<void> playPointsSpent() => playSound(pointsSpentSound);
-
-  /// Play level up sound
-  static Future<void> playLevelUp() => playSound(levelUpSound);
-
-  /// Play achievement unlocked sound
-  static Future<void> playAchievement() => playSound(achievementSound);
-
-  /// Play chaos event sound
-  static Future<void> playChaosEvent() => playSound(chaosEventSound);
-
-  /// Play button click sound
-  static Future<void> playButtonClick() => playSound(buttonClickSound);
-
-  /// Play note created sound
-  static Future<void> playNoteCreated() => playSound(noteCreatedSound);
-
-  /// Play error sound
-  static Future<void> playError() => playSound(errorSound);
-
-  /// Dispose audio resources
-  static Future<void> dispose() async {
-    // todo(mixin27): Dispose audio players
+  /// Dispose resources
+  Future<void> dispose() async {
+    await _player.dispose();
+    _isInitialized = false;
   }
+}
+
+// Enum for all app sounds
+enum AppSound {
+  correct('sounds/success.mp3'),
+  incorrect('sounds/fail.mp3'),
+  pointsEarned('sounds/coin.mp3'),
+  pointsSpent('sounds/whoosh.mp3'),
+  levelUp('sounds/pick_up.mp3'),
+  achievement('sounds/success.mp3'),
+  chaosEvent('sounds/alert.mp3'),
+  buttonClick('sounds/button_click.mp3'),
+  noteCreated('sounds/notification.mp3'),
+  error('sounds/error.mp3');
+
+  final String path;
+  const AppSound(this.path);
 }

@@ -16,24 +16,26 @@ class CustomBadge extends StatelessWidget {
     this.isSmall = false,
   });
 
-  Color _getBackgroundColor() {
+  Color _getBackgroundColor(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return switch (variant) {
-      BadgeVariant.primary => AppColors.primary.withValues(alpha: 0.1),
-      BadgeVariant.secondary => AppColors.secondary.withValues(alpha: 0.1),
+      BadgeVariant.primary => colorScheme.primary.withValues(alpha: 0.1),
+      BadgeVariant.secondary => colorScheme.secondary.withValues(alpha: 0.1),
       BadgeVariant.success => AppColors.success.withValues(alpha: 0.1),
       BadgeVariant.warning => AppColors.warning.withValues(alpha: 0.1),
-      BadgeVariant.error => AppColors.error.withValues(alpha: 0.1),
+      BadgeVariant.error => colorScheme.error.withValues(alpha: 0.1),
       BadgeVariant.info => AppColors.info.withValues(alpha: 0.1),
     };
   }
 
-  Color _getTextColor() {
+  Color _getTextColor(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return switch (variant) {
-      BadgeVariant.primary => AppColors.primary,
-      BadgeVariant.secondary => AppColors.secondary,
+      BadgeVariant.primary => colorScheme.primary,
+      BadgeVariant.secondary => colorScheme.secondary,
       BadgeVariant.success => AppColors.success,
       BadgeVariant.warning => AppColors.warning,
-      BadgeVariant.error => AppColors.error,
+      BadgeVariant.error => colorScheme.error,
       BadgeVariant.info => AppColors.info,
     };
   }
@@ -46,7 +48,7 @@ class CustomBadge extends StatelessWidget {
         vertical: isSmall ? AppSpacing.xs / 2 : AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: _getBackgroundColor(),
+        color: _getBackgroundColor(context),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
       ),
       child: Text(
@@ -54,7 +56,7 @@ class CustomBadge extends StatelessWidget {
         style: TextStyle(
           fontSize: isSmall ? 10 : 12,
           fontWeight: FontWeight.w600,
-          color: _getTextColor(),
+          color: _getTextColor(context),
         ),
       ),
     );

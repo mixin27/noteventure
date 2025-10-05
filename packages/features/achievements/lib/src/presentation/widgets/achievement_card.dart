@@ -31,7 +31,7 @@ class AchievementCard extends StatelessWidget {
             child: Icon(
               _getIconData(achievement.iconName),
               color: achievement.isUnlocked
-                  ? Colors.white
+                  ? Theme.of(context).colorScheme.onPrimary
                   : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
               size: AppSpacing.iconLg,
             ),

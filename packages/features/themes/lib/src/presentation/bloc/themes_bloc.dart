@@ -151,7 +151,9 @@ class ThemesBloc extends Bloc<ThemesEvent, ThemesState> {
     final result = await activateTheme(event.themeKey);
 
     result.fold(
-      (failure) => emit(ThemesError(failure.message)),
+      (failure) {
+        emit(ThemesError(failure.message));
+      },
       (_) {}, // Will be updated by stream
     );
   }

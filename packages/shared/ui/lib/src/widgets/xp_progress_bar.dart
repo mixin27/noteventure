@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:core/core.dart';
-import '../themes/app_colors.dart';
 import '../themes/app_spacing.dart';
 
 class XpProgressBar extends StatelessWidget {
@@ -47,7 +46,9 @@ class XpProgressBar extends StatelessWidget {
             value: progress.clamp(0.0, 1.0),
             minHeight: height,
             backgroundColor: theme.colorScheme.surfaceContainerHighest,
-            valueColor: const AlwaysStoppedAnimation(AppColors.success),
+            valueColor: AlwaysStoppedAnimation(
+              Theme.of(context).colorScheme.primary,
+            ),
           ),
         ),
       ],

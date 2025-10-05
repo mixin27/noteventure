@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../themes/app_colors.dart';
 import '../themes/app_spacing.dart';
 
 class LevelDisplay extends StatelessWidget {
@@ -19,14 +18,16 @@ class LevelDisplay extends StatelessWidget {
           vertical: AppSpacing.xs / 2,
         ),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(colors: AppColors.primaryGradient),
+          gradient: LinearGradient(
+            colors: [theme.colorScheme.primary, theme.colorScheme.secondary],
+          ),
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         ),
         child: Text(
           'LV $level',
           style: theme.textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: theme.colorScheme.onPrimary,
           ),
         ),
       );
@@ -35,15 +36,18 @@ class LevelDisplay extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: AppColors.primaryGradient,
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.secondary,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -55,7 +59,9 @@ class LevelDisplay extends StatelessWidget {
           Text(
             'LV',
             style: theme.textTheme.labelSmall?.copyWith(
-              color: Colors.white.withValues(alpha: 0.9),
+              color: Theme.of(
+                context,
+              ).colorScheme.onPrimary.withValues(alpha: 0.9),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -63,7 +69,7 @@ class LevelDisplay extends StatelessWidget {
             '$level',
             style: theme.textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
           ),
         ],

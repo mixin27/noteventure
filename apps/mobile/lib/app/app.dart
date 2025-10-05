@@ -57,22 +57,39 @@ class NoteventureApp extends StatelessWidget {
                 themeMode = _parseThemeMode(settingsState.settings.themeMode);
               }
 
-              // Get active theme colors
-              ThemeData customLightTheme = ui.AppTheme.lightTheme;
-              ThemeData customDarkTheme = ui.AppTheme.darkTheme;
+              // Start with defaults
+              ThemeData lightTheme = ui.AppTheme.lightTheme;
+              ThemeData darkTheme = ui.AppTheme.darkTheme;
 
+              // Apply custom theme if active
               if (themesState is ThemesLoaded &&
                   themesState.activeTheme != null) {
-                final activeTheme = themesState.activeTheme!;
-                customLightTheme = activeTheme.toCustomLightTheme();
-                customDarkTheme = activeTheme.toCustomDarkTheme();
+                final active = themesState.activeTheme!;
+
+                if (active.themeStyle == 'light') {
+                  lightTheme = ui.ThemeBuilder.buildCustomTheme(
+                    primary: active.primaryColorValue,
+                    secondary: active.secondaryColorValue,
+                    background: active.backgroundColorValue,
+                    surface: active.surfaceColorValue,
+                    isDark: false,
+                  );
+                } else if (active.themeStyle == 'dark') {
+                  darkTheme = ui.ThemeBuilder.buildCustomTheme(
+                    primary: active.primaryColorValue,
+                    secondary: active.secondaryColorValue,
+                    background: active.backgroundColorValue,
+                    surface: active.surfaceColorValue,
+                    isDark: true,
+                  );
+                }
               }
 
               return MaterialApp.router(
                 title: 'Noteventure',
                 debugShowCheckedModeBanner: false,
-                theme: customLightTheme,
-                darkTheme: customDarkTheme,
+                theme: lightTheme,
+                darkTheme: darkTheme,
                 themeMode: themeMode,
                 routerConfig: AppRouter.router,
               );

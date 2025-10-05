@@ -24,6 +24,7 @@ dependencies:
   # DI
   get_it: ^8.2.0
   injectable: ^2.5.1
+  audioplayers: ^6.5.1
 
 dev_dependencies:
   flutter_test:

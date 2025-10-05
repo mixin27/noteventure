@@ -18,7 +18,5 @@ export 'src/presentation/bloc/themes_event.dart';
 export 'src/presentation/bloc/themes_state.dart';
 export 'src/presentation/pages/themes_page.dart';
 
-export 'src/utils/app_theme_extension.dart';
-
 // DI
 export 'src/di/themes_injection.dart' hide getIt;

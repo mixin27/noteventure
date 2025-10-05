@@ -1,3 +1,4 @@
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -10,6 +11,9 @@ void main() async {
 
   // Setup dependency injection
   await configureDependencies();
+
+  // Initialize audio
+  await AudioManager().initialize();
 
   // Setup BLoC observer for debugging
   Bloc.observer = AppBlocObserver();

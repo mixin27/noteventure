@@ -16,9 +16,7 @@ class ProgressBloc extends Bloc<ProgressEvent, ProgressState> {
   final UpdateStreak updateStreak;
   final ProgressRepository repository;
 
-  StreamSubscription? _xpEventSubscription;
-  StreamSubscription? _noteEventSubscription;
-  StreamSubscription? _challengeEventSubscription;
+  StreamSubscription? _eventBusSubscription;
 
   ProgressBloc({
     required this.getUserProgress,
@@ -35,33 +33,34 @@ class ProgressBloc extends Bloc<ProgressEvent, ProgressState> {
   }
 
   void _listenToEvents() {
-    // Listen for XP gains
-    // _xpEventSubscription = AppEventBus().on<XpGainedEvent>().listen((event) {
-    //   add(AddXpEvent(event.amount));
-    // });
+    _eventBusSubscription = AppEventBus().stream.listen((event) {
+      if (event is ChallengeCompletedEvent && event.wasCorrect) {
+        // Add XP
+        if (!isClosed) {
+          add(AddXpEvent(event.xpEarned));
+        }
 
-    // Listen for note events to update stats
-    _noteEventSubscription = AppEventBus().on<NoteCreatedEvent>().listen((_) {
-      repository.incrementNotesCreated();
-      add(LoadUserProgress());
+        // Update stats (these should NOT reload progress)
+        repository.incrementChallengesSolved();
+        repository.updateStreak(true);
+      } else if (event is ChallengeFailedEvent) {
+        repository.incrementChallengesFailed();
+        repository.updateStreak(false);
+        // add(LoadUserProgress());
+      } else if (event is NoteCreatedEvent) {
+        repository.incrementNotesCreated();
+        // add(LoadUserProgress());
+      } else if (event is NoteDeletedEvent) {
+        repository.incrementNotesDeleted();
+        // add(LoadUserProgress());
+      }
     });
+  }
 
-    // Listen for challenge events
-    _challengeEventSubscription = AppEventBus()
-        .on<ChallengeCompletedEvent>()
-        .listen((event) async {
-          if (event.wasCorrect) {
-            await repository.incrementChallengesSolved();
-            await addXp(event.xpEarned);
-
-            // Then reload once
-            add(LoadUserProgress());
-          } else {
-            await repository.incrementChallengesFailed();
-            // Then reload once
-            add(LoadUserProgress());
-          }
-        });
+  @override
+  Future<void> close() {
+    _eventBusSubscription?.cancel();
+    return super.close();
   }
 
   Future<void> _onLoadUserProgress(
@@ -91,6 +90,8 @@ class ProgressBloc extends Bloc<ProgressEvent, ProgressState> {
         progress,
       ) {
         if (levelUpResult['leveledUp'] == true) {
+          AudioManager().playLevelUp();
+
           emit(
             ProgressLeveledUp(
               oldLevel: levelUpResult['oldLevel'],
@@ -115,13 +116,5 @@ class ProgressBloc extends Bloc<ProgressEvent, ProgressState> {
       (failure) => emit(ProgressError(failure.message)),
       (progress) => emit(ProgressLoaded(progress)),
     );
-  }
-
-  @override
-  Future<void> close() {
-    _xpEventSubscription?.cancel();
-    _noteEventSubscription?.cancel();
-    _challengeEventSubscription?.cancel();
-    return super.close();
   }
 }

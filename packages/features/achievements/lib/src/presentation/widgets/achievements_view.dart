@@ -91,8 +91,11 @@ class _AchievementsViewState extends State<AchievementsView>
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: AppColors.primaryGradient,
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.secondary,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -108,13 +111,15 @@ class _AchievementsViewState extends State<AchievementsView>
                   Text(
                     'Your Progress',
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onPrimary.withValues(alpha: 0.9),
                     ),
                   ),
                   Text(
                     '${state.unlockedCount} / ${state.totalAchievements}',
                     style: theme.textTheme.displaySmall?.copyWith(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -125,13 +130,15 @@ class _AchievementsViewState extends State<AchievementsView>
                 height: 80,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onPrimary.withValues(alpha: 0.2),
                 ),
                 child: Center(
                   child: Text(
                     '${state.completionPercentage.toInt()}%',
                     style: theme.textTheme.headlineMedium?.copyWith(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -145,8 +152,12 @@ class _AchievementsViewState extends State<AchievementsView>
             child: LinearProgressIndicator(
               value: state.completionPercentage / 100,
               minHeight: 12,
-              backgroundColor: Colors.white.withValues(alpha: 0.3),
-              valueColor: const AlwaysStoppedAnimation(Colors.white),
+              backgroundColor: Theme.of(
+                context,
+              ).colorScheme.onPrimary.withValues(alpha: 0.3),
+              valueColor: AlwaysStoppedAnimation(
+                Theme.of(context).colorScheme.onPrimary,
+              ),
             ),
           ),
         ],

@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
+import 'package:core/core.dart';
 
 import '../../domain/entities/app_settings.dart';
 import '../../domain/usecases/get_settings.dart';
@@ -13,6 +16,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final UpdateSettings updateSettings;
   final ResetSettings resetSettings;
   final WatchSettings watchSettings;
+
+  late StreamSubscription _settingsSubscription;
 
   SettingsBloc({
     required this.getSettings,
@@ -33,11 +38,18 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<SettingsUpdated>(_onSettingsUpdated);
 
     // Watch for settings changes
-    watchSettings().listen((settings) {
+    _settingsSubscription = watchSettings().listen((settings) {
       if (!isClosed) {
+        AudioManager().setSoundEnabled(settings.soundEnabled);
         add(SettingsUpdated(settings));
       }
     });
+  }
+
+  @override
+  Future<void> close() {
+    _settingsSubscription.cancel();
+    return super.close();
   }
 
   Future<void> _onLoadSettings(

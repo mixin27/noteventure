@@ -25,3 +25,5 @@ export 'src/widgets/animations/bounce_animation.dart';
 export 'src/widgets/points_display.dart';
 export 'src/widgets/level_display.dart';
 export 'src/widgets/xp_progress_bar.dart';
+
+export 'src/utils/theme_builder.dart';

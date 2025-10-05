@@ -107,7 +107,9 @@ class AchievementsBloc extends Bloc<AchievementsEvent, AchievementsState> {
 
     result.fold(
       (failure) => emit(AchievementsError(failure.message)),
-      (_) {}, // Will be handled by stream update
+      (_) {
+        AudioManager().playAchievement();
+      }, // Will be handled by stream update
     );
   }
 

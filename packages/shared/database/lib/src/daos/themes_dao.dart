@@ -97,107 +97,185 @@ class ThemesDao extends DatabaseAccessor<AppDatabase> with _$ThemesDaoMixin {
 
   List<ThemesCompanion> _getDefaultThemes() {
     return [
-      // Default theme (free, unlocked, active)
+      // Default - Light (free, active)
       ThemesCompanion.insert(
-        themeKey: 'default',
+        themeKey: 'default_light',
         name: 'Default',
         description: 'Classic Noteventure theme',
         unlockCost: 0,
-        isUnlocked: Value(true),
-        unlockedAt: Value(DateTime.now()),
-        isActive: Value(true),
-        primaryColor: '#6366F1', // Indigo
-        secondaryColor: '#8B5CF6', // Purple
+        isUnlocked: const Value(true),
+        isActive: const Value(true),
+        primaryColor: '#6366F1',
+        secondaryColor: '#8B5CF6',
         backgroundColor: '#FFFFFF',
-        surfaceColor: '#F9FAFB',
+        surfaceColor: '#F3F4F6',
         themeStyle: 'light',
       ),
 
-      // Retro Terminal
+      // Default - Dark (free)
       ThemesCompanion.insert(
-        themeKey: 'retro_terminal',
+        themeKey: 'default_dark',
+        name: 'Default Dark',
+        description: 'Classic Noteventure dark theme',
+        unlockCost: 0,
+        isUnlocked: const Value(true),
+        primaryColor: '#818CF8',
+        secondaryColor: '#A78BFA',
+        backgroundColor: '#0F172A',
+        surfaceColor: '#1E293B',
+        themeStyle: 'dark',
+      ),
+      // Retro Terminal - Light
+      ThemesCompanion.insert(
+        themeKey: 'retro_light',
         name: 'Retro Terminal',
-        description: 'Green phosphor CRT aesthetic',
+        description: 'Green on beige, vintage computer',
         unlockCost: 100,
-        isUnlocked: Value(false),
-        isActive: Value(false),
-        primaryColor: '#00FF00', // Bright green
-        secondaryColor: '#39FF14', // Neon green
-        backgroundColor: '#0A0A0A',
-        surfaceColor: '#1A1A1A',
+        primaryColor: '#2D5016',
+        secondaryColor: '#4A7C2C',
+        backgroundColor: '#F5F5DC',
+        surfaceColor: '#E8E8D0',
+        themeStyle: 'light',
+      ),
+
+      // Retro Terminal - Dark
+      ThemesCompanion.insert(
+        themeKey: 'retro_dark',
+        name: 'Retro Terminal Dark',
+        description: 'Green on black, Matrix vibes',
+        unlockCost: 100,
+        primaryColor: '#00FF00',
+        secondaryColor: '#39FF14',
+        backgroundColor: '#000000',
+        surfaceColor: '#0A0A0A',
         themeStyle: 'dark',
       ),
 
-      // Vaporwave
+      // Vaporwave - Light
       ThemesCompanion.insert(
-        themeKey: 'vaporwave',
+        themeKey: 'vaporwave_light',
         name: 'Vaporwave',
-        description: 'A e s t h e t i c vibes',
+        description: 'Pastel pink and cyan dreams',
         unlockCost: 150,
-        isUnlocked: Value(false),
-        isActive: Value(false),
-        primaryColor: '#FF71CE', // Hot pink
-        secondaryColor: '#01CDFE', // Cyan
+        primaryColor: '#FFB3D9',
+        secondaryColor: '#B3E5FC',
+        backgroundColor: '#FFF0F5',
+        surfaceColor: '#FFE4F0',
+        themeStyle: 'light',
+      ),
+
+      // Vaporwave - Dark
+      ThemesCompanion.insert(
+        themeKey: 'vaporwave_dark',
+        name: 'Vaporwave Dark',
+        description: 'Neon pink and cyan aesthetic',
+        unlockCost: 150,
+        primaryColor: '#FF71CE',
+        secondaryColor: '#01CDFE',
         backgroundColor: '#2E1A47',
         surfaceColor: '#3D2458',
         themeStyle: 'dark',
       ),
 
-      // Brutalist
+      // Brutalist - Light
       ThemesCompanion.insert(
-        themeKey: 'brutalist',
+        themeKey: 'brutalist_light',
         name: 'Brutalist',
-        description: 'Raw, minimalist design',
+        description: 'Raw concrete and stark contrast',
         unlockCost: 75,
-        isUnlocked: Value(false),
-        isActive: Value(false),
-        primaryColor: '#000000', // Black
-        secondaryColor: '#FF0000', // Red
-        backgroundColor: '#E5E5E5',
-        surfaceColor: '#FFFFFF',
+        primaryColor: '#000000',
+        secondaryColor: '#424242',
+        backgroundColor: '#F5F5F5',
+        surfaceColor: '#E0E0E0',
         themeStyle: 'light',
       ),
 
-      // Comic Book
+      // Brutalist - Dark
       ThemesCompanion.insert(
-        themeKey: 'comic_book',
+        themeKey: 'brutalist_dark',
+        name: 'Brutalist Dark',
+        description: 'Dark concrete brutalism',
+        unlockCost: 75,
+        primaryColor: '#BDBDBD',
+        secondaryColor: '#9E9E9E',
+        backgroundColor: '#121212',
+        surfaceColor: '#1E1E1E',
+        themeStyle: 'dark',
+      ),
+
+      // Comic Book - Light
+      ThemesCompanion.insert(
+        themeKey: 'comic_light',
         name: 'Comic Book',
-        description: 'Bold, colorful, action-packed',
+        description: 'POW! BAM! Colorful action',
         unlockCost: 200,
-        isUnlocked: Value(false),
-        isActive: Value(false),
-        primaryColor: '#FFD700', // Gold
-        secondaryColor: '#FF4500', // Orange red
-        backgroundColor: '#FFF5E1',
+        primaryColor: '#FF0000',
+        secondaryColor: '#FFD700',
+        backgroundColor: '#FFFFFF',
+        surfaceColor: '#FFF9C4',
+        themeStyle: 'light',
+      ),
+
+      // Comic Book - Dark
+      ThemesCompanion.insert(
+        themeKey: 'comic_dark',
+        name: 'Comic Book Dark',
+        description: 'Dark superhero noir',
+        unlockCost: 200,
+        primaryColor: '#FF5252',
+        secondaryColor: '#FFD740',
+        backgroundColor: '#1A1A1A',
+        surfaceColor: '#2D2D2D',
+        themeStyle: 'dark',
+      ),
+
+      // Handwritten - Light
+      ThemesCompanion.insert(
+        themeKey: 'handwritten_light',
+        name: 'Handwritten',
+        description: 'Notebook paper aesthetic',
+        unlockCost: 125,
+        primaryColor: '#1976D2',
+        secondaryColor: '#388E3C',
+        backgroundColor: '#FFF8DC',
         surfaceColor: '#FFFACD',
         themeStyle: 'light',
       ),
 
-      // Handwritten
+      // Handwritten - Dark
       ThemesCompanion.insert(
-        themeKey: 'handwritten',
-        name: 'Handwritten',
-        description: 'Personal touch aesthetic',
+        themeKey: 'handwritten_dark',
+        name: 'Handwritten Dark',
+        description: 'Dark journal pages',
         unlockCost: 125,
-        isUnlocked: Value(false),
-        isActive: Value(false),
-        primaryColor: '#3B5998', // Dark blue
-        secondaryColor: '#8B4513', // Brown
-        backgroundColor: '#FFF8DC',
-        surfaceColor: '#FFFAF0',
+        primaryColor: '#64B5F6',
+        secondaryColor: '#81C784',
+        backgroundColor: '#2C2416',
+        surfaceColor: '#3D3424',
+        themeStyle: 'dark',
+      ),
+
+      // Neon Cyberpunk - Light (unusual but possible)
+      ThemesCompanion.insert(
+        themeKey: 'cyberpunk_light',
+        name: 'Cyberpunk',
+        description: 'Bright future neon',
+        unlockCost: 250,
+        primaryColor: '#00E5FF',
+        secondaryColor: '#E040FB',
+        backgroundColor: '#F5F5F5',
+        surfaceColor: '#E8E8E8',
         themeStyle: 'light',
       ),
 
-      // Neon Cyberpunk
+      // Neon Cyberpunk - Dark
       ThemesCompanion.insert(
-        themeKey: 'neon_cyberpunk',
-        name: 'Neon Cyberpunk',
-        description: 'Futuristic neon cityscape',
+        themeKey: 'cyberpunk_dark',
+        name: 'Cyberpunk Dark',
+        description: 'Dark city neon nights',
         unlockCost: 250,
-        isUnlocked: Value(false),
-        isActive: Value(false),
-        primaryColor: '#00FFFF', // Cyan
-        secondaryColor: '#FF00FF', // Magenta
+        primaryColor: '#00F0FF',
+        secondaryColor: '#FF00FF',
         backgroundColor: '#0D0221',
         surfaceColor: '#1B0638',
         themeStyle: 'dark',

@@ -92,6 +92,8 @@ class ChallengeBloc extends Bloc<ChallengeEvent, ChallengeState> {
       isCorrect,
     ) {
       if (isCorrect) {
+        AudioManager().playCorrect();
+
         // Award points
         pointsBloc.add(
           EarnPointsEvent(
@@ -131,6 +133,8 @@ class ChallengeBloc extends Bloc<ChallengeEvent, ChallengeState> {
           ),
         );
       } else {
+        AudioManager().playIncorrect();
+
         final message = MessageGenerator.getWrongMessage('random');
 
         emit(

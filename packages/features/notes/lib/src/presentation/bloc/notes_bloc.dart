@@ -204,6 +204,8 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     final result = await createNoteUseCase(params);
 
     result.fold((failure) => emit(NotesError(failure.message)), (note) {
+      AudioManager().playNoteCreated();
+
       // Emit event via EventBus
       AppEventBus().emit(
         NoteCreatedEvent(noteId: note.id, noteType: note.noteType.name),

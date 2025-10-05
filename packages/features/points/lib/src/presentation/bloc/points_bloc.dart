@@ -82,6 +82,8 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
         }
       },
       (newBalance) {
+        AudioManager().playPointsSpent();
+
         emit(PointsSpent(newBalance: newBalance, amountSpent: event.amount));
         // Reload balance
         add(LoadPointBalance());
@@ -103,6 +105,8 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     final result = await earnPointsUseCase(params);
 
     result.fold((failure) => emit(PointsError(failure.message)), (newBalance) {
+      AudioManager().playPointsEarned();
+
       emit(PointsEarned(newBalance: newBalance, amountEarned: event.amount));
       // Reload balance
       add(LoadPointBalance());
