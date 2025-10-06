@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:core/core.dart';
 import 'package:points/points.dart';
 
 import '../../domain/usecases/activate_theme.dart';
@@ -138,6 +139,13 @@ class ThemesBloc extends Bloc<ThemesEvent, ThemesState> {
         emit(currentState); // Restore previous state
       },
       (_) {
+        // Emit theme unlocked event
+        AppEventBus().emit(
+          ThemeUnlockedEvent(
+            themeKey: event.themeKey,
+            themeName: '', // Would need to fetch name
+          ),
+        );
         emit(ThemeUnlocked(theme));
         // Will be updated by stream
       },
@@ -154,7 +162,10 @@ class ThemesBloc extends Bloc<ThemesEvent, ThemesState> {
       (failure) {
         emit(ThemesError(failure.message));
       },
-      (_) {}, // Will be updated by stream
+      (_) {
+        // Emit theme changed event
+        AppEventBus().emit(ThemeChangedEvent(event.themeKey));
+      }, // Will be updated by stream
     );
   }
 

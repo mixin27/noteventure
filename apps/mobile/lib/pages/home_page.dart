@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:points/points.dart';
 import 'package:progress/progress.dart';
+import 'package:settings/settings.dart';
 import 'package:ui/ui.dart';
 import 'package:core/core.dart';
 import 'package:notes/notes.dart';
@@ -20,6 +21,19 @@ class HomePage extends StatelessWidget {
     return BlocListener<ChaosBloc, ChaosState>(
       listener: (context, state) {
         if (state is ChaosEventTriggered) {
+          // Play sound effect
+          AudioManager().playChaosEvent();
+
+          // Emit event to event bus
+          AppEventBus().emit(
+            ChaosEventTriggeredEvent(
+              eventKey: state.event.eventKey,
+              eventType: state.event.eventType.name,
+              title: state.event.title,
+              message: state.event.message,
+            ),
+          );
+
           // Show notification based on event type
           if (state.event.eventType == ChaosEventType.positive) {
             // Important positive events get full dialog
@@ -79,6 +93,25 @@ class HomePage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Active Effects Bar (shows when chaos is enabled)
+                      BlocBuilder<SettingsBloc, SettingsState>(
+                        builder: (context, state) {
+                          final settings = state is SettingsLoaded
+                              ? state.settings
+                              : null;
+
+                          if (settings?.chaosEnabled ?? false) {
+                            return Column(
+                              children: [
+                                const ChaosActiveEffectsBar(),
+                                const SizedBox(height: AppSpacing.md),
+                              ],
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+
                       // Points and Level Display
                       BlocBuilder<PointsBloc, PointsState>(
                         builder: (context, state) {
@@ -356,15 +389,9 @@ class HomePage extends StatelessWidget {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            context.read<ChaosBloc>().add(TriggerRandomEventAction());
-          },
-          child: const Icon(Icons.casino),
+          onPressed: () => context.push(RouteConstants.noteCreate),
+          child: const Icon(Icons.add),
         ),
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: () => context.push(RouteConstants.noteCreate),
-        //   child: const Icon(Icons.add),
-        // ),
       ),
     );
   }

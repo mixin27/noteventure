@@ -9,7 +9,7 @@ abstract class AchievementsRepository {
   Future<Either<Failure, List<Achievement>>> getLockedAchievements();
   Future<Either<Failure, Achievement>> getAchievementByKey(String key);
   Future<Either<Failure, Unit>> updateProgress(String key, int progress);
-  Future<Either<Failure, Unit>> unlockAchievement(String key);
+  Future<Either<Failure, Achievement?>> unlockAchievement(String key);
   Future<Either<Failure, Unit>> initializeAchievements();
   Stream<List<Achievement>> watchAchievements();
 }

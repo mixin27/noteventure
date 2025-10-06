@@ -107,8 +107,18 @@ class AchievementsBloc extends Bloc<AchievementsEvent, AchievementsState> {
 
     result.fold(
       (failure) => emit(AchievementsError(failure.message)),
-      (_) {
-        AudioManager().playAchievement();
+      (result) {
+        if (result != null) {
+          AudioManager().playAchievement();
+          // Emit achievement unlocked event
+          AppEventBus().emit(
+            AchievementUnlockedEvent(
+              achievementKey: result.achievementKey,
+              achievementName: result.name,
+              pointReward: result.pointReward,
+            ),
+          );
+        }
       }, // Will be handled by stream update
     );
   }

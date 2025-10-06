@@ -1,6 +1,7 @@
 import 'package:core/core.dart';
 import 'package:dartz/dartz.dart';
 
+import '../entities/achievement.dart';
 import '../repositories/achievements_repository.dart';
 
 class UnlockAchievement {
@@ -8,7 +9,7 @@ class UnlockAchievement {
 
   UnlockAchievement(this.repository);
 
-  Future<Either<Failure, Unit>> call(String key) {
+  Future<Either<Failure, Achievement?>> call(String key) {
     return repository.unlockAchievement(key);
   }
 }

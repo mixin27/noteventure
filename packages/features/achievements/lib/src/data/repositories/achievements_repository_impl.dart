@@ -64,23 +64,12 @@ class AchievementsRepositoryImpl implements AchievementsRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> unlockAchievement(String key) async {
+  Future<Either<Failure, Achievement?>> unlockAchievement(String key) async {
     try {
       await localDataSource.unlockAchievement(key);
       final result = await localDataSource.getAchievementByKey(key);
 
-      if (result != null) {
-        // Emit achievement unlocked event
-        AppEventBus().emit(
-          AchievementUnlockedEvent(
-            achievementKey: key,
-            achievementName: result.name,
-            pointReward: result.pointReward,
-          ),
-        );
-      }
-
-      return const Right(unit);
+      return Right(result?.toEntity());
     } catch (e) {
       return Left(CacheFailure(e.toString()));
     }

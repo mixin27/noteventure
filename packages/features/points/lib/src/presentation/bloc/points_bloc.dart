@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 
-import '../../domain/repositories/points_repository.dart';
 import '../../domain/usecases/check_points.dart';
 import '../../domain/usecases/earn_points.dart';
+import '../../domain/usecases/get_all_transactions.dart';
 import '../../domain/usecases/get_point_balance.dart';
+import '../../domain/usecases/get_recent_transactions.dart';
 import '../../domain/usecases/spend_points.dart';
+import '../../domain/usecases/watch_points_balance.dart';
 import 'points_event.dart';
 import 'points_state.dart';
 
@@ -16,16 +18,21 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
   final CheckPoints checkPoints;
   final SpendPoints spendPointsUseCase;
   final EarnPoints earnPointsUseCase;
-  final PointsRepository repository;
+  final GetAllTransactions getAllTransactions;
+  final GetRecentTransactions getRecentTransactions;
+  final WatchPointsBalance watchPointsBalance;
 
-  StreamSubscription? _eventBusSubscription;
+  // StreamSubscription? _eventBusSubscription;
+  StreamSubscription? _pointsStreamSubscription;
 
   PointsBloc({
     required this.getPointBalance,
     required this.checkPoints,
     required this.spendPointsUseCase,
     required this.earnPointsUseCase,
-    required this.repository,
+    required this.getAllTransactions,
+    required this.getRecentTransactions,
+    required this.watchPointsBalance,
   }) : super(PointsInitial()) {
     on<LoadPointBalance>(_onLoadPointBalance);
     on<SpendPointsEvent>(_onSpendPoints);
@@ -34,10 +41,16 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     on<LoadTransactionsEvent>(_onLoadTransactions);
 
     // Listen to EventBus for point changes from other features
-    _eventBusSubscription = AppEventBus().on<PointsChangedEvent>().listen((
-      event,
-    ) {
-      add(LoadPointBalance());
+    // _eventBusSubscription = AppEventBus().on<PointsChangedEvent>().listen((
+    //   event,
+    // ) {
+    //   add(LoadPointBalance());
+    // });
+    // Watch points changes from database
+    _pointsStreamSubscription = watchPointsBalance().listen((balance) {
+      if (!isClosed) {
+        add(LoadPointBalance());
+      }
     });
   }
 
@@ -45,7 +58,10 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     LoadPointBalance event,
     Emitter<PointsState> emit,
   ) async {
-    emit(PointsLoading());
+    // Don't show loading if we already have data
+    if (state is! PointsLoaded) {
+      emit(PointsLoading());
+    }
 
     final result = await getPointBalance();
 
@@ -84,9 +100,18 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
       (newBalance) {
         AudioManager().playPointsSpent();
 
+        // Emit to EventBus
+        AppEventBus().emit(
+          PointsSpentEvent(
+            amount: event.amount,
+            action: event.reason,
+            relatedId: event.relatedNoteId,
+          ),
+        );
+
         emit(PointsSpent(newBalance: newBalance, amountSpent: event.amount));
         // Reload balance
-        add(LoadPointBalance());
+        // add(LoadPointBalance());
       },
     );
   }
@@ -107,9 +132,18 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     result.fold((failure) => emit(PointsError(failure.message)), (newBalance) {
       AudioManager().playPointsEarned();
 
+      // Emit to EventBus
+      AppEventBus().emit(
+        PointsEarnedEvent(
+          amount: event.amount,
+          source: event.reason,
+          relatedId: event.relatedChallengeId,
+        ),
+      );
+
       emit(PointsEarned(newBalance: newBalance, amountEarned: event.amount));
       // Reload balance
-      add(LoadPointBalance());
+      // add(LoadPointBalance());
     });
   }
 
@@ -141,8 +175,8 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
   ) async {
     final balanceResult = await getPointBalance();
     final transactionsResult = event.limit != null
-        ? await repository.getRecentTransactions(event.limit!)
-        : await repository.getAllTransactions();
+        ? await getRecentTransactions(limit: event.limit!)
+        : await getAllTransactions();
 
     balanceResult.fold((failure) => emit(PointsError(failure.message)), (
       balance,
@@ -158,7 +192,8 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
 
   @override
   Future<void> close() {
-    _eventBusSubscription?.cancel();
+    // _eventBusSubscription?.cancel();
+    _pointsStreamSubscription?.cancel();
     return super.close();
   }
 }

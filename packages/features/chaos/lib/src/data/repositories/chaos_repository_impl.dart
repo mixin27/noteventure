@@ -36,17 +36,6 @@ class ChaosRepositoryImpl implements ChaosRepository {
   Future<Either<Failure, ChaosEventEntity>> triggerRandomEvent() async {
     try {
       final event = await localDataSource.triggerRandomEvent();
-
-      // Emit event via EventBus
-      AppEventBus().emit(
-        ChaosEventTriggeredEvent(
-          eventKey: event.eventKey,
-          eventType: event.eventType.name,
-          title: event.title,
-          message: event.message,
-        ),
-      );
-
       return Right(event.toEntity());
     } catch (e) {
       return Left(CacheFailure(e.toString()));

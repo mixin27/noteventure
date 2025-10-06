@@ -67,15 +67,6 @@ class ThemesRepositoryImpl implements ThemesRepository {
   Future<Either<Failure, Unit>> unlockTheme(String key) async {
     try {
       await localDataSource.unlockTheme(key);
-
-      // Emit theme unlocked event
-      AppEventBus().emit(
-        ThemeUnlockedEvent(
-          themeKey: key,
-          themeName: '', // Would need to fetch name
-        ),
-      );
-
       return const Right(unit);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -86,10 +77,6 @@ class ThemesRepositoryImpl implements ThemesRepository {
   Future<Either<Failure, Unit>> activateTheme(String key) async {
     try {
       await localDataSource.activateTheme(key);
-
-      // Emit theme changed event
-      AppEventBus().emit(ThemeChangedEvent(key));
-
       return const Right(unit);
     } catch (e) {
       return Left(CacheFailure(e.toString()));

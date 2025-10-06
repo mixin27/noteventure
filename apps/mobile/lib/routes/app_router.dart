@@ -1,5 +1,6 @@
 import 'package:achievements/achievements.dart';
 import 'package:challenges/challenges.dart';
+import 'package:chaos/chaos.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:notes/notes.dart';
@@ -68,6 +69,11 @@ class AppRouter {
         path: RouteConstants.settings,
         name: RouteConstants.settingsName,
         builder: (context, state) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: RouteConstants.chaos,
+        name: RouteConstants.chaosName,
+        builder: (context, state) => const ChaosHistoryPage(),
       ),
     ],
     errorBuilder: (context, state) =>

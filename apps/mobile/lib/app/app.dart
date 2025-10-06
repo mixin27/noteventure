@@ -1,6 +1,7 @@
 import 'package:achievements/achievements.dart';
 import 'package:challenges/challenges.dart';
 import 'package:chaos/chaos.dart';
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notes/notes.dart';
@@ -47,56 +48,106 @@ class NoteventureApp extends StatelessWidget {
         ),
       ],
 
-      child: BlocBuilder<SettingsBloc, SettingsState>(
-        builder: (context, settingsState) {
-          return BlocBuilder<ThemesBloc, ThemesState>(
-            builder: (context, themesState) {
-              // Get theme mode from settings
-              ThemeMode themeMode = ThemeMode.system;
-              if (settingsState is SettingsLoaded) {
-                themeMode = _parseThemeMode(settingsState.settings.themeMode);
+      child: _AppContent(),
+    );
+  }
+}
+
+class _AppContent extends StatefulWidget {
+  const _AppContent();
+
+  @override
+  State<_AppContent> createState() => __AppContentState();
+}
+
+class __AppContentState extends State<_AppContent> with WidgetsBindingObserver {
+  ChaosTriggerService? _chaosTriggerService;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
+    // Initialize chaos service after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final chaosBloc = context.read<ChaosBloc>();
+      _chaosTriggerService = ChaosTriggerService(chaosBloc);
+    });
+  }
+
+  @override
+  void dispose() {
+    _chaosTriggerService?.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    AppEventBus().dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.paused:
+        AppEventBus().emit(AppPausedEvent());
+        break;
+      case AppLifecycleState.resumed:
+        AppEventBus().emit(AppResumedEvent());
+        break;
+      default:
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SettingsBloc, SettingsState>(
+      builder: (context, settingsState) {
+        return BlocBuilder<ThemesBloc, ThemesState>(
+          builder: (context, themesState) {
+            // Get theme mode from settings
+            ThemeMode themeMode = ThemeMode.system;
+            if (settingsState is SettingsLoaded) {
+              themeMode = _parseThemeMode(settingsState.settings.themeMode);
+            }
+
+            // Start with defaults
+            ThemeData lightTheme = ui.AppTheme.lightTheme;
+            ThemeData darkTheme = ui.AppTheme.darkTheme;
+
+            // Apply custom theme if active
+            if (themesState is ThemesLoaded &&
+                themesState.activeTheme != null) {
+              final active = themesState.activeTheme!;
+
+              if (active.themeStyle == 'light') {
+                lightTheme = ui.ThemeBuilder.buildCustomTheme(
+                  primary: active.primaryColorValue,
+                  secondary: active.secondaryColorValue,
+                  background: active.backgroundColorValue,
+                  surface: active.surfaceColorValue,
+                  isDark: false,
+                );
+              } else if (active.themeStyle == 'dark') {
+                darkTheme = ui.ThemeBuilder.buildCustomTheme(
+                  primary: active.primaryColorValue,
+                  secondary: active.secondaryColorValue,
+                  background: active.backgroundColorValue,
+                  surface: active.surfaceColorValue,
+                  isDark: true,
+                );
               }
+            }
 
-              // Start with defaults
-              ThemeData lightTheme = ui.AppTheme.lightTheme;
-              ThemeData darkTheme = ui.AppTheme.darkTheme;
-
-              // Apply custom theme if active
-              if (themesState is ThemesLoaded &&
-                  themesState.activeTheme != null) {
-                final active = themesState.activeTheme!;
-
-                if (active.themeStyle == 'light') {
-                  lightTheme = ui.ThemeBuilder.buildCustomTheme(
-                    primary: active.primaryColorValue,
-                    secondary: active.secondaryColorValue,
-                    background: active.backgroundColorValue,
-                    surface: active.surfaceColorValue,
-                    isDark: false,
-                  );
-                } else if (active.themeStyle == 'dark') {
-                  darkTheme = ui.ThemeBuilder.buildCustomTheme(
-                    primary: active.primaryColorValue,
-                    secondary: active.secondaryColorValue,
-                    background: active.backgroundColorValue,
-                    surface: active.surfaceColorValue,
-                    isDark: true,
-                  );
-                }
-              }
-
-              return MaterialApp.router(
-                title: 'Noteventure',
-                debugShowCheckedModeBanner: false,
-                theme: lightTheme,
-                darkTheme: darkTheme,
-                themeMode: themeMode,
-                routerConfig: AppRouter.router,
-              );
-            },
-          );
-        },
-      ),
+            return MaterialApp.router(
+              title: 'Noteventure',
+              debugShowCheckedModeBanner: false,
+              theme: lightTheme,
+              darkTheme: darkTheme,
+              themeMode: themeMode,
+              routerConfig: AppRouter.router,
+            );
+          },
+        );
+      },
     );
   }
 

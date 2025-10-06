@@ -32,18 +32,6 @@ class ProgressLocalDataSourceImpl implements ProgressLocalDataSource {
   Future<Map<String, dynamic>> addXp(int amount) async {
     final result = await userProgressDao.addXp(amount);
 
-    // Emit events via EventBus
-    AppEventBus().emit(XpGainedEvent(amount: amount, source: 'challenge'));
-
-    if (result['leveledUp'] == true) {
-      AppEventBus().emit(
-        LevelUpEvent(
-          oldLevel: result['oldLevel'],
-          newLevel: result['newLevel'],
-        ),
-      );
-    }
-
     return result;
   }
 
@@ -54,16 +42,6 @@ class ProgressLocalDataSourceImpl implements ProgressLocalDataSource {
     final progress = await userProgressDao.getUserProgress();
     if (progress == null) {
       throw const DatabaseException('User progress not found');
-    }
-
-    // Emit streak event if updated
-    if (success && progress.currentStreak > 0) {
-      AppEventBus().emit(
-        StreakUpdatedEvent(
-          currentStreak: progress.currentStreak,
-          isNewRecord: progress.currentStreak == progress.longestStreak,
-        ),
-      );
     }
 
     return UserProgressModel.fromDrift(progress);

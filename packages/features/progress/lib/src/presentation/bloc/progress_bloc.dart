@@ -80,6 +80,9 @@ class ProgressBloc extends Bloc<ProgressEvent, ProgressState> {
   Future<void> _onAddXp(AddXpEvent event, Emitter<ProgressState> emit) async {
     final result = await addXp(event.amount);
 
+    final currentState = state as ProgressLoaded;
+    final currentProgress = currentState.progress;
+
     result.fold((failure) => emit(ProgressError(failure.message)), (
       levelUpResult,
     ) async {
@@ -91,6 +94,13 @@ class ProgressBloc extends Bloc<ProgressEvent, ProgressState> {
       ) {
         if (levelUpResult['leveledUp'] == true) {
           AudioManager().playLevelUp();
+          AppEventBus().emit(
+            LevelUpEvent(
+              oldLevel: currentProgress.level,
+              newLevel: progress.level,
+              unlockedFeatures: [],
+            ),
+          );
 
           emit(
             ProgressLeveledUp(
@@ -100,6 +110,11 @@ class ProgressBloc extends Bloc<ProgressEvent, ProgressState> {
             ),
           );
         } else {
+          // Emit XP gained event
+          AppEventBus().emit(
+            XpGainedEvent(amount: event.amount, source: 'challenge'),
+          );
+
           emit(ProgressLoaded(progress));
         }
       });
@@ -112,9 +127,17 @@ class ProgressBloc extends Bloc<ProgressEvent, ProgressState> {
   ) async {
     final result = await updateStreak(event.success);
 
-    result.fold(
-      (failure) => emit(ProgressError(failure.message)),
-      (progress) => emit(ProgressLoaded(progress)),
-    );
+    result.fold((failure) => emit(ProgressError(failure.message)), (progress) {
+      if (progress.currentStreak > 0) {
+        AppEventBus().emit(
+          StreakUpdatedEvent(
+            currentStreak: progress.currentStreak,
+            isNewRecord: progress.currentStreak == progress.longestStreak,
+          ),
+        );
+      }
+
+      emit(ProgressLoaded(progress));
+    });
   }
 }

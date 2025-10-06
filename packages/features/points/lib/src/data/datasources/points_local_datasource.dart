@@ -74,24 +74,6 @@ class PointsLocalDataSourceImpl implements PointsLocalDataSource {
     );
 
     await pointTransactionsDao.createTransaction(transaction);
-
-    // Emit event via EventBus
-    AppEventBus().emit(
-      PointsSpentEvent(
-        amount: amount,
-        action: reason,
-        relatedId: relatedNoteId,
-      ),
-    );
-
-    AppEventBus().emit(
-      PointsChangedEvent(
-        newBalance: newBalance,
-        change: -amount,
-        reason: reason,
-      ),
-    );
-
     return newBalance;
   }
 
@@ -119,23 +101,6 @@ class PointsLocalDataSourceImpl implements PointsLocalDataSource {
     );
 
     await pointTransactionsDao.createTransaction(transaction);
-
-    // Emit event via EventBus
-    AppEventBus().emit(
-      PointsEarnedEvent(
-        amount: amount,
-        source: reason,
-        relatedId: relatedChallengeId,
-      ),
-    );
-
-    AppEventBus().emit(
-      PointsChangedEvent(
-        newBalance: newBalance,
-        change: amount,
-        reason: reason,
-      ),
-    );
 
     return newBalance;
   }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:core/core.dart';
 import 'package:settings/settings.dart';
 
 import '../../domain/usecases/get_recent_events.dart';
@@ -75,10 +76,18 @@ class ChaosBloc extends Bloc<ChaosEvent, ChaosState> {
 
     final result = await triggerRandomEvent();
 
-    result.fold(
-      (failure) => emit(ChaosError(failure.message)),
-      (event) => emit(ChaosEventTriggered(event)),
-    );
+    result.fold((failure) => emit(ChaosError(failure.message)), (event) {
+      // Emit event via EventBus
+      AppEventBus().emit(
+        ChaosEventTriggeredEvent(
+          eventKey: event.eventKey,
+          eventType: event.eventType.name,
+          title: event.title,
+          message: event.message,
+        ),
+      );
+      emit(ChaosEventTriggered(event));
+    });
   }
 
   Future<void> _onResolveEvent(

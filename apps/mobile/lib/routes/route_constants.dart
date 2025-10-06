@@ -12,6 +12,7 @@ class RouteConstants {
   static const String achievements = '/achievements';
   static const String themes = '/themes';
   static const String settings = '/settings';
+  static const String chaos = '/chaos';
 
   // Route names
   static const String splashName = 'splash';
@@ -24,4 +25,5 @@ class RouteConstants {
   static const String achievementsName = 'achievements';
   static const String themesName = 'themes';
   static const String settingsName = 'settings';
+  static const String chaosName = 'chaos';
 }
