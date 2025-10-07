@@ -15,6 +15,7 @@ import (
 	"github.com/mixin27/noteventure/web-service/config"
 	"github.com/mixin27/noteventure/web-service/internal/api/rest"
 	"github.com/mixin27/noteventure/web-service/internal/api/rest/middlewares"
+	"github.com/mixin27/noteventure/web-service/internal/domain/sync"
 	"github.com/mixin27/noteventure/web-service/internal/domain/user"
 	"github.com/mixin27/noteventure/web-service/internal/infrastructure/database"
 )
@@ -39,12 +40,15 @@ func main() {
 
 	// Initialize repositories
 	userRepo := database.NewUserRepository(db)
+	syncRepo := database.NewSyncRepository(db)
 
 	// Initialize services
 	userService := user.NewService(userRepo, cfg)
+	syncService := sync.NewService(syncRepo)
 
 	// Initialize handlers
 	authHandler := rest.NewAuthHandler(userService)
+	syncHandler := rest.NewSyncHandler(syncService)
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -80,15 +84,23 @@ func main() {
 	auth.Post("/register", authHandler.Register)
 	auth.Post("/login", authHandler.Login)
 
-	// Protected routes example
-	protected := api.Group("/user", middlewares.AuthMiddleware(userService))
-	protected.Get("/profile", func(c *fiber.Ctx) error {
+	// Protected routes
+	protected := api.Group("", middlewares.AuthMiddleware(userService))
+
+	// User routes
+	protected.Get("/user/profile", func(c *fiber.Ctx) error {
 		userID := c.Locals("user_id").(string)
 		return c.JSON(fiber.Map{
 			"user_id": userID,
 			"message": "This is a protected route",
 		})
 	})
+
+	// Sync routes
+	syncGroup := protected.Group("/sync")
+	syncGroup.Post("/", syncHandler.Sync)     // Combined push + pull
+	syncGroup.Get("/pull", syncHandler.Pull)  // Pull only
+	syncGroup.Post("/push", syncHandler.Push) // Push only
 
 	// Graceful shutdown
 	c := make(chan os.Signal, 1)
@@ -103,6 +115,13 @@ func main() {
 	// Start server
 	port := cfg.Server.Port
 	log.Printf("Server starting on port %s", port)
+	log.Println("Available endpoints:")
+	log.Println("  POST /api/v1/auth/register")
+	log.Println("  POST /api/v1/auth/login")
+	log.Println("  POST /api/v1/sync (authenticated)")
+	log.Println("  GET  /api/v1/sync/pull (authenticated)")
+	log.Println("  POST /api/v1/sync/push (authenticated)")
+
 	if err := app.Listen(":" + port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
