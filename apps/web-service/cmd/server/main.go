@@ -15,6 +15,7 @@ import (
 	"github.com/mixin27/noteventure/web-service/config"
 	"github.com/mixin27/noteventure/web-service/internal/api/rest"
 	"github.com/mixin27/noteventure/web-service/internal/api/rest/middlewares"
+	"github.com/mixin27/noteventure/web-service/internal/domain/challenge"
 	"github.com/mixin27/noteventure/web-service/internal/domain/sync"
 	"github.com/mixin27/noteventure/web-service/internal/domain/user"
 	"github.com/mixin27/noteventure/web-service/internal/infrastructure/database"
@@ -41,14 +42,17 @@ func main() {
 	// Initialize repositories
 	userRepo := database.NewUserRepository(db)
 	syncRepo := database.NewSyncRepository(db)
+	challengeRepo := database.NewChallengeRepository(db)
 
 	// Initialize services
 	userService := user.NewService(userRepo, cfg)
 	syncService := sync.NewService(syncRepo)
+	challengeService := challenge.NewService(challengeRepo)
 
 	// Initialize handlers
 	authHandler := rest.NewAuthHandler(userService)
 	syncHandler := rest.NewSyncHandler(syncService)
+	challengeHandler := rest.NewChallengeHandler(challengeService)
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -102,6 +106,11 @@ func main() {
 	syncGroup.Get("/pull", syncHandler.Pull)  // Pull only
 	syncGroup.Post("/push", syncHandler.Push) // Push only
 
+	// Challenge routes
+	challengeGroup := protected.Group("/challenges")
+	challengeGroup.Get("/random", challengeHandler.GetRandomChallenge)
+	challengeGroup.Post("/submit", challengeHandler.SubmitAnswer)
+
 	// Graceful shutdown
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -121,6 +130,8 @@ func main() {
 	log.Println("  POST /api/v1/sync (authenticated)")
 	log.Println("  GET  /api/v1/sync/pull (authenticated)")
 	log.Println("  POST /api/v1/sync/push (authenticated)")
+	log.Println("  GET  /api/v1/challenges/random?type=math&difficulty=easy (authenticated)")
+	log.Println("  POST /api/v1/challenges/submit (authenticated)")
 
 	if err := app.Listen(":" + port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
