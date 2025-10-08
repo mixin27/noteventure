@@ -13,6 +13,8 @@ class RouteConstants {
   static const String themes = '/themes';
   static const String settings = '/settings';
   static const String chaos = '/chaos';
+  static const String login = '/login';
+  static const String register = '/register';
 
   // Route names
   static const String splashName = 'splash';
@@ -26,4 +28,6 @@ class RouteConstants {
   static const String themesName = 'themes';
   static const String settingsName = 'settings';
   static const String chaosName = 'chaos';
+  static const String loginName = 'login';
+  static const String registerName = 'register';
 }

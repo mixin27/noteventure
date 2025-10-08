@@ -1,6 +1,8 @@
 import 'package:achievements/achievements.dart';
+import 'package:auth/auth.dart';
 import 'package:challenges/challenges.dart';
 import 'package:chaos/chaos.dart';
+import 'package:core/core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:database/database.dart';
 import 'package:notes/notes.dart';
@@ -8,6 +10,8 @@ import 'package:points/points.dart';
 import 'package:progress/progress.dart';
 import 'package:settings/settings.dart';
 import 'package:themes/themes.dart';
+
+import '../routes/app_router.dart';
 
 final getIt = GetIt.instance;
 
@@ -25,7 +29,11 @@ Future<void> configureDependencies() async {
   getIt.registerSingleton<ThemesDao>(ThemesDao(database));
   getIt.registerSingleton<AppSettingsDao>(AppSettingsDao(database));
 
+  // Core
+  initCoreInjection();
+
   // Initialize features
+  initAuthFeature();
   initNotesFeature();
   initPointsFeature();
   initChallengesFeature();
@@ -34,4 +42,7 @@ Future<void> configureDependencies() async {
   initChaosDependencies();
   initThemesFeature();
   initSettingsDependencies();
+
+  // Router
+  getIt.registerLazySingleton(() => AppRouter(getIt()));
 }

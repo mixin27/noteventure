@@ -1,159 +1,81 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import '../constants/app_constants.dart';
-import '../errors/exceptions.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
-/// Dio client for network requests
+import '../storage/token_storage.dart';
+import 'api_config.dart';
+
 class DioClient {
-  late final Dio _dio;
+  static DioClient? _instance;
+  late Dio _dio;
+  final TokenStorage _tokenStorage;
 
-  DioClient() {
+  DioClient._internal({TokenStorage? tokenStorage})
+    : _tokenStorage = tokenStorage ?? TokenStorage() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: AppConstants.apiBaseUrl,
-        connectTimeout: AppConstants.apiTimeout,
-        receiveTimeout: AppConstants.apiTimeout,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        baseUrl: ApiConfig.baseUrl,
+        connectTimeout: ApiConfig.connectTimeout,
+        receiveTimeout: ApiConfig.receiveTimeout,
+        sendTimeout: ApiConfig.sendTimeout,
+        headers: ApiConfig.defaultHeaders,
       ),
     );
 
-    _dio.interceptors.add(_LoggingInterceptor());
+    _setupInterceptors();
   }
 
-  /// GET request
-  Future<Response> get(
-    String path, {
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) async {
-    try {
-      return await _dio.get(
-        path,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      );
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
+  factory DioClient({TokenStorage? tokenStorage}) {
+    _instance ??= DioClient._internal(tokenStorage: tokenStorage);
+    return _instance!;
   }
 
-  /// POST request
-  Future<Response> post(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) async {
-    try {
-      return await _dio.post(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      );
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
-  }
+  Dio get dio => _dio;
 
-  /// PUT request
-  Future<Response> put(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) async {
-    try {
-      return await _dio.put(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      );
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
-  }
-
-  /// DELETE request
-  Future<Response> delete(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) async {
-    try {
-      return await _dio.delete(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      );
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
-  }
-
-  /// Handle Dio errors
-  AppException _handleError(DioException error) {
-    switch (error.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-      case DioExceptionType.receiveTimeout:
-        return const TimeoutException('Request timed out');
-
-      case DioExceptionType.badResponse:
-        final statusCode = error.response?.statusCode;
-        final message = error.response?.data?['message'] ?? 'Server error';
-        return ServerException(message, statusCode);
-
-      case DioExceptionType.cancel:
-        return const AppException('Request was cancelled');
-
-      case DioExceptionType.connectionError:
-        return const NetworkException('No internet connection');
-
-      default:
-        return AppException('Network error: ${error.message}');
-    }
-  }
-}
-
-/// Logging interceptor for debugging
-class _LoggingInterceptor extends Interceptor {
-  @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    debugPrint('REQUEST[${options.method}] => PATH: ${options.path}');
-    debugPrint('DATA: ${options.data}');
-    super.onRequest(options, handler);
-  }
-
-  @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
-    debugPrint(
-      'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
+  void _setupInterceptors() {
+    _dio.interceptors.add(
+      PrettyDioLogger(
+        requestHeader: true,
+        requestBody: true,
+        responseBody: true,
+        responseHeader: false,
+        error: true,
+        compact: true,
+      ),
     );
-    debugPrint('DATA: ${response.data}');
-    super.onResponse(response, handler);
+
+    // Add auth interceptor
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          // Add token to headers if available
+          final token = await _getToken();
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          return handler.next(options);
+        },
+        onError: (error, handler) async {
+          // Handle 401 Unauthorized
+          if (error.response?.statusCode == 401) {
+            await _tokenStorage.clearTokens();
+            // todo(mixin27): Navigate to login or refresh token
+          }
+          return handler.next(error);
+        },
+      ),
+    );
   }
 
-  @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
-    debugPrint(
-      'ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}',
-    );
-    debugPrint('MESSAGE: ${err.message}');
-    super.onError(err, handler);
+  Future<String?> _getToken() async {
+    return _tokenStorage.getAccessToken();
+  }
+
+  Future<void> updateToken(String token) async {
+    _dio.options.headers['Authorization'] = 'Bearer $token';
+  }
+
+  Future<void> clearToken() async {
+    _dio.options.headers.remove('Authorization');
+    await _tokenStorage.clearTokens();
   }
 }

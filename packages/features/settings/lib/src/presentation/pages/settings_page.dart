@@ -1,5 +1,7 @@
+import 'package:auth/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui/ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -110,6 +112,12 @@ class SettingsView extends StatelessWidget {
                   _buildSectionTitle(context, 'About'),
                   const SizedBox(height: AppSpacing.sm),
                   _buildAboutSection(context),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  _buildSectionTitle(context, 'Account'),
+                  const SizedBox(height: AppSpacing.sm),
+                  _buildAuthSection(context),
+                  const SizedBox(height: AppSpacing.lg),
                 ],
               ),
             );
@@ -346,6 +354,72 @@ class SettingsView extends StatelessWidget {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAuthSection(BuildContext context) {
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthUnauthenticated) {
+          context.go("/login");
+        } else if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      },
+      child: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          final user = state is AuthAuthenticated ? state.user : null;
+          return CustomCard(
+            child: Column(
+              children: [
+                ListTile(
+                  title: Text(user?.username ?? ""),
+                  subtitle: Text(user?.email ?? ""),
+                ),
+                ListTile(
+                  leading: Icon(Icons.logout, color: AppColors.error),
+                  title: Text(
+                    'Logout',
+                    style: TextStyle(color: AppColors.error),
+                  ),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Logout'),
+                        content: const Text('Are you sure you want to logout?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              context.read<AuthBloc>().add(
+                                AuthLogoutRequested(),
+                              );
+                            },
+                            child: Text(
+                              'Logout',
+                              style: TextStyle(color: AppColors.error),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

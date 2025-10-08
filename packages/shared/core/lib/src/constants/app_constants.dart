@@ -34,10 +34,6 @@ class AppConstants {
   static const Duration mediumAnimation = Duration(milliseconds: 400);
   static const Duration longAnimation = Duration(milliseconds: 600);
 
-  // API (for future use)
-  static const String apiBaseUrl = 'https://api.noteventure.app';
-  static const Duration apiTimeout = Duration(seconds: 30);
-
   // Audio
   static const double defaultVolume = 0.7;
   static const bool soundEnabledByDefault = true;

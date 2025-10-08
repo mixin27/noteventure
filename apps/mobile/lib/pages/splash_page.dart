@@ -1,4 +1,6 @@
+import 'package:auth/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/ui.dart';
 
@@ -15,13 +17,21 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    _navigateToHome();
+    _checkAuthStatus();
   }
 
-  Future<void> _navigateToHome() async {
+  Future<void> _checkAuthStatus() async {
+    // Add a small delay for splash screen
     await Future.delayed(const Duration(seconds: 2));
-    if (mounted) {
+
+    if (!mounted) return;
+
+    final authState = context.read<AuthBloc>().state;
+
+    if (authState is AuthAuthenticated) {
       context.go(RouteConstants.home);
+    } else {
+      context.go(RouteConstants.login);
     }
   }
 
@@ -70,6 +80,9 @@ class _SplashPageState extends State<SplashPage> {
                   ),
                 ),
               ),
+              const SizedBox(height: AppSpacing.xl),
+              // Loading Indicator
+              LoadingIndicator(color: Theme.of(context).colorScheme.onPrimary),
             ],
           ),
         ),

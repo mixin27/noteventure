@@ -9,6 +9,7 @@ workspace:
   - packages/shared/core
   - packages/shared/ui
   - packages/shared/database
+  - packages/features/auth
   - packages/features/notes
   - packages/features/challenges
   - packages/features/points
