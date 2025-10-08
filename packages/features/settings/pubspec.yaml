@@ -20,6 +20,9 @@ dependencies:
   database:
     path: ../../shared/database
 
+  auth:
+    path: ../auth
+
   # State Management
   bloc: ^9.0.1
   flutter_bloc: ^9.1.1

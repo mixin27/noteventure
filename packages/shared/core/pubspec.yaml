@@ -16,15 +16,20 @@ dependencies:
   equatable: ^2.0.5
   dartz: ^0.10.1
   intl: ^0.20.0
+  flutter_secure_storage: ^9.2.4
 
   # Network
   dio: ^5.4.0
+  pretty_dio_logger: ^1.4.0
+  retrofit: ^4.7.3
   connectivity_plus: ^7.0.0
+  json_annotation: ^4.9.0
 
   # DI
   get_it: ^8.2.0
   injectable: ^2.5.1
   audioplayers: ^6.5.1
+
 
 dev_dependencies:
   flutter_test:
@@ -32,3 +37,5 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   injectable_generator: ^2.8.1
   build_runner: ^2.7.1
+  json_serializable: ^6.11.1
+  retrofit_generator: ^10.0.6

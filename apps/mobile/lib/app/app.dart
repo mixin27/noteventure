@@ -1,4 +1,5 @@
 import 'package:achievements/achievements.dart';
+import 'package:auth/auth.dart';
 import 'package:challenges/challenges.dart';
 import 'package:chaos/chaos.dart';
 import 'package:core/core.dart';
@@ -14,13 +15,65 @@ import 'package:ui/ui.dart' as ui;
 import '../di/injection.dart';
 import '../routes/app_router.dart';
 
-class NoteventureApp extends StatelessWidget {
+class NoteventureApp extends StatefulWidget {
   const NoteventureApp({super.key});
+
+  @override
+  State<NoteventureApp> createState() => _NoteventureAppState();
+}
+
+class _NoteventureAppState extends State<NoteventureApp>
+    with WidgetsBindingObserver {
+  late final AuthBloc _authBloc;
+  late final AuthStateNotifier _authStateNotifier;
+  late final AppRouter _appRouter;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
+    _authBloc = getIt<AuthBloc>();
+    _authStateNotifier = getIt<AuthStateNotifier>();
+    _appRouter = getIt<AppRouter>();
+
+    // Listen to auth state changes and update notifier
+    _authBloc.stream.listen((state) {
+      _authStateNotifier.updateAuthState(state);
+    });
+
+    // Check initial auth status
+    _authBloc.add(AuthCheckStatusRequested());
+
+    // Initialize chaos service after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {});
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.paused:
+        AppEventBus().emit(AppPausedEvent());
+        break;
+      case AppLifecycleState.resumed:
+        AppEventBus().emit(AppResumedEvent());
+        break;
+      default:
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider.value(value: _authBloc),
         BlocProvider(create: (context) => getIt<NotesBloc>()..add(NotesLoad())),
         BlocProvider(
           create: (context) => getIt<PointsBloc>()..add(LoadPointBalance()),
@@ -48,25 +101,26 @@ class NoteventureApp extends StatelessWidget {
         ),
       ],
 
-      child: _AppContent(),
+      child: _AppContent(_appRouter),
     );
   }
 }
 
 class _AppContent extends StatefulWidget {
-  const _AppContent();
+  const _AppContent(this.appRouter);
+
+  final AppRouter appRouter;
 
   @override
   State<_AppContent> createState() => __AppContentState();
 }
 
-class __AppContentState extends State<_AppContent> with WidgetsBindingObserver {
+class __AppContentState extends State<_AppContent> {
   ChaosTriggerService? _chaosTriggerService;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
 
     // Initialize chaos service after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -78,23 +132,7 @@ class __AppContentState extends State<_AppContent> with WidgetsBindingObserver {
   @override
   void dispose() {
     _chaosTriggerService?.dispose();
-    WidgetsBinding.instance.removeObserver(this);
-    AppEventBus().dispose();
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.paused:
-        AppEventBus().emit(AppPausedEvent());
-        break;
-      case AppLifecycleState.resumed:
-        AppEventBus().emit(AppResumedEvent());
-        break;
-      default:
-        break;
-    }
   }
 
   @override
@@ -143,7 +181,7 @@ class __AppContentState extends State<_AppContent> with WidgetsBindingObserver {
               theme: lightTheme,
               darkTheme: darkTheme,
               themeMode: themeMode,
-              routerConfig: AppRouter.router,
+              routerConfig: widget.appRouter.router,
             );
           },
         );

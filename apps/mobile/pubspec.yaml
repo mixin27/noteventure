@@ -22,6 +22,8 @@ dependencies:
     path: ../../packages/shared/database
 
   # Feature packages
+  auth:
+    path: ../../packages/features/auth
   notes:
     path: ../../packages/features/notes
   challenges:

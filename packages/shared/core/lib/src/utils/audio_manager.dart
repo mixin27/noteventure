@@ -69,6 +69,7 @@ class AudioManager {
   Future<void> playButtonClick() => playSound(AppSound.buttonClick);
   Future<void> playNoteCreated() => playSound(AppSound.noteCreated);
   Future<void> playError() => playSound(AppSound.error);
+  Future<void> playSuccess() => playSound(AppSound.correct);
 
   /// Dispose resources
   Future<void> dispose() async {

@@ -21,5 +21,15 @@ export 'src/utils/xp_calculator.dart';
 export 'src/utils/message_generator.dart';
 export 'src/utils/audio_manager.dart';
 
-// Network
+// Network exports
+export 'src/network/api_config.dart';
 export 'src/network/dio_client.dart';
+export 'src/network/api_response.dart';
+export 'src/network/api_exception.dart';
+export 'src/network/api_services/auth_api_service.dart';
+
+// Storage exports
+export 'src/storage/token_storage.dart';
+export 'src/storage/user_storage.dart';
+
+export 'src/di/core_injection.dart' hide getIt;
