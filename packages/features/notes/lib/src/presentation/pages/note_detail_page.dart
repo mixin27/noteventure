@@ -11,7 +11,7 @@ import '../bloc/notes_state.dart';
 import 'note_editor_page.dart';
 
 class NoteDetailPage extends StatelessWidget {
-  final int noteId;
+  final String noteId;
 
   const NoteDetailPage({super.key, required this.noteId});
 

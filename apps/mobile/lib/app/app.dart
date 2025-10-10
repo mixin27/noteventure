@@ -11,6 +11,7 @@ import 'package:progress/progress.dart';
 import 'package:settings/settings.dart';
 import 'package:themes/themes.dart';
 import 'package:ui/ui.dart' as ui;
+import 'package:syncing/syncing.dart';
 
 import '../di/injection.dart';
 import '../routes/app_router.dart';
@@ -25,6 +26,7 @@ class NoteventureApp extends StatefulWidget {
 class _NoteventureAppState extends State<NoteventureApp>
     with WidgetsBindingObserver {
   late final AuthBloc _authBloc;
+  late final SyncBloc _syncBloc;
   late final AuthStateNotifier _authStateNotifier;
   late final AppRouter _appRouter;
 
@@ -34,12 +36,20 @@ class _NoteventureAppState extends State<NoteventureApp>
     WidgetsBinding.instance.addObserver(this);
 
     _authBloc = getIt<AuthBloc>();
+    _syncBloc = getIt<SyncBloc>();
+
     _authStateNotifier = getIt<AuthStateNotifier>();
     _appRouter = getIt<AppRouter>();
 
     // Listen to auth state changes and update notifier
     _authBloc.stream.listen((state) {
       _authStateNotifier.updateAuthState(state);
+
+      // Trigger sync when user logs in
+      if (state is AuthAuthenticated) {
+        // todo(mixin27): uncomment when get fixed
+        // _syncBloc.add(SyncRequested());
+      }
     });
 
     // Check initial auth status
@@ -66,6 +76,8 @@ class _NoteventureAppState extends State<NoteventureApp>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _authBloc.close();
+    _syncBloc.close();
     super.dispose();
   }
 
@@ -74,6 +86,7 @@ class _NoteventureAppState extends State<NoteventureApp>
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: _authBloc),
+        BlocProvider.value(value: _syncBloc),
         BlocProvider(create: (context) => getIt<NotesBloc>()..add(NotesLoad())),
         BlocProvider(
           create: (context) => getIt<PointsBloc>()..add(LoadPointBalance()),

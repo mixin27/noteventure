@@ -13,6 +13,7 @@ class PointTransactionModel extends PointTransaction {
     super.relatedChallengeId,
     super.relatedEventId,
     required super.balanceAfter,
+    super.serverUuid,
   });
 
   factory PointTransactionModel.fromDrift(
@@ -28,6 +29,7 @@ class PointTransactionModel extends PointTransaction {
       relatedChallengeId: driftTransaction.relatedChallengeId,
       relatedEventId: driftTransaction.relatedEventId,
       balanceAfter: driftTransaction.balanceAfter,
+      serverUuid: driftTransaction.serverUuid,
     );
   }
 
@@ -42,6 +44,7 @@ class PointTransactionModel extends PointTransaction {
       relatedChallengeId: relatedChallengeId,
       relatedEventId: relatedEventId,
       balanceAfter: balanceAfter,
+      serverUuid: serverUuid,
     );
   }
 }

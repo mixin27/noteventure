@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart';
 
+import '../app_database.dart';
+
 /// Table for storing app-wide settings as key-value pairs.
 ///
 /// Settings are stored as strings and parsed to appropriate types
@@ -19,7 +21,8 @@ import 'package:drift/drift.dart';
 @DataClassName('AppSettingsData')
 class AppSettings extends Table {
   /// Primary key
-  IntColumn get id => integer().autoIncrement()();
+  // IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => uuid.v4())();
 
   /// Setting key (e.g., 'sound_enabled', 'theme_mode')
   /// Must be unique to prevent duplicate settings

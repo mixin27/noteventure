@@ -1,8 +1,10 @@
 import 'package:drift/drift.dart';
 
+import '../app_database.dart';
+
 @DataClassName('DailyChallenge')
 class DailyChallenges extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => uuid.v4())();
   DateTimeColumn get date => dateTime()();
   TextColumn get challengeType => text()();
   TextColumn get title => text()();
@@ -12,4 +14,7 @@ class DailyChallenges extends Table {
   IntColumn get pointReward => integer()();
   BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
   DateTimeColumn get completedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }

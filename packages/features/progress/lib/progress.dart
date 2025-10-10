@@ -1,5 +1,8 @@
 library;
 
+// Domain - Repositories
+export 'src/domain/repositories/progress_repository.dart';
+
 // Domain - Entities
 export 'src/domain/entities/user_progress.dart';
 

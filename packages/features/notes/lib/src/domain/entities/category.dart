@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class Category extends Equatable {
-  final int id;
+  final String id;
   final String name;
   final String color;
   final String? icon;
@@ -18,7 +18,7 @@ class Category extends Equatable {
   });
 
   Category copyWith({
-    int? id,
+    String? id,
     String? name,
     String? color,
     String? icon,

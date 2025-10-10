@@ -28,7 +28,7 @@ class CreateNoteParams {
   final String title;
   final String content;
   final NoteType noteType;
-  final int? categoryId;
+  final String? categoryId;
   final String? color;
 
   const CreateNoteParams({

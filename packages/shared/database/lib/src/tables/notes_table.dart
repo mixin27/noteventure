@@ -1,10 +1,12 @@
 import 'package:drift/drift.dart';
 
+import '../app_database.dart';
 import 'categories_table.dart';
 
 @DataClassName('Note')
 class Notes extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  // IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => uuid.v4())();
   TextColumn get title => text().withLength(min: 1, max: 255)();
   TextColumn get content => text()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
@@ -19,7 +21,7 @@ class Notes extends Table {
   DateTimeColumn get unlockDate => dateTime().nullable()();
 
   // Organization
-  IntColumn get categoryId => integer().nullable().references(
+  TextColumn get categoryId => text().nullable().references(
     Categories,
     #id,
     onDelete: KeyAction.setNull,
@@ -37,4 +39,9 @@ class Notes extends Table {
   // Soft delete
   BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
   DateTimeColumn get deletedAt => dateTime().nullable()();
+
+  TextColumn get serverUuid => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }

@@ -21,6 +21,7 @@ class NoteModel extends Note {
     super.requiredChallengeLevel,
     required super.isDeleted,
     super.deletedAt,
+    super.serverUuid,
   });
 
   /// Convert from Drift Note to NoteModel
@@ -43,6 +44,7 @@ class NoteModel extends Note {
       requiredChallengeLevel: driftNote.requiredChallengeLevel,
       isDeleted: driftNote.isDeleted,
       deletedAt: driftNote.deletedAt,
+      serverUuid: driftNote.serverUuid,
     );
   }
 
@@ -66,6 +68,7 @@ class NoteModel extends Note {
       requiredChallengeLevel: requiredChallengeLevel,
       isDeleted: isDeleted,
       deletedAt: deletedAt,
+      serverUuid: serverUuid,
     );
   }
 }

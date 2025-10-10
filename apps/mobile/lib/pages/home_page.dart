@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:points/points.dart';
 import 'package:progress/progress.dart';
 import 'package:settings/settings.dart';
+import 'package:syncing/syncing.dart';
 import 'package:ui/ui.dart';
 import 'package:core/core.dart';
 import 'package:notes/notes.dart';
@@ -18,47 +19,90 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return BlocListener<ChaosBloc, ChaosState>(
-      listener: (context, state) {
-        if (state is ChaosEventTriggered) {
-          // Play sound effect
-          AudioManager().playChaosEvent();
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<ChaosBloc, ChaosState>(
+          listener: (context, state) {
+            if (state is ChaosEventTriggered) {
+              // Play sound effect
+              AudioManager().playChaosEvent();
 
-          // Emit event to event bus
-          AppEventBus().emit(
-            ChaosEventTriggeredEvent(
-              eventKey: state.event.eventKey,
-              eventType: state.event.eventType.name,
-              title: state.event.title,
-              message: state.event.message,
-            ),
-          );
+              // Emit event to event bus
+              AppEventBus().emit(
+                ChaosEventTriggeredEvent(
+                  eventKey: state.event.eventKey,
+                  eventType: state.event.eventType.name,
+                  title: state.event.title,
+                  message: state.event.message,
+                ),
+              );
 
-          // Show notification based on event type
-          if (state.event.eventType == ChaosEventType.positive) {
-            // Important positive events get full dialog
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) => ChaosEventDialog(event: state.event),
-            );
-          } else {
-            // Negative/neutral get snackbar
-            ChaosEventSnackBar.show(context, state.event);
-          }
+              // Show notification based on event type
+              if (state.event.eventType == ChaosEventType.positive) {
+                // Important positive events get full dialog
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => ChaosEventDialog(event: state.event),
+                );
+              } else {
+                // Negative/neutral get snackbar
+                ChaosEventSnackBar.show(context, state.event);
+              }
 
-          // Award points if any
-          if (state.event.pointsAwarded > 0) {
-            context.read<PointsBloc>().add(
-              EarnPointsEvent(
-                amount: state.event.pointsAwarded,
-                reason: 'chaos_event',
-                description: state.event.title,
-              ),
-            );
-          }
-        }
-      },
+              // Award points if any
+              if (state.event.pointsAwarded > 0) {
+                context.read<PointsBloc>().add(
+                  EarnPointsEvent(
+                    amount: state.event.pointsAwarded,
+                    reason: 'chaos_event',
+                    description: state.event.title,
+                  ),
+                );
+              }
+            }
+          },
+        ),
+
+        BlocListener<SyncBloc, SyncState>(
+          listener: (context, state) {
+            if (state is SyncSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      const Icon(Icons.cloud_done, color: Colors.white),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Synced: ${state.result.notesSynced} notes, '
+                          '${state.result.transactionsSynced} transactions',
+                        ),
+                      ),
+                    ],
+                  ),
+                  backgroundColor: AppColors.success,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            } else if (state is SyncError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      const Icon(Icons.cloud_off, color: Colors.white),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(state.message)),
+                    ],
+                  ),
+                  backgroundColor: AppColors.error,
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            }
+          },
+        ),
+      ],
       child: Scaffold(
         body: RefreshIndicator(
           onRefresh: () async {

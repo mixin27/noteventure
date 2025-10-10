@@ -43,7 +43,7 @@ class ChaosRepositoryImpl implements ChaosRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> resolveEvent(int id) async {
+  Future<Either<Failure, Unit>> resolveEvent(String id) async {
     try {
       await localDataSource.resolveEvent(id);
       return const Right(unit);

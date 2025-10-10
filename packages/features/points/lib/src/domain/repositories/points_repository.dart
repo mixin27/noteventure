@@ -15,7 +15,7 @@ abstract class PointsRepository {
     required int amount,
     required String reason,
     String? description,
-    int? relatedNoteId,
+    String? relatedNoteId,
   });
 
   /// Earn points
@@ -23,7 +23,7 @@ abstract class PointsRepository {
     required int amount,
     required String reason,
     String? description,
-    int? relatedChallengeId,
+    String? relatedChallengeId,
   });
 
   /// Get recent transactions

@@ -1,10 +1,12 @@
 import 'package:drift/drift.dart';
 
+import '../app_database.dart';
 import 'notes_table.dart';
 
 @DataClassName('ChallengeHistoryEntry')
 class ChallengeHistory extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  // IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => uuid.v4())();
   TextColumn get challengeType =>
       text()(); // "math", "trivia", "word_game", etc.
   TextColumn get difficulty => text()(); // "easy", "medium", "hard"
@@ -37,4 +39,7 @@ class ChallengeHistory extends Table {
     #id,
     onDelete: KeyAction.setNull,
   )();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }

@@ -22,6 +22,8 @@ dependencies:
 
   auth:
     path: ../auth
+  syncing:
+    path: ../syncing
 
   # State Management
   bloc: ^9.0.1

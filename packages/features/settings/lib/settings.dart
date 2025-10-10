@@ -1,5 +1,8 @@
 library;
 
+// Domain - Repositories
+export 'src/domain/repositories/settings_repository.dart';
+
 // Domain - Entities
 export 'src/domain/entities/app_settings.dart';
 export 'src/domain/usecases/watch_settings.dart';

@@ -1,5 +1,8 @@
 library;
 
+// Domain - Repositories
+export 'src/domain/repositories/points_repository.dart';
+
 // Domain - Entities
 export 'src/domain/entities/point_transaction.dart';
 

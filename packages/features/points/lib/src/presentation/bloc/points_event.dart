@@ -13,7 +13,7 @@ final class SpendPointsEvent extends PointsEvent {
   final int amount;
   final String reason;
   final String? description;
-  final int? relatedNoteId;
+  final String? relatedNoteId;
 
   const SpendPointsEvent({
     required this.amount,
@@ -30,7 +30,7 @@ final class EarnPointsEvent extends PointsEvent {
   final int amount;
   final String reason;
   final String? description;
-  final int? relatedChallengeId;
+  final String? relatedChallengeId;
 
   const EarnPointsEvent({
     required this.amount,

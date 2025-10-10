@@ -9,6 +9,7 @@ import 'package:notes/notes.dart';
 import 'package:points/points.dart';
 import 'package:progress/progress.dart';
 import 'package:settings/settings.dart';
+import 'package:syncing/syncing.dart';
 import 'package:themes/themes.dart';
 
 import '../routes/app_router.dart';
@@ -42,6 +43,7 @@ Future<void> configureDependencies() async {
   initChaosDependencies();
   initThemesFeature();
   initSettingsDependencies();
+  initSyncingFeature();
 
   // Router
   getIt.registerLazySingleton(() => AppRouter(getIt()));

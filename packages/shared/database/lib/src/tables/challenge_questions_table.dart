@@ -1,8 +1,10 @@
 import 'package:drift/drift.dart';
 
+import '../app_database.dart';
+
 @DataClassName('ChallengeQuestion')
 class ChallengeQuestions extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => uuid.v4())();
   TextColumn get challengeType => text()();
   TextColumn get difficulty => text()();
   TextColumn get question => text()();
@@ -14,4 +16,7 @@ class ChallengeQuestions extends Table {
       text().nullable()(); // For trivia: "history", "science", etc.
   IntColumn get timesUsed => integer().withDefault(const Constant(0))();
   DateTimeColumn get lastUsed => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }

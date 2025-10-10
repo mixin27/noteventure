@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:core/core.dart';
 import 'package:database/database.dart';
 import 'package:drift/drift.dart';
@@ -8,8 +10,8 @@ import '../../domain/entities/note.dart';
 
 abstract class NotesLocalDataSource {
   Future<List<NoteModel>> getAllNotes();
-  Future<List<NoteModel>> getNotesByCategory(int categoryId);
-  Future<NoteModel> getNoteById(int id);
+  Future<List<NoteModel>> getNotesByCategory(String categoryId);
+  Future<NoteModel> getNoteById(String id);
   Future<List<NoteModel>> getPinnedNotes();
   Future<List<NoteModel>> getFavoriteNotes();
   Future<List<NoteModel>> searchNotes(String query);
@@ -17,19 +19,19 @@ abstract class NotesLocalDataSource {
     required String title,
     required String content,
     NoteType noteType = NoteType.standard,
-    int? categoryId,
+    String? categoryId,
     String? color,
   });
   Future<NoteModel> updateNote({
-    required int id,
+    required String id,
     String? title,
     String? content,
-    int? categoryId,
+    String? categoryId,
     String? color,
   });
-  Future<void> deleteNote(int id);
-  Future<NoteModel> togglePin(int id);
-  Future<NoteModel> toggleFavorite(int id);
+  Future<void> deleteNote(String id);
+  Future<NoteModel> togglePin(String id);
+  Future<NoteModel> toggleFavorite(String id);
   Future<List<CategoryModel>> getAllCategories();
   Future<CategoryModel> createCategory({
     required String name,
@@ -37,14 +39,14 @@ abstract class NotesLocalDataSource {
     String? icon,
   });
   Future<CategoryModel> updateCategory({
-    required int id,
+    required String id,
     String? name,
     String? color,
     String? icon,
   });
-  Future<void> deleteCategory(int id);
+  Future<void> deleteCategory(String id);
   Stream<List<NoteModel>> watchAllNotes();
-  Stream<NoteModel> watchNoteById(int id);
+  Stream<NoteModel> watchNoteById(String id);
 }
 
 class NotesLocalDataSourceImpl implements NotesLocalDataSource {
@@ -59,13 +61,13 @@ class NotesLocalDataSourceImpl implements NotesLocalDataSource {
   }
 
   @override
-  Future<List<NoteModel>> getNotesByCategory(int categoryId) async {
+  Future<List<NoteModel>> getNotesByCategory(String categoryId) async {
     final notes = await notesDao.getNotesByCategory(categoryId);
     return notes.map((note) => NoteModel.fromDrift(note)).toList();
   }
 
   @override
-  Future<NoteModel> getNoteById(int id) async {
+  Future<NoteModel> getNoteById(String id) async {
     final note = await notesDao.getNoteById(id);
     if (note == null) {
       throw const NotFoundException('Note not found');
@@ -96,10 +98,12 @@ class NotesLocalDataSourceImpl implements NotesLocalDataSource {
     required String title,
     required String content,
     NoteType noteType = NoteType.standard,
-    int? categoryId,
+    String? categoryId,
     String? color,
   }) async {
+    final noteId = uuid.v4();
     final companion = NotesCompanion.insert(
+      id: Value(noteId),
       title: title,
       content: content,
       noteType: Value(noteType.name),
@@ -107,9 +111,9 @@ class NotesLocalDataSourceImpl implements NotesLocalDataSource {
       color: Value(color),
     );
 
-    final noteId = await notesDao.createNote(companion);
-    final note = await notesDao.getNoteById(noteId);
+    await notesDao.createNote(companion);
 
+    final note = await notesDao.getNoteById(noteId);
     if (note == null) {
       throw const DatabaseException('Failed to create note');
     }
@@ -119,10 +123,10 @@ class NotesLocalDataSourceImpl implements NotesLocalDataSource {
 
   @override
   Future<NoteModel> updateNote({
-    required int id,
+    required String id,
     String? title,
     String? content,
-    int? categoryId,
+    String? categoryId,
     String? color,
   }) async {
     final companion = NotesCompanion(
@@ -150,12 +154,12 @@ class NotesLocalDataSourceImpl implements NotesLocalDataSource {
   }
 
   @override
-  Future<void> deleteNote(int id) async {
+  Future<void> deleteNote(String id) async {
     await notesDao.softDeleteNote(id);
   }
 
   @override
-  Future<NoteModel> togglePin(int id) async {
+  Future<NoteModel> togglePin(String id) async {
     final note = await notesDao.getNoteById(id);
     if (note == null) {
       throw const NotFoundException('Note not found');
@@ -172,7 +176,7 @@ class NotesLocalDataSourceImpl implements NotesLocalDataSource {
   }
 
   @override
-  Future<NoteModel> toggleFavorite(int id) async {
+  Future<NoteModel> toggleFavorite(String id) async {
     final note = await notesDao.getNoteById(id);
     if (note == null) {
       throw const NotFoundException('Note not found');
@@ -206,7 +210,7 @@ class NotesLocalDataSourceImpl implements NotesLocalDataSource {
 
   @override
   Future<CategoryModel> updateCategory({
-    required int id,
+    required String id,
     String? name,
     String? color,
     String? icon,
@@ -216,7 +220,7 @@ class NotesLocalDataSourceImpl implements NotesLocalDataSource {
   }
 
   @override
-  Future<void> deleteCategory(int id) async {
+  Future<void> deleteCategory(String id) async {
     // todo(mixin27): Implement when CategoriesDao is created
     throw UnimplementedError();
   }
@@ -229,7 +233,7 @@ class NotesLocalDataSourceImpl implements NotesLocalDataSource {
   }
 
   @override
-  Stream<NoteModel> watchNoteById(int id) {
+  Stream<NoteModel> watchNoteById(String id) {
     return notesDao.watchNoteById(id).map((note) {
       if (note == null) {
         throw const NotFoundException('Note not found');

@@ -57,7 +57,7 @@ class PointsChangedEvent extends AppEvent {
 class PointsSpentEvent extends AppEvent {
   final int amount;
   final String action;
-  final int? relatedId;
+  final String? relatedId;
 
   PointsSpentEvent({
     required this.amount,
@@ -69,7 +69,7 @@ class PointsSpentEvent extends AppEvent {
 class PointsEarnedEvent extends AppEvent {
   final int amount;
   final String source;
-  final int? relatedId;
+  final String? relatedId;
 
   PointsEarnedEvent({
     required this.amount,
@@ -80,27 +80,27 @@ class PointsEarnedEvent extends AppEvent {
 
 /// Note-related events
 class NoteCreatedEvent extends AppEvent {
-  final int noteId;
+  final String noteId;
   final String noteType;
 
   NoteCreatedEvent({required this.noteId, required this.noteType});
 }
 
 class NoteUpdatedEvent extends AppEvent {
-  final int noteId;
+  final String noteId;
 
   NoteUpdatedEvent(this.noteId);
 }
 
 class NoteDeletedEvent extends AppEvent {
-  final int noteId;
+  final String noteId;
 
   NoteDeletedEvent(this.noteId);
 }
 
 /// Challenge-related events
 class ChallengeCompletedEvent extends AppEvent {
-  final int challengeId;
+  final String challengeId;
   final bool wasCorrect;
   final int pointsEarned;
   final int xpEarned;
@@ -116,7 +116,7 @@ class ChallengeCompletedEvent extends AppEvent {
 }
 
 class ChallengeFailedEvent extends AppEvent {
-  final int challengeId;
+  final String challengeId;
   final String challengeType;
   final int pointsLost;
 

@@ -1,7 +1,10 @@
 import 'package:auth/auth.dart';
+import 'package:core/core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:syncing/syncing.dart';
 import 'package:ui/ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -106,6 +109,12 @@ class SettingsView extends StatelessWidget {
                   _buildSectionTitle(context, 'Content'),
                   const SizedBox(height: AppSpacing.sm),
                   _buildContentSettings(context, settings),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Sync Section
+                  _buildSectionTitle(context, 'Sync'),
+                  const SizedBox(height: AppSpacing.sm),
+                  _buildSyncSection(context),
                   const SizedBox(height: AppSpacing.lg),
 
                   // About Section
@@ -321,6 +330,54 @@ class SettingsView extends StatelessWidget {
     );
   }
 
+  Widget _buildSyncSection(BuildContext context) {
+    return CustomCard(
+      child: Column(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.cloud_sync),
+            title: const Text('Data Sync'),
+            subtitle: BlocBuilder<SyncBloc, SyncState>(
+              builder: (context, state) {
+                if (state is LastSyncLoaded && state.lastSyncTime != null) {
+                  return Text('Last synced: ${state.lastSyncTime!.timeAgo}');
+                }
+                return const Text('Never synced');
+              },
+            ),
+            trailing: BlocBuilder<SyncBloc, SyncState>(
+              builder: (context, state) {
+                final isSyncing = state is SyncInProgress;
+
+                if (isSyncing) {
+                  return const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  );
+                }
+
+                return IconButton(
+                  icon: const Icon(Icons.sync),
+                  onPressed: () {
+                    context.read<SyncBloc>().add(SyncRequested());
+                  },
+                );
+              },
+            ),
+            onTap: () {
+              // Show sync details dialog
+              showDialog(
+                context: context,
+                builder: (context) => const SyncDetailsDialog(),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildAboutSection(BuildContext context) {
     return CustomCard(
       child: Column(
@@ -378,6 +435,12 @@ class SettingsView extends StatelessWidget {
           return CustomCard(
             child: Column(
               children: [
+                if (kDebugMode)
+                  ListTile(
+                    leading: const Icon(Icons.bug_report),
+                    title: const Text('Debug Tools'),
+                    onTap: () => context.push("/debug"),
+                  ),
                 ListTile(
                   title: Text(user?.username ?? ""),
                   subtitle: Text(user?.email ?? ""),

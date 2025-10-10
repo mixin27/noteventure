@@ -39,7 +39,7 @@ class PointsRepositoryImpl implements PointsRepository {
     required int amount,
     required String reason,
     String? description,
-    int? relatedNoteId,
+    String? relatedNoteId,
   }) async {
     try {
       final newBalance = await localDataSource.spendPoints(
@@ -65,7 +65,7 @@ class PointsRepositoryImpl implements PointsRepository {
     required int amount,
     required String reason,
     String? description,
-    int? relatedChallengeId,
+    String? relatedChallengeId,
   }) async {
     try {
       final newBalance = await localDataSource.earnPoints(

@@ -1,9 +1,8 @@
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 class AppTheme extends Equatable {
-  final int id;
+  final String id;
   final String themeKey;
   final String name;
   final String description;
@@ -33,13 +32,17 @@ class AppTheme extends Equatable {
     required this.themeStyle,
   });
 
-  Color get primaryColorValue => Color(int.parse(primaryColor.substring(1), radix: 16) + 0xFF000000);
-  Color get secondaryColorValue => Color(int.parse(secondaryColor.substring(1), radix: 16) + 0xFF000000);
-  Color get backgroundColorValue => Color(int.parse(backgroundColor.substring(1), radix: 16) + 0xFF000000);
-  Color get surfaceColorValue => Color(int.parse(surfaceColor.substring(1), radix: 16) + 0xFF000000);
+  Color get primaryColorValue =>
+      Color(int.parse(primaryColor.substring(1), radix: 16) + 0xFF000000);
+  Color get secondaryColorValue =>
+      Color(int.parse(secondaryColor.substring(1), radix: 16) + 0xFF000000);
+  Color get backgroundColorValue =>
+      Color(int.parse(backgroundColor.substring(1), radix: 16) + 0xFF000000);
+  Color get surfaceColorValue =>
+      Color(int.parse(surfaceColor.substring(1), radix: 16) + 0xFF000000);
 
   AppTheme copyWith({
-    int? id,
+    String? id,
     String? themeKey,
     String? name,
     String? description,
@@ -72,18 +75,18 @@ class AppTheme extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        themeKey,
-        name,
-        description,
-        unlockCost,
-        isUnlocked,
-        unlockedAt,
-        isActive,
-        primaryColor,
-        secondaryColor,
-        backgroundColor,
-        surfaceColor,
-        themeStyle,
-      ];
+    id,
+    themeKey,
+    name,
+    description,
+    unlockCost,
+    isUnlocked,
+    unlockedAt,
+    isActive,
+    primaryColor,
+    secondaryColor,
+    backgroundColor,
+    surfaceColor,
+    themeStyle,
+  ];
 }

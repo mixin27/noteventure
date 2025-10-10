@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class Note extends Equatable {
-  final int id;
+  final String id;
   final String title;
   final String content;
   final DateTime createdAt;
@@ -10,7 +10,7 @@ class Note extends Equatable {
   final NoteType noteType;
   final bool isLocked;
   final DateTime? unlockDate;
-  final int? categoryId;
+  final String? categoryId;
   final int sortOrder;
   final String? color;
   final bool isPinned;
@@ -18,6 +18,7 @@ class Note extends Equatable {
   final int? requiredChallengeLevel;
   final bool isDeleted;
   final DateTime? deletedAt;
+  final String? serverUuid;
 
   const Note({
     required this.id,
@@ -37,10 +38,11 @@ class Note extends Equatable {
     this.requiredChallengeLevel,
     required this.isDeleted,
     this.deletedAt,
+    this.serverUuid,
   });
 
   Note copyWith({
-    int? id,
+    String? id,
     String? title,
     String? content,
     DateTime? createdAt,
@@ -49,7 +51,7 @@ class Note extends Equatable {
     NoteType? noteType,
     bool? isLocked,
     DateTime? unlockDate,
-    int? categoryId,
+    String? categoryId,
     int? sortOrder,
     String? color,
     bool? isPinned,
@@ -57,6 +59,7 @@ class Note extends Equatable {
     int? requiredChallengeLevel,
     bool? isDeleted,
     DateTime? deletedAt,
+    String? serverUuid,
   }) {
     return Note(
       id: id ?? this.id,
@@ -77,6 +80,7 @@ class Note extends Equatable {
           requiredChallengeLevel ?? this.requiredChallengeLevel,
       isDeleted: isDeleted ?? this.isDeleted,
       deletedAt: deletedAt ?? this.deletedAt,
+      serverUuid: serverUuid ?? this.serverUuid,
     );
   }
 
@@ -99,6 +103,7 @@ class Note extends Equatable {
     requiredChallengeLevel,
     isDeleted,
     deletedAt,
+    serverUuid,
   ];
 }
 

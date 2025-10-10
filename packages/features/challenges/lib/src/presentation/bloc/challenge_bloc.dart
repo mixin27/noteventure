@@ -118,7 +118,7 @@ class ChallengeBloc extends Bloc<ChallengeEvent, ChallengeState> {
         // Emit event via EventBus
         AppEventBus().emit(
           ChallengeCompletedEvent(
-            challengeId: 0, // todo(mixin27): Add proper ID
+            challengeId: "0", // todo(mixin27): Add proper ID
             wasCorrect: true,
             pointsEarned: challenge.pointReward,
             xpEarned: challenge.xpReward,
@@ -149,7 +149,7 @@ class ChallengeBloc extends Bloc<ChallengeEvent, ChallengeState> {
         // Emit event via EventBus
         AppEventBus().emit(
           ChallengeFailedEvent(
-            challengeId: 0, // todo(mixin27): Add proper ID
+            challengeId: "0", // todo(mixin27): Add proper ID
             challengeType: challenge.type.name,
             pointsLost: 0,
           ),

@@ -8,7 +8,7 @@ class TogglePinNote {
 
   TogglePinNote(this.repository);
 
-  Future<Either<Failure, Note>> call(int noteId) async {
+  Future<Either<Failure, Note>> call(String noteId) async {
     return await repository.togglePin(noteId);
   }
 }

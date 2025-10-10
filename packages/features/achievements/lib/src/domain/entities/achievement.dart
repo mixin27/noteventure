@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class Achievement extends Equatable {
-  final int id;
+  final String id;
   final String achievementKey;
   final String name;
   final String description;
@@ -35,7 +35,7 @@ class Achievement extends Equatable {
   bool get isCompleted => currentProgress >= targetValue;
 
   Achievement copyWith({
-    int? id,
+    String? id,
     String? achievementKey,
     String? name,
     String? description,

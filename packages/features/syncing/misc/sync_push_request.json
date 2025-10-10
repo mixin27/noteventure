@@ -1,0 +1,138 @@
+{
+    "device_id": "android_AP3A.240905.015.A2",
+    "last_sync": null,
+    "notes": [
+        {
+            "id": "8879247c-d44b-4eb3-89eb-2fe41a9595f0",
+            "title": "My First Note",
+            "content": "I am writing to seek clarification regarding my Offer of Place for the Postgraduate Certificate in Computer and Information Sciences.\n\nI had originally applied for the Master’s programme, but I understand that my IELTS result (Overall 6.5 with 5.5 in Speaking) may have influenced the decision to offer me the certificate pathway first, with the option to progress to the Master’s upon achieving the required academic grade.\n\nCould you please confirm whether, if I provide a new IELTS result with Overall 6.5 and no band lower than 6.0, I would then be eligible to be reconsidered for direct entry into the Master’s programme?\n\nI appreciate your time and guidance, and I look forward to your response.\n\nKind regards,\nKyaw Zayar Tun",
+            "note_type": "standard",
+            "is_locked": false,
+            "unlock_date": null,
+            "category_id": null,
+            "sort_order": 0,
+            "color": null,
+            "is_pinned": false,
+            "is_favorite": false,
+            "required_challenge_level": null,
+            "is_deleted": false,
+            "deleted_at": null,
+            "edit_count": 0,
+            "created_at": "2025-10-08T10:01:06.000Z",
+            "updated_at": "2025-10-08T10:01:06.000Z",
+            "device_id": "android_AP3A.240905.015.A2",
+            "version": 1
+        }
+    ],
+    "progress": {
+        "total_points": 0,
+        "lifetime_points_earned": 0,
+        "lifetime_points_spent": 0,
+        "level": 2,
+        "current_xp": 5,
+        "xp_to_next_level": 150,
+        "current_streak": 7,
+        "longest_streak": 7,
+        "last_challenge_date": "2025-10-08T10:02:49.000Z",
+        "total_challenges_solved": 7,
+        "total_challenges_failed": 0,
+        "total_notes_created": 1,
+        "total_notes_deleted": 0,
+        "chaos_enabled": true,
+        "challenge_time_limit": 30,
+        "personality_tone": "random",
+        "sound_enabled": true,
+        "notifications_enabled": true,
+        "updated_at": "2025-10-10T09:33:52.383363Z"
+    },
+    "transactions": [
+        {
+            "id": "2307e7dd-0173-48a2-a018-40cc97fbc09e",
+            "amount": 10,
+            "reason": "challenge_completed",
+            "description": "Completed Pattern challenge",
+            "related_note_id": null,
+            "related_challenge_id": null,
+            "related_event_id": null,
+            "balance_after": 160,
+            "timestamp": "2025-10-08T10:02:49.000Z"
+        },
+        {
+            "id": "993b20cd-7067-4465-94b3-9960f528cd61",
+            "amount": 10,
+            "reason": "challenge_completed",
+            "description": "Completed Word Game challenge",
+            "related_note_id": null,
+            "related_challenge_id": null,
+            "related_event_id": null,
+            "balance_after": 150,
+            "timestamp": "2025-10-08T10:01:38.000Z"
+        },
+        {
+            "id": "dd8dcff4-7511-44f0-8821-95db9347906f",
+            "amount": -10,
+            "reason": "note_created",
+            "description": "Created Standard note",
+            "related_note_id": null,
+            "related_challenge_id": null,
+            "related_event_id": null,
+            "balance_after": 140,
+            "timestamp": "2025-10-08T10:01:06.000Z"
+        },
+        {
+            "id": "60d11a5f-64c3-4b6a-83f4-245dc1f9f6df",
+            "amount": 10,
+            "reason": "challenge_completed",
+            "description": "Completed Pattern challenge",
+            "related_note_id": null,
+            "related_challenge_id": null,
+            "related_event_id": null,
+            "balance_after": 150,
+            "timestamp": "2025-10-08T05:59:50.000Z"
+        },
+        {
+            "id": "cb564435-2d7d-4c93-8e85-3581d324356e",
+            "amount": 10,
+            "reason": "challenge_completed",
+            "description": "Completed Pattern challenge",
+            "related_note_id": null,
+            "related_challenge_id": null,
+            "related_event_id": null,
+            "balance_after": 140,
+            "timestamp": "2025-10-08T05:59:40.000Z"
+        },
+        {
+            "id": "38201efc-a134-4767-b0a5-272d81527b2b",
+            "amount": 10,
+            "reason": "challenge_completed",
+            "description": "Completed Pattern challenge",
+            "related_note_id": null,
+            "related_challenge_id": null,
+            "related_event_id": null,
+            "balance_after": 130,
+            "timestamp": "2025-10-08T05:59:34.000Z"
+        },
+        {
+            "id": "0bbf8cc1-9107-4835-a4f8-90e17325f8f3",
+            "amount": 10,
+            "reason": "challenge_completed",
+            "description": "Completed Pattern challenge",
+            "related_note_id": null,
+            "related_challenge_id": null,
+            "related_event_id": null,
+            "balance_after": 120,
+            "timestamp": "2025-10-08T05:59:23.000Z"
+        },
+        {
+            "id": "7408f6f3-4a98-446c-8ed3-b28f547f10cb",
+            "amount": 10,
+            "reason": "challenge_completed",
+            "description": "Completed Trivia challenge",
+            "related_note_id": null,
+            "related_challenge_id": null,
+            "related_event_id": null,
+            "balance_after": 110,
+            "timestamp": "2025-10-08T05:59:11.000Z"
+        }
+    ]
+}

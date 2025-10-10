@@ -7,7 +7,7 @@ abstract class ChaosLocalDataSource {
   Future<List<ChaosEventModel>> getAllEvents();
   Future<List<ChaosEventModel>> getRecentEvents({int limit});
   Future<ChaosEventModel> triggerRandomEvent();
-  Future<void> resolveEvent(int id);
+  Future<void> resolveEvent(String id);
   Stream<List<ChaosEventModel>> watchEvents();
 }
 
@@ -43,7 +43,7 @@ class ChaosLocalDataSourceImpl implements ChaosLocalDataSource {
   }
 
   @override
-  Future<void> resolveEvent(int id) async {
+  Future<void> resolveEvent(String id) async {
     await chaosEventsDao.markAsResolved(id);
   }
 

@@ -58,6 +58,7 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
       'theme_mode': settingsMap['theme_mode'] ?? 'system',
       'show_tutorial': _parseBool(settingsMap['show_tutorial'], true),
       'profanity_filter': _parseBool(settingsMap['profanity_filter'], true),
+      'last_sync_timestamp': settingsMap['last_sync_timestamp'],
     });
   }
 
@@ -99,6 +100,7 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
         'theme_mode': settingsMap['theme_mode'] ?? 'system',
         'show_tutorial': _parseBool(settingsMap['show_tutorial'], true),
         'profanity_filter': _parseBool(settingsMap['profanity_filter'], true),
+        'last_sync_timestamp': settingsMap['last_sync_timestamp'],
       });
     });
   }

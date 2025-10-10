@@ -11,6 +11,7 @@ class AppSettingsModel extends AppSettings {
     required super.themeMode,
     required super.showTutorial,
     required super.profanityFilter,
+    super.lastSyncTimestamp,
   });
 
   factory AppSettingsModel.fromEntity(AppSettings entity) {
@@ -24,6 +25,7 @@ class AppSettingsModel extends AppSettings {
       themeMode: entity.themeMode,
       showTutorial: entity.showTutorial,
       profanityFilter: entity.profanityFilter,
+      lastSyncTimestamp: entity.lastSyncTimestamp,
     );
   }
 
@@ -38,6 +40,7 @@ class AppSettingsModel extends AppSettings {
       themeMode: themeMode,
       showTutorial: showTutorial,
       profanityFilter: profanityFilter,
+      lastSyncTimestamp: lastSyncTimestamp,
     );
   }
 
@@ -54,6 +57,9 @@ class AppSettingsModel extends AppSettings {
       themeMode: settings['theme_mode'] as String? ?? 'system',
       showTutorial: settings['show_tutorial'] as bool? ?? true,
       profanityFilter: settings['profanity_filter'] as bool? ?? true,
+      lastSyncTimestamp: settings['last_sync_timestamp'] != null
+          ? DateTime.tryParse(settings['last_sync_timestamp'])
+          : null,
     );
   }
 
@@ -68,6 +74,7 @@ class AppSettingsModel extends AppSettings {
       'theme_mode': themeMode,
       'show_tutorial': showTutorial,
       'profanity_filter': profanityFilter,
+      'last_sync_timestamp': lastSyncTimestamp?.toIso8601String() ?? '',
     };
   }
 }

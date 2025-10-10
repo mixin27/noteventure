@@ -23,7 +23,9 @@ class NotesRepositoryImpl implements NotesRepository {
   }
 
   @override
-  Future<Either<Failure, List<Note>>> getNotesByCategory(int categoryId) async {
+  Future<Either<Failure, List<Note>>> getNotesByCategory(
+    String categoryId,
+  ) async {
     try {
       final notes = await localDataSource.getNotesByCategory(categoryId);
       return Right(notes.map((model) => model.toEntity()).toList());
@@ -35,7 +37,7 @@ class NotesRepositoryImpl implements NotesRepository {
   }
 
   @override
-  Future<Either<Failure, Note>> getNoteById(int id) async {
+  Future<Either<Failure, Note>> getNoteById(String id) async {
     try {
       final note = await localDataSource.getNoteById(id);
       return Right(note.toEntity());
@@ -89,7 +91,7 @@ class NotesRepositoryImpl implements NotesRepository {
     required String title,
     required String content,
     NoteType noteType = NoteType.standard,
-    int? categoryId,
+    String? categoryId,
     String? color,
   }) async {
     try {
@@ -110,10 +112,10 @@ class NotesRepositoryImpl implements NotesRepository {
 
   @override
   Future<Either<Failure, Note>> updateNote({
-    required int id,
+    required String id,
     String? title,
     String? content,
-    int? categoryId,
+    String? categoryId,
     String? color,
   }) async {
     try {
@@ -135,7 +137,7 @@ class NotesRepositoryImpl implements NotesRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteNote(int id) async {
+  Future<Either<Failure, void>> deleteNote(String id) async {
     try {
       await localDataSource.deleteNote(id);
       return const Right(null);
@@ -147,7 +149,7 @@ class NotesRepositoryImpl implements NotesRepository {
   }
 
   @override
-  Future<Either<Failure, Note>> togglePin(int id) async {
+  Future<Either<Failure, Note>> togglePin(String id) async {
     try {
       final note = await localDataSource.togglePin(id);
       return Right(note.toEntity());
@@ -161,7 +163,7 @@ class NotesRepositoryImpl implements NotesRepository {
   }
 
   @override
-  Future<Either<Failure, Note>> toggleFavorite(int id) async {
+  Future<Either<Failure, Note>> toggleFavorite(String id) async {
     try {
       final note = await localDataSource.toggleFavorite(id);
       return Right(note.toEntity());
@@ -208,7 +210,7 @@ class NotesRepositoryImpl implements NotesRepository {
 
   @override
   Future<Either<Failure, Category>> updateCategory({
-    required int id,
+    required String id,
     String? name,
     String? color,
     String? icon,
@@ -231,7 +233,7 @@ class NotesRepositoryImpl implements NotesRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteCategory(int id) async {
+  Future<Either<Failure, void>> deleteCategory(String id) async {
     try {
       await localDataSource.deleteCategory(id);
       return const Right(null);
@@ -254,7 +256,7 @@ class NotesRepositoryImpl implements NotesRepository {
   }
 
   @override
-  Stream<Either<Failure, Note>> watchNoteById(int id) {
+  Stream<Either<Failure, Note>> watchNoteById(String id) {
     try {
       return localDataSource
           .watchNoteById(id)

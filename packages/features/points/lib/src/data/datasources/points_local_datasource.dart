@@ -11,13 +11,13 @@ abstract class PointsLocalDataSource {
     required int amount,
     required String reason,
     String? description,
-    int? relatedNoteId,
+    String? relatedNoteId,
   });
   Future<int> earnPoints({
     required int amount,
     required String reason,
     String? description,
-    int? relatedChallengeId,
+    String? relatedChallengeId,
   });
   Future<List<PointTransactionModel>> getRecentTransactions(int limit);
   Future<List<PointTransactionModel>> getAllTransactions();
@@ -47,7 +47,7 @@ class PointsLocalDataSourceImpl implements PointsLocalDataSource {
     required int amount,
     required String reason,
     String? description,
-    int? relatedNoteId,
+    String? relatedNoteId,
   }) async {
     final currentBalance = await getPointBalance();
 
@@ -82,7 +82,7 @@ class PointsLocalDataSourceImpl implements PointsLocalDataSource {
     required int amount,
     required String reason,
     String? description,
-    int? relatedChallengeId,
+    String? relatedChallengeId,
   }) async {
     final currentBalance = await getPointBalance();
     final newBalance = currentBalance + amount;

@@ -51,14 +51,14 @@ class ChaosEventsDao extends DatabaseAccessor<AppDatabase>
   }
 
   // Mark event as resolved
-  Future<void> markAsResolved(int id) async {
+  Future<void> markAsResolved(String id) async {
     await (update(chaosEvents)..where((tbl) => tbl.id.equals(id))).write(
       const ChaosEventsCompanion(wasResolved: Value(true)),
     );
   }
 
   // Delete event
-  Future<void> deleteEvent(int id) async {
+  Future<void> deleteEvent(String id) async {
     await (delete(chaosEvents)..where((tbl) => tbl.id.equals(id))).go();
   }
 

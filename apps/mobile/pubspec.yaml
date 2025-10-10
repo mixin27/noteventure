@@ -40,6 +40,8 @@ dependencies:
     path: ../../packages/features/themes
   settings:
     path: ../../packages/features/settings
+  syncing:
+    path: ../../packages/features/syncing
 
   #  State management
   flutter_bloc: ^9.1.1

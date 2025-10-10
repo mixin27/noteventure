@@ -1,0 +1,25 @@
+{
+    "device_id": "test-device-001",
+    "progress": {
+        "total_points": 100,
+        "level": 1,
+        "current_xp": 0,
+        "xp_to_next_level": 100,
+        "current_streak": 0,
+        "longest_streak": 0,
+        "total_challenges_solved": 0,
+        "total_challenges_failed": 0,
+        "total_notes_created": 0,
+        "total_notes_deleted": 0,
+        "chaos_enabled": true,
+        "challenge_time_limit": 30,
+        "personality_tone": "random",
+        "sound_enabled": true,
+        "notifications_enabled": true,
+        "updated_at": "2025-01-08T10:00:00Z",
+        "lifetime_points_earned": 0,
+        "lifetime_points_spent": 0
+    },
+    "notes": [],
+    "transactions": []
+}

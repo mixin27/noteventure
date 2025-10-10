@@ -24,7 +24,7 @@ class NotesDao extends DatabaseAccessor<AppDatabase> with _$NotesDaoMixin {
   }
 
   /// Get notes by category
-  Future<List<Note>> getNotesByCategory(int categoryId) {
+  Future<List<Note>> getNotesByCategory(String categoryId) {
     return (select(notes)
           ..where(
             (tbl) =>
@@ -40,7 +40,7 @@ class NotesDao extends DatabaseAccessor<AppDatabase> with _$NotesDaoMixin {
   }
 
   /// Get note by ID
-  Future<Note?> getNoteById(int id) {
+  Future<Note?> getNoteById(String id) {
     return (select(notes)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
   }
 
@@ -75,7 +75,7 @@ class NotesDao extends DatabaseAccessor<AppDatabase> with _$NotesDaoMixin {
   }
 
   /// Create note
-  Future<int> createNote(NotesCompanion note) {
+  Future<int> createNote(NotesCompanion note) async {
     return into(notes).insert(note);
   }
 
@@ -85,7 +85,7 @@ class NotesDao extends DatabaseAccessor<AppDatabase> with _$NotesDaoMixin {
   }
 
   /// Delete note (soft delete)
-  Future<int> softDeleteNote(int id) {
+  Future<int> softDeleteNote(String id) {
     return (update(notes)..where((tbl) => tbl.id.equals(id))).write(
       NotesCompanion(
         isDeleted: const Value(true),
@@ -95,19 +95,19 @@ class NotesDao extends DatabaseAccessor<AppDatabase> with _$NotesDaoMixin {
   }
 
   /// Permanently delete note
-  Future<int> permanentlyDeleteNote(int id) {
+  Future<int> permanentlyDeleteNote(String id) {
     return (delete(notes)..where((tbl) => tbl.id.equals(id))).go();
   }
 
   /// Toggle pin status
-  Future<int> togglePin(int id, bool isPinned) {
+  Future<int> togglePin(String id, bool isPinned) {
     return (update(notes)..where((tbl) => tbl.id.equals(id))).write(
       NotesCompanion(isPinned: Value(isPinned)),
     );
   }
 
   /// Toggle favorite status
-  Future<int> toggleFavorite(int id, bool isFavorite) {
+  Future<int> toggleFavorite(String id, bool isFavorite) {
     return (update(notes)..where((tbl) => tbl.id.equals(id))).write(
       NotesCompanion(isFavorite: Value(isFavorite)),
     );
@@ -148,7 +148,7 @@ class NotesDao extends DatabaseAccessor<AppDatabase> with _$NotesDaoMixin {
   }
 
   /// Watch note by ID
-  Stream<Note?> watchNoteById(int id) {
+  Stream<Note?> watchNoteById(String id) {
     return (select(
       notes,
     )..where((tbl) => tbl.id.equals(id))).watchSingleOrNull();

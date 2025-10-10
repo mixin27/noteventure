@@ -17,3 +17,4 @@ workspace:
   - packages/features/achievements
   - packages/features/chaos
   - packages/features/themes
+  - packages/features/syncing

@@ -11,6 +11,7 @@ class AppSettings extends Equatable {
   final String themeMode; // light, dark, system
   final bool showTutorial;
   final bool profanityFilter;
+  final DateTime? lastSyncTimestamp;
 
   const AppSettings({
     this.soundEnabled = true,
@@ -22,6 +23,7 @@ class AppSettings extends Equatable {
     this.themeMode = 'system',
     this.showTutorial = true,
     this.profanityFilter = true,
+    this.lastSyncTimestamp,
   });
 
   AppSettings copyWith({
@@ -34,6 +36,7 @@ class AppSettings extends Equatable {
     String? themeMode,
     bool? showTutorial,
     bool? profanityFilter,
+    DateTime? lastSyncTimestamp,
   }) {
     return AppSettings(
       soundEnabled: soundEnabled ?? this.soundEnabled,
@@ -46,6 +49,7 @@ class AppSettings extends Equatable {
       themeMode: themeMode ?? this.themeMode,
       showTutorial: showTutorial ?? this.showTutorial,
       profanityFilter: profanityFilter ?? this.profanityFilter,
+      lastSyncTimestamp: lastSyncTimestamp ?? this.lastSyncTimestamp,
     );
   }
 
@@ -60,5 +64,6 @@ class AppSettings extends Equatable {
     themeMode,
     showTutorial,
     profanityFilter,
+    lastSyncTimestamp,
   ];
 }

@@ -22,7 +22,7 @@ class EarnPointsParams {
   final int amount;
   final String reason;
   final String? description;
-  final int? relatedChallengeId;
+  final String? relatedChallengeId;
 
   const EarnPointsParams({
     required this.amount,

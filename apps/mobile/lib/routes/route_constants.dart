@@ -30,4 +30,7 @@ class RouteConstants {
   static const String chaosName = 'chaos';
   static const String loginName = 'login';
   static const String registerName = 'register';
+
+  static const String debug = '/debug';
+  static const String debugName = 'debug';
 }

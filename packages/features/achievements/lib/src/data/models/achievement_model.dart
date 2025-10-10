@@ -17,7 +17,7 @@ class AchievementModel extends Achievement {
     required super.rarity,
   });
 
-  factory AchievementModel.fromEntity(db.Achievement entity) {
+  factory AchievementModel.fromEntity(Achievement entity) {
     return AchievementModel(
       id: entity.id,
       achievementKey: entity.achievementKey,
@@ -29,7 +29,7 @@ class AchievementModel extends Achievement {
       isUnlocked: entity.isUnlocked,
       unlockedAt: entity.unlockedAt,
       pointReward: entity.pointReward,
-      rarity: AchievementRarity.fromString(entity.rarity),
+      rarity: entity.rarity,
     );
   }
 

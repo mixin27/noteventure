@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 
 import '../network/api_services/auth_api_service.dart';
+import '../network/api_services/sync_api_service.dart';
 import '../network/dio_client.dart';
 import '../storage/token_storage.dart';
 import '../storage/user_storage.dart';
@@ -16,5 +17,10 @@ Future<void> initCoreInjection() async {
   // Auth API Service
   getIt.registerLazySingleton<AuthApiService>(
     () => AuthApiService(getIt<DioClient>().dio),
+  );
+
+  // Sync API Service
+  getIt.registerLazySingleton<SyncApiService>(
+    () => SyncApiService(getIt<DioClient>().dio),
   );
 }

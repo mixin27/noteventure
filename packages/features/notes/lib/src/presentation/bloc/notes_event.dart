@@ -16,7 +16,7 @@ final class NotesLoad extends NotesEvent {
 
 /// Load notes by category
 final class NotesByCategoryLoad extends NotesEvent {
-  final int categoryId;
+  final String categoryId;
 
   const NotesByCategoryLoad(this.categoryId);
 
@@ -59,7 +59,7 @@ final class NoteCreate extends NotesEvent {
   final String title;
   final String content;
   final NoteType noteType;
-  final int? categoryId;
+  final String? categoryId;
   final String? color;
 
   const NoteCreate({
@@ -76,7 +76,7 @@ final class NoteCreate extends NotesEvent {
 
 /// Request note edit (check points)
 final class NoteEditRequest extends NotesEvent {
-  final int noteId;
+  final String noteId;
 
   const NoteEditRequest(this.noteId);
 
@@ -86,10 +86,10 @@ final class NoteEditRequest extends NotesEvent {
 
 /// Update note (after points are spent)
 final class NoteUpdate extends NotesEvent {
-  final int id;
+  final String id;
   final String? title;
   final String? content;
-  final int? categoryId;
+  final String? categoryId;
   final String? color;
 
   const NoteUpdate({
@@ -106,7 +106,7 @@ final class NoteUpdate extends NotesEvent {
 
 /// Request note preview (check points)
 final class NotePreviewRequest extends NotesEvent {
-  final int noteId;
+  final String noteId;
 
   const NotePreviewRequest(this.noteId);
 
@@ -116,7 +116,7 @@ final class NotePreviewRequest extends NotesEvent {
 
 /// Request note deletion (check points)
 final class NoteDeletionRequest extends NotesEvent {
-  final int noteId;
+  final String noteId;
 
   const NoteDeletionRequest(this.noteId);
 
@@ -126,7 +126,7 @@ final class NoteDeletionRequest extends NotesEvent {
 
 /// Delete note (after points are spent)
 final class NoteDelete extends NotesEvent {
-  final int noteId;
+  final String noteId;
 
   const NoteDelete(this.noteId);
 
@@ -136,7 +136,7 @@ final class NoteDelete extends NotesEvent {
 
 /// Toggle pin status
 final class PinNoteToggle extends NotesEvent {
-  final int noteId;
+  final String noteId;
 
   const PinNoteToggle(this.noteId);
 
@@ -146,7 +146,7 @@ final class PinNoteToggle extends NotesEvent {
 
 /// Toggle favorite status
 final class FavoriteNoteToggle extends NotesEvent {
-  final int noteId;
+  final String noteId;
 
   const FavoriteNoteToggle(this.noteId);
 

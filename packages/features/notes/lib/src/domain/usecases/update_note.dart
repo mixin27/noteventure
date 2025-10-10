@@ -25,10 +25,10 @@ class UpdateNote {
 }
 
 class UpdateNoteParams {
-  final int id;
+  final String id;
   final String? title;
   final String? content;
-  final int? categoryId;
+  final String? categoryId;
   final String? color;
 
   const UpdateNoteParams({

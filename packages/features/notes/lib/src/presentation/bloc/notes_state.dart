@@ -47,7 +47,7 @@ final class NoteActionRequiresChallenge extends NotesState {
   final String action; // "create", "edit", "delete", "preview"
   final int pointCost;
   final int currentPoints;
-  final int? noteId;
+  final String? noteId;
 
   const NoteActionRequiresChallenge({
     required this.action,

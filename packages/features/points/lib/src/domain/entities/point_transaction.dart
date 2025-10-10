@@ -1,15 +1,16 @@
 import 'package:equatable/equatable.dart';
 
 class PointTransaction extends Equatable {
-  final int id;
+  final String id;
   final int amount;
   final String reason;
   final String? description;
   final DateTime timestamp;
-  final int? relatedNoteId;
-  final int? relatedChallengeId;
-  final int? relatedEventId;
+  final String? relatedNoteId;
+  final String? relatedChallengeId;
+  final String? relatedEventId;
   final int balanceAfter;
+  final String? serverUuid;
 
   const PointTransaction({
     required this.id,
@@ -21,6 +22,7 @@ class PointTransaction extends Equatable {
     this.relatedChallengeId,
     this.relatedEventId,
     required this.balanceAfter,
+    this.serverUuid,
   });
 
   @override
@@ -34,5 +36,6 @@ class PointTransaction extends Equatable {
     relatedChallengeId,
     relatedEventId,
     balanceAfter,
+    serverUuid,
   ];
 }

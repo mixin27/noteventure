@@ -45,7 +45,7 @@ class PointTransactionsDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Get transaction by ID
-  Future<PointTransaction?> getTransactionById(int id) {
+  Future<PointTransaction?> getTransactionById(String id) {
     return (select(
       pointTransactions,
     )..where((tbl) => tbl.id.equals(id))).getSingleOrNull();

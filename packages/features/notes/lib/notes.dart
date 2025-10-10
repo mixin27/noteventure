@@ -1,5 +1,8 @@
 library;
 
+// Domain - Repositories
+export 'src/domain/repositories/notes_repository.dart';
+
 // Domain - Entities
 export 'src/domain/entities/note.dart';
 export 'src/domain/entities/category.dart';

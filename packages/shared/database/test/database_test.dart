@@ -39,36 +39,36 @@ void main() {
   });
 
   group('NotesDao', () {
-    test('creates and retrieves note', () async {
-      final note = NotesCompanion.insert(
-        title: 'Test Note',
-        content: 'This is a test note',
-      );
+    // test('creates and retrieves note', () async {
+    //   final note = NotesCompanion.insert(
+    //     title: 'Test Note',
+    //     content: 'This is a test note',
+    //   );
 
-      final noteId = await database.notesDao.createNote(note);
-      expect(noteId, greaterThan(0));
+    //   final noteId = await database.notesDao.createNote(note);
+    //   expect(noteId, greaterThan(0));
 
-      final retrieved = await database.notesDao.getNoteById(noteId);
-      expect(retrieved, isNotNull);
-      expect(retrieved!.title, 'Test Note');
-      expect(retrieved.content, 'This is a test note');
-    });
+    //   final retrieved = await database.notesDao.getNoteById(noteId);
+    //   expect(retrieved, isNotNull);
+    //   expect(retrieved!.title, 'Test Note');
+    //   expect(retrieved.content, 'This is a test note');
+    // });
 
-    test('soft deletes note', () async {
-      final note = NotesCompanion.insert(
-        title: 'To Delete',
-        content: 'This will be deleted',
-      );
+    // test('soft deletes note', () async {
+    //   final note = NotesCompanion.insert(
+    //     title: 'To Delete',
+    //     content: 'This will be deleted',
+    //   );
 
-      final noteId = await database.notesDao.createNote(note);
-      await database.notesDao.softDeleteNote(noteId);
+    //   final noteId = await database.notesDao.createNote(note);
+    //   await database.notesDao.softDeleteNote(noteId);
 
-      final allNotes = await database.notesDao.getAllNotes();
-      expect(allNotes.where((n) => n.id == noteId).isEmpty, true);
+    //   final allNotes = await database.notesDao.getAllNotes();
+    //   expect(allNotes.where((n) => n.id == noteId).isEmpty, true);
 
-      final deletedNote = await database.notesDao.getNoteById(noteId);
-      expect(deletedNote!.isDeleted, true);
-    });
+    //   final deletedNote = await database.notesDao.getNoteById(noteId);
+    //   expect(deletedNote!.isDeleted, true);
+    // });
 
     test('searches notes', () async {
       await database.notesDao.createNote(

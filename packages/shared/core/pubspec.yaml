@@ -17,6 +17,7 @@ dependencies:
   dartz: ^0.10.1
   intl: ^0.20.0
   flutter_secure_storage: ^9.2.4
+  device_info_plus: ^12.1.0
 
   # Network
   dio: ^5.4.0

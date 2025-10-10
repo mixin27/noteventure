@@ -1,7 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:database/database.dart';
 
-import '../../points.dart';
 import '../data/datasources/points_local_datasource.dart';
 import '../data/repositories/points_repository_impl.dart';
 import '../domain/repositories/points_repository.dart';
@@ -12,6 +11,7 @@ import '../domain/usecases/get_point_balance.dart';
 import '../domain/usecases/get_recent_transactions.dart';
 import '../domain/usecases/spend_points.dart';
 import '../domain/usecases/watch_points_balance.dart';
+import '../presentation/bloc/points_bloc.dart';
 
 final getIt = GetIt.instance;
 

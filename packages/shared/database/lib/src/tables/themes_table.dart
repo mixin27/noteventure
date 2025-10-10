@@ -1,8 +1,10 @@
 import 'package:drift/drift.dart';
 
+import '../app_database.dart';
+
 @DataClassName('Theme')
 class Themes extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => uuid.v4())();
   TextColumn get themeKey => text().unique()();
   TextColumn get name => text()();
   TextColumn get description => text()();
@@ -17,4 +19,7 @@ class Themes extends Table {
   TextColumn get backgroundColor => text()();
   TextColumn get surfaceColor => text()();
   TextColumn get themeStyle => text()(); // "retro", "vaporwave", etc.
+
+  @override
+  Set<Column> get primaryKey => {id};
 }

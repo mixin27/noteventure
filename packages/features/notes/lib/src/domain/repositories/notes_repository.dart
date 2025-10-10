@@ -8,10 +8,10 @@ abstract class NotesRepository {
   Future<Either<Failure, List<Note>>> getAllNotes();
 
   /// Get notes by category
-  Future<Either<Failure, List<Note>>> getNotesByCategory(int categoryId);
+  Future<Either<Failure, List<Note>>> getNotesByCategory(String categoryId);
 
   /// Get note by ID
-  Future<Either<Failure, Note>> getNoteById(int id);
+  Future<Either<Failure, Note>> getNoteById(String id);
 
   /// Get pinned notes
   Future<Either<Failure, List<Note>>> getPinnedNotes();
@@ -27,27 +27,27 @@ abstract class NotesRepository {
     required String title,
     required String content,
     NoteType noteType = NoteType.standard,
-    int? categoryId,
+    String? categoryId,
     String? color,
   });
 
   /// Update note
   Future<Either<Failure, Note>> updateNote({
-    required int id,
+    required String id,
     String? title,
     String? content,
-    int? categoryId,
+    String? categoryId,
     String? color,
   });
 
   /// Delete note (soft delete)
-  Future<Either<Failure, void>> deleteNote(int id);
+  Future<Either<Failure, void>> deleteNote(String id);
 
   /// Toggle pin status
-  Future<Either<Failure, Note>> togglePin(int id);
+  Future<Either<Failure, Note>> togglePin(String id);
 
   /// Toggle favorite status
-  Future<Either<Failure, Note>> toggleFavorite(int id);
+  Future<Either<Failure, Note>> toggleFavorite(String id);
 
   /// Get all categories
   Future<Either<Failure, List<Category>>> getAllCategories();
@@ -61,18 +61,18 @@ abstract class NotesRepository {
 
   /// Update category
   Future<Either<Failure, Category>> updateCategory({
-    required int id,
+    required String id,
     String? name,
     String? color,
     String? icon,
   });
 
   /// Delete category
-  Future<Either<Failure, void>> deleteCategory(int id);
+  Future<Either<Failure, void>> deleteCategory(String id);
 
   /// Watch notes (stream)
   Stream<Either<Failure, List<Note>>> watchAllNotes();
 
   /// Watch note by ID (stream)
-  Stream<Either<Failure, Note>> watchNoteById(int id);
+  Stream<Either<Failure, Note>> watchNoteById(String id);
 }

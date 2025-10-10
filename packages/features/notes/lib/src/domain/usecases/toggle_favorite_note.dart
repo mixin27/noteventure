@@ -8,7 +8,7 @@ class ToggleFavoriteNote {
 
   ToggleFavoriteNote(this.repository);
 
-  Future<Either<Failure, Note>> call(int noteId) async {
+  Future<Either<Failure, Note>> call(String noteId) async {
     return await repository.toggleFavorite(noteId);
   }
 }

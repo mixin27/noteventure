@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class ChaosEventEntity extends Equatable {
-  final int id;
+  final String id;
   final String eventKey;
   final ChaosEventType eventType;
   final String title;
@@ -22,7 +22,7 @@ class ChaosEventEntity extends Equatable {
   });
 
   ChaosEventEntity copyWith({
-    int? id,
+    String? id,
     String? eventKey,
     ChaosEventType? eventType,
     String? title,

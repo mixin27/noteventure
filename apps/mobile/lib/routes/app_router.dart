@@ -9,6 +9,7 @@ import 'package:progress/progress.dart';
 import 'package:settings/settings.dart';
 import 'package:themes/themes.dart';
 
+import '../pages/debug/debug_page.dart';
 import '../pages/home_page.dart';
 import '../pages/notes_page.dart';
 import '../pages/splash_page.dart';
@@ -93,6 +94,11 @@ class AppRouter {
 
   List<RouteBase> get _routes => [
     GoRoute(
+      path: RouteConstants.debug,
+      name: RouteConstants.debugName,
+      builder: (context, state) => const DebugPage(),
+    ),
+    GoRoute(
       path: RouteConstants.splash,
       name: RouteConstants.splashName,
       builder: (context, state) => const SplashPage(),
@@ -121,7 +127,7 @@ class AppRouter {
       path: '${RouteConstants.noteDetail}/:id',
       name: RouteConstants.noteDetailName,
       builder: (context, state) {
-        final id = int.parse(state.pathParameters['id']!);
+        final id = state.pathParameters['id']!;
         return NoteDetailPage(noteId: id);
       },
     ),

@@ -1,8 +1,11 @@
 import 'package:drift/drift.dart';
 
+import '../app_database.dart';
+
 @DataClassName('UserProgress')
 class UserProgressTable extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  // IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => uuid.v4())();
   IntColumn get totalPoints => integer().withDefault(const Constant(100))();
   IntColumn get lifetimePointsEarned =>
       integer().withDefault(const Constant(0))();
@@ -41,4 +44,7 @@ class UserProgressTable extends Table {
 
   @override
   String get tableName => 'user_progress';
+
+  @override
+  Set<Column> get primaryKey => {id};
 }

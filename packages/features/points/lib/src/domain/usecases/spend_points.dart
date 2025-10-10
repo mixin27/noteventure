@@ -22,7 +22,7 @@ class SpendPointsParams {
   final int amount;
   final String reason;
   final String? description;
-  final int? relatedNoteId;
+  final String? relatedNoteId;
 
   const SpendPointsParams({
     required this.amount,

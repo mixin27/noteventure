@@ -1,8 +1,10 @@
 import 'package:drift/drift.dart';
 
+import '../app_database.dart';
+
 @DataClassName('ChaosEvent')
 class ChaosEvents extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => uuid.v4())();
   TextColumn get eventKey => text()();
   TextColumn get eventType => text()(); // "positive", "negative", "neutral"
   TextColumn get title => text()();
@@ -11,4 +13,7 @@ class ChaosEvents extends Table {
       dateTime().withDefault(currentDateAndTime)();
   BoolColumn get wasResolved => boolean().withDefault(const Constant(false))();
   IntColumn get pointsAwarded => integer().withDefault(const Constant(0))();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }

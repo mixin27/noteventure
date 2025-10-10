@@ -1,8 +1,11 @@
 import 'package:drift/drift.dart';
 
+import '../app_database.dart';
+
 @DataClassName('Achievement')
 class Achievements extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  // IntColumn get id => integer().autoIncrement()();
+  TextColumn get id => text().clientDefault(() => uuid.v4())();
   TextColumn get achievementKey => text().unique()();
   TextColumn get name => text()();
   TextColumn get description => text()();
@@ -15,4 +18,7 @@ class Achievements extends Table {
   TextColumn get rarity => text().withDefault(
     const Constant('common'),
   )(); // common, rare, epic, legendary
+
+  @override
+  Set<Column> get primaryKey => {id};
 }
