@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -40,45 +41,87 @@ func (r *SyncRepository) GetNotesSince(ctx context.Context, userID uuid.UUID, si
 	return notes, err
 }
 
+// UpsertNote with proper conflict resolution
 func (r *SyncRepository) UpsertNote(ctx context.Context, userID uuid.UUID, note *sync.NoteSync) error {
-	query := `
-        INSERT INTO notes (
-            id, user_id, title, content, note_type, is_locked, unlock_date, category_id,
-            sort_order, color, is_pinned, is_favorite, required_challenge_level,
-            is_deleted, deleted_at, edit_count, created_at, updated_at, device_id, version, last_synced_at
-        ) VALUES (
-            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, NOW()
-        )
-        ON CONFLICT (id) DO UPDATE SET
-            title = EXCLUDED.title,
-            content = EXCLUDED.content,
-            note_type = EXCLUDED.note_type,
-            is_locked = EXCLUDED.is_locked,
-            unlock_date = EXCLUDED.unlock_date,
-            category_id = EXCLUDED.category_id,
-            sort_order = EXCLUDED.sort_order,
-            color = EXCLUDED.color,
-            is_pinned = EXCLUDED.is_pinned,
-            is_favorite = EXCLUDED.is_favorite,
-            required_challenge_level = EXCLUDED.required_challenge_level,
-            is_deleted = EXCLUDED.is_deleted,
-            deleted_at = EXCLUDED.deleted_at,
-            edit_count = EXCLUDED.edit_count,
-            updated_at = EXCLUDED.updated_at,
-            device_id = EXCLUDED.device_id,
-            version = EXCLUDED.version,
-            last_synced_at = NOW()
-        WHERE notes.updated_at < EXCLUDED.updated_at
-    `
+	// First, check if note exists and get its updated_at timestamp
+	var existingUpdatedAt time.Time
+	checkQuery := `SELECT updated_at FROM notes WHERE id = $1 AND user_id = $2`
+	err := r.db.GetContext(ctx, &existingUpdatedAt, checkQuery, note.ID, userID)
 
-	_, err := r.db.ExecContext(ctx, query,
-		note.ID, userID, note.Title, note.Content, note.NoteType, note.IsLocked,
-		note.UnlockDate, note.CategoryID, note.SortOrder, note.Color, note.IsPinned,
-		note.IsFavorite, note.RequiredChallengeLevel, note.IsDeleted, note.DeletedAt,
-		note.EditCount, note.CreatedAt, note.UpdatedAt, note.DeviceID, note.Version,
-	)
+	if err == sql.ErrNoRows {
+		// Note doesn't exist - INSERT only
+		insertQuery := `
+            INSERT INTO notes (
+                id, user_id, title, content, note_type, is_locked, unlock_date, category_id,
+                sort_order, color, is_pinned, is_favorite, required_challenge_level,
+                is_deleted, deleted_at, edit_count, created_at, updated_at, device_id, version, last_synced_at
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, NOW()
+            )
+        `
 
-	return err
+		_, err = r.db.ExecContext(ctx, insertQuery,
+			note.ID, userID, note.Title, note.Content, note.NoteType, note.IsLocked,
+			note.UnlockDate, note.CategoryID, note.SortOrder, note.Color, note.IsPinned,
+			note.IsFavorite, note.RequiredChallengeLevel, note.IsDeleted, note.DeletedAt,
+			note.EditCount, note.CreatedAt, note.UpdatedAt, note.DeviceID, note.Version,
+		)
+
+		return err
+	} else if err != nil {
+		return err
+	}
+
+	// Note exists - check if client data is newer
+	// Use UTC for comparison to avoid timezone issues
+	clientTime := note.UpdatedAt.UTC()
+	serverTime := existingUpdatedAt.UTC()
+
+	if clientTime.After(serverTime) {
+		// Client data is newer - UPDATE
+		updateQuery := `
+            UPDATE notes SET
+                title = $1,
+                content = $2,
+                note_type = $3,
+                is_locked = $4,
+                unlock_date = $5,
+                category_id = $6,
+                sort_order = $7,
+                color = $8,
+                is_pinned = $9,
+                is_favorite = $10,
+                required_challenge_level = $11,
+                is_deleted = $12,
+                deleted_at = $13,
+                edit_count = $14,
+                updated_at = $15,
+                device_id = $16,
+                version = $17,
+                last_synced_at = NOW()
+            WHERE id = $18 AND user_id = $19
+        `
+
+		_, err = r.db.ExecContext(ctx, updateQuery,
+			note.Title, note.Content, note.NoteType, note.IsLocked, note.UnlockDate,
+			note.CategoryID, note.SortOrder, note.Color, note.IsPinned, note.IsFavorite,
+			note.RequiredChallengeLevel, note.IsDeleted, note.DeletedAt, note.EditCount,
+			note.UpdatedAt, note.DeviceID, note.Version, note.ID, userID,
+		)
+
+		return err
+	} else if clientTime.Equal(serverTime) {
+		// Same timestamp - already synced, just update last_synced_at
+		_, err = r.db.ExecContext(ctx, `
+            UPDATE notes SET last_synced_at = NOW()
+            WHERE id = $1 AND user_id = $2
+        `, note.ID, userID)
+
+		return err
+	}
+
+	// Server data is newer - SKIP update (client will get it on next pull)
+	return nil
 }
 
 // Progress
@@ -97,6 +140,9 @@ func (r *SyncRepository) GetProgress(ctx context.Context, userID uuid.UUID) (*sy
     `
 
 	err := r.db.GetContext(ctx, &progress, query, userID)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -104,51 +150,84 @@ func (r *SyncRepository) GetProgress(ctx context.Context, userID uuid.UUID) (*sy
 	return &progress, nil
 }
 
+// UpsertProgress with conflict resolution
 func (r *SyncRepository) UpsertProgress(ctx context.Context, userID uuid.UUID, progress *sync.ProgressSync) error {
-	query := `
-        INSERT INTO user_progress (
-            user_id, total_points, lifetime_points_earned, lifetime_points_spent,
-            level, current_xp, xp_to_next_level, current_streak, longest_streak,
-            last_challenge_date, total_challenges_solved, total_challenges_failed,
-            total_notes_created, total_notes_deleted, chaos_enabled,
-            challenge_time_limit, personality_tone, sound_enabled,
-            notifications_enabled, updated_at
-        ) VALUES (
-            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20
-        )
-        ON CONFLICT (user_id) DO UPDATE SET
-            total_points = EXCLUDED.total_points,
-            lifetime_points_earned = EXCLUDED.lifetime_points_earned,
-            lifetime_points_spent = EXCLUDED.lifetime_points_spent,
-            level = EXCLUDED.level,
-            current_xp = EXCLUDED.current_xp,
-            xp_to_next_level = EXCLUDED.xp_to_next_level,
-            current_streak = EXCLUDED.current_streak,
-            longest_streak = EXCLUDED.longest_streak,
-            last_challenge_date = EXCLUDED.last_challenge_date,
-            total_challenges_solved = EXCLUDED.total_challenges_solved,
-            total_challenges_failed = EXCLUDED.total_challenges_failed,
-            total_notes_created = EXCLUDED.total_notes_created,
-            total_notes_deleted = EXCLUDED.total_notes_deleted,
-            chaos_enabled = EXCLUDED.chaos_enabled,
-            challenge_time_limit = EXCLUDED.challenge_time_limit,
-            personality_tone = EXCLUDED.personality_tone,
-            sound_enabled = EXCLUDED.sound_enabled,
-            notifications_enabled = EXCLUDED.notifications_enabled,
-            updated_at = EXCLUDED.updated_at
-        WHERE user_progress.updated_at < EXCLUDED.updated_at
-    `
+	// Check if progress exists
+	var existingUpdatedAt time.Time
+	err := r.db.GetContext(ctx, &existingUpdatedAt,
+		`SELECT updated_at FROM user_progress WHERE user_id = $1`, userID)
 
-	_, err := r.db.ExecContext(ctx, query,
-		userID, progress.TotalPoints, progress.LifetimePointsEarned, progress.LifetimePointsSpent,
-		progress.Level, progress.CurrentXp, progress.XpToNextLevel, progress.CurrentStreak,
-		progress.LongestStreak, progress.LastChallengeDate, progress.TotalChallengesSolved,
-		progress.TotalChallengesFailed, progress.TotalNotesCreated, progress.TotalNotesDeleted,
-		progress.ChaosEnabled, progress.ChallengeTimeLimit, progress.PersonalityTone,
-		progress.SoundEnabled, progress.NotificationsEnabled, progress.UpdatedAt,
-	)
+	if err == sql.ErrNoRows {
+		// Progress doesn't exist - INSERT
+		insertQuery := `
+            INSERT INTO user_progress (
+                user_id, total_points, lifetime_points_earned, lifetime_points_spent,
+                level, current_xp, xp_to_next_level, current_streak, longest_streak,
+                last_challenge_date, total_challenges_solved, total_challenges_failed,
+                total_notes_created, total_notes_deleted, chaos_enabled,
+                challenge_time_limit, personality_tone, sound_enabled,
+                notifications_enabled, updated_at, last_synced_at
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, NOW()
+            )
+        `
 
-	return err
+		_, err = r.db.ExecContext(ctx, insertQuery,
+			userID, progress.TotalPoints, progress.LifetimePointsEarned, progress.LifetimePointsSpent,
+			progress.Level, progress.CurrentXp, progress.XpToNextLevel, progress.CurrentStreak,
+			progress.LongestStreak, progress.LastChallengeDate, progress.TotalChallengesSolved,
+			progress.TotalChallengesFailed, progress.TotalNotesCreated, progress.TotalNotesDeleted,
+			progress.ChaosEnabled, progress.ChallengeTimeLimit, progress.PersonalityTone,
+			progress.SoundEnabled, progress.NotificationsEnabled, progress.UpdatedAt,
+		)
+
+		return err
+	} else if err != nil {
+		return err
+	}
+
+	// Progress exists - check if client data is newer
+	if progress.UpdatedAt.After(existingUpdatedAt) {
+		// Client data is newer - UPDATE
+		updateQuery := `
+            UPDATE user_progress SET
+                total_points = $1,
+                lifetime_points_earned = $2,
+                lifetime_points_spent = $3,
+                level = $4,
+                current_xp = $5,
+                xp_to_next_level = $6,
+                current_streak = $7,
+                longest_streak = $8,
+                last_challenge_date = $9,
+                total_challenges_solved = $10,
+                total_challenges_failed = $11,
+                total_notes_created = $12,
+                total_notes_deleted = $13,
+                chaos_enabled = $14,
+                challenge_time_limit = $15,
+                personality_tone = $16,
+                sound_enabled = $17,
+                notifications_enabled = $18,
+                updated_at = $19,
+                last_synced_at = NOW()
+            WHERE user_id = $20
+        `
+
+		_, err = r.db.ExecContext(ctx, updateQuery,
+			progress.TotalPoints, progress.LifetimePointsEarned, progress.LifetimePointsSpent,
+			progress.Level, progress.CurrentXp, progress.XpToNextLevel, progress.CurrentStreak,
+			progress.LongestStreak, progress.LastChallengeDate, progress.TotalChallengesSolved,
+			progress.TotalChallengesFailed, progress.TotalNotesCreated, progress.TotalNotesDeleted,
+			progress.ChaosEnabled, progress.ChallengeTimeLimit, progress.PersonalityTone,
+			progress.SoundEnabled, progress.NotificationsEnabled, progress.UpdatedAt, userID,
+		)
+
+		return err
+	}
+
+	// Server data is newer or same - SKIP
+	return nil
 }
 
 // Transactions
@@ -172,7 +251,23 @@ func (r *SyncRepository) GetTransactionsSince(ctx context.Context, userID uuid.U
 	return transactions, err
 }
 
+// UpsertTransaction - Transactions are immutable, only insert if not exists
 func (r *SyncRepository) UpsertTransaction(ctx context.Context, userID uuid.UUID, tx *sync.TransactionSync) error {
+	// Check if transaction already exists
+	var exists bool
+	err := r.db.GetContext(ctx, &exists,
+		`SELECT EXISTS(SELECT 1 FROM point_transactions WHERE id = $1)`, tx.ID)
+
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		// Transaction already exists - SKIP (transactions are immutable)
+		return nil
+	}
+
+	// Transaction doesn't exist - INSERT
 	query := `
         INSERT INTO point_transactions (
             id, user_id, amount, reason, description, related_note_id,
@@ -180,10 +275,9 @@ func (r *SyncRepository) UpsertTransaction(ctx context.Context, userID uuid.UUID
         ) VALUES (
             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW()
         )
-        ON CONFLICT (id) DO NOTHING
     `
 
-	_, err := r.db.ExecContext(ctx, query,
+	_, err = r.db.ExecContext(ctx, query,
 		tx.ID, userID, tx.Amount, tx.Reason, tx.Description, tx.RelatedNoteID,
 		tx.RelatedChallengeID, tx.RelatedEventID, tx.BalanceAfter, tx.Timestamp,
 	)

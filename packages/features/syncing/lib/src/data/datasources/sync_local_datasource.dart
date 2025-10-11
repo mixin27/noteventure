@@ -52,9 +52,13 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
   @override
   Future<List<notes.Note>> getNotesToSync(DateTime? since) async {
     // Get all notes modified after 'since' timestamp
-    // For now, get all notes
     final result = await _notesRepository.getAllNotes();
-    return result.fold((failure) => [], (notesList) => notesList);
+    return result.fold((failure) => [], (notesList) {
+      if (since == null) return notesList;
+
+      // Filter notes updated after last sync
+      return notesList.where((note) => note.updatedAt.isAfter(since)).toList();
+    });
   }
 
   @override
@@ -81,7 +85,7 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
   Future<settings.AppSettings> getSettingsToSync() async {
     final result = await _settingsRepository.getSettings();
     return result.fold(
-      (failure) => const settings.AppSettings(), // Return defaults on failure
+      (failure) => const settings.AppSettings(),
       (appSettings) => appSettings,
     );
   }
@@ -89,61 +93,101 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
   // ============================================================================
   // SAVE SYNCED DATA
   // ============================================================================
-
   @override
-  Future<void> saveNotesFromSync(List<notes.Note> notes) async {
-    // Save each note to local database
-    for (final note in notes) {
-      // Check if note already exists
-      final existingNote = await _notesRepository.getNoteById(note.id);
+  Future<void> saveNotesFromSync(List<notes.Note> notesFromServer) async {
+    for (final serverNote in notesFromServer) {
+      // Get existing note by ID
+      final existingNoteResult = await _notesRepository.getNoteById(
+        serverNote.id,
+      );
 
-      existingNote.fold(
+      await existingNoteResult.fold(
+        // Note doesn't exist locally
         (failure) async {
-          // Note doesn't exist, create it
+          // Only insert if it's truly a new note from another device
+          // Check by serverUuid if available
+          if (serverNote.serverUuid != null) {
+            // Check if we already have a note with this serverUuid
+            final allNotesResult = await _notesRepository.getAllNotes();
+            final allNotes = allNotesResult.getOrElse(() => []);
+
+            final existingByServerUuid = allNotes.any(
+              (n) => n.serverUuid == serverNote.serverUuid,
+            );
+
+            if (existingByServerUuid) {
+              // We already have this note, just different local ID
+              // Skip insertion to avoid duplicate
+              return;
+            }
+          }
+
+          // Truly new note from server - insert it
           await _notesRepository.createNote(
-            title: note.title,
-            content: note.content,
-            noteType: note.noteType,
-            categoryId: note.categoryId,
+            title: serverNote.title,
+            content: serverNote.content,
+            noteType: serverNote.noteType,
+            categoryId: serverNote.categoryId,
+            color: serverNote.color,
+            // isPinned: serverNote.isPinned,
+            // isFavorite: serverNote.isFavorite,
           );
         },
-        (existing) async {
-          // Note exists, update if server version is newer
-          if (note.updatedAt.isAfter(existing.updatedAt)) {
+        // Note exists locally
+        (existingNote) async {
+          // Compare timestamps - only update if server version is newer
+          if (serverNote.updatedAt.isAfter(existingNote.updatedAt)) {
+            // Server has newer version - update local
             await _notesRepository.updateNote(
-              id: note.id,
-              title: note.title,
-              content: note.content,
-              categoryId: note.categoryId,
+              id: existingNote.id,
+              title: serverNote.title,
+              content: serverNote.content,
+              categoryId: serverNote.categoryId,
+              color: serverNote.color,
+              // isPinned: serverNote.isPinned,
+              // isFavorite: serverNote.isFavorite,
             );
+          } else if (serverNote.updatedAt.isBefore(existingNote.updatedAt)) {
+            // Local version is newer - skip (it will be synced on next push)
+            return;
           }
+          // If timestamps are equal, no action needed (already synced)
         },
       );
     }
   }
 
   @override
-  Future<void> saveProgressFromSync(progress.UserProgress progress) async {
-    // Get current local progress
+  Future<void> saveProgressFromSync(
+    progress.UserProgress progressFromServer,
+  ) async {
     final currentResult = await _progressRepository.getUserProgress();
 
-    currentResult.fold(
+    await currentResult.fold(
       (failure) async {
-        // No local progress exists, this shouldn't happen but handle gracefully
+        // No local progress exists - this shouldn't happen
+        // but handle gracefully by doing nothing
         // Progress should be initialized on first app run
       },
       (current) async {
-        // Only update if server has newer or higher values
+        // Compare levels and XP - only update if server is ahead
         // This prevents downgrading progress
-        if (progress.level >= current.level &&
-            progress.totalXp >= current.totalXp) {
-          // Update progress
-          // Note: You may need to add a method to directly update progress
-          // For now, we can add XP to reach the synced level
-          final xpDiff = progress.totalXp - current.totalXp;
+        final shouldUpdate =
+            progressFromServer.level > current.level ||
+            (progressFromServer.level == current.level &&
+                progressFromServer.currentXp > current.currentXp);
+
+        if (shouldUpdate) {
+          // Server progress is ahead - update local
+          // Note: You might need to add a direct update method to ProgressRepository
+          // For now, use the existing addXp method
+          final xpDiff = progressFromServer.currentXp - current.currentXp;
           if (xpDiff > 0) {
             await _progressRepository.addXp(xpDiff);
           }
+
+          // Update other stats that might have changed
+          // todo(mixin27): Add methods to update streaks, stats etc if needed
         }
       },
     );
@@ -151,14 +195,24 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
 
   @override
   Future<void> saveTransactionsFromSync(
-    List<points.PointTransaction> transactions,
+    List<points.PointTransaction> transactionsFromServer,
   ) async {
-    // Transactions are typically append-only
-    // Check if each transaction already exists before inserting
-    for (final transaction in transactions) {
-      // You may need to add a method to check if transaction exists
-      // For now, assume repository handles duplicates
-      // TODO: Implement transaction existence check if needed
+    // Transactions are immutable - only insert if they don't exist
+    final allTransactionsResult = await _pointsRepository.getAllTransactions();
+    final existingTransactionIds = allTransactionsResult.fold(
+      (failure) => <String>[],
+      (transactions) => transactions.map((tx) => tx.id).toSet(),
+    );
+
+    for (final serverTransaction in transactionsFromServer) {
+      // Check if transaction already exists locally
+      if (!existingTransactionIds.contains(serverTransaction.id)) {
+        // New transaction from server - insert it
+        // You may need to add a method to directly insert a transaction
+        // with a specific ID and timestamp
+        // For now, this assumes the repository handles it
+        // todo(mixin27): Add insertTransaction method to PointsRepository if needed
+      }
     }
   }
 
@@ -170,15 +224,14 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
     bool soundEnabled,
     bool notificationsEnabled,
   ) async {
-    // Get current settings
     final currentResult = await _settingsRepository.getSettings();
 
-    currentResult.fold(
+    await currentResult.fold(
       (failure) async {
         // Failed to get settings, skip update
       },
       (current) async {
-        // Update only the synced settings, keep local-only settings
+        // Update only the synced settings
         final updatedSettings = current.copyWith(
           chaosEnabled: chaosEnabled,
           challengeTimeLimit: challengeTimeLimit,
@@ -206,7 +259,7 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
   Future<void> saveLastSyncTimestamp(DateTime timestamp) async {
     final result = await _settingsRepository.getSettings();
 
-    result.fold(
+    await result.fold(
       (failure) async {
         throw CacheException("Can't save without existing settings");
       },

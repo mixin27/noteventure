@@ -47,8 +47,7 @@ class _NoteventureAppState extends State<NoteventureApp>
 
       // Trigger sync when user logs in
       if (state is AuthAuthenticated) {
-        // todo(mixin27): uncomment when get fixed
-        // _syncBloc.add(SyncRequested());
+        _syncBloc.add(SyncRequested());
       }
     });
 

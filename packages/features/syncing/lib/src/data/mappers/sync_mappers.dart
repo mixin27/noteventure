@@ -68,9 +68,9 @@ class SyncMappers {
     bool notificationsEnabled,
   ) {
     return ProgressSyncDto(
-      totalPoints: 0, // TODO: Get from points system
-      lifetimePointsEarned: 0, // TODO: Get from points system
-      lifetimePointsSpent: 0, // TODO: Get from points system
+      totalPoints: 0, // todo(mixin27): Get from points system
+      lifetimePointsEarned: 0, // todo(mixin27): Get from points system
+      lifetimePointsSpent: 0, // todo(mixin27): Get from points system
       level: progress.level,
       currentXp: progress.currentXp,
       xpToNextLevel: progress.xpToNextLevel,

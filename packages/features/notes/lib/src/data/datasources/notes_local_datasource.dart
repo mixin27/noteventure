@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:core/core.dart';
 import 'package:database/database.dart';
 import 'package:drift/drift.dart';

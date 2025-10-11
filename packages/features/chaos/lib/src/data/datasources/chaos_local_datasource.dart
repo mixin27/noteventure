@@ -34,11 +34,11 @@ class ChaosLocalDataSourceImpl implements ChaosLocalDataSource {
     final event = _generateRandomEvent();
 
     // Insert into database
-    final id = await chaosEventsDao.insertEvent(event);
+    await chaosEventsDao.insertEvent(event);
 
     // Fetch and return
     final insertedEvent = await chaosEventsDao.getAllEvents();
-    final found = insertedEvent.firstWhere((e) => e.id == id);
+    final found = insertedEvent.firstWhere((e) => e.id == event.id.toString());
     return ChaosEventModel.fromDrift(found);
   }
 
@@ -59,6 +59,7 @@ class ChaosLocalDataSourceImpl implements ChaosLocalDataSource {
     final random = events[DateTime.now().millisecond % events.length];
 
     return ChaosEventsCompanion.insert(
+      id: Value(uuid.v4()),
       eventKey: random['key']!,
       eventType: random['type']!,
       title: random['title']!,
