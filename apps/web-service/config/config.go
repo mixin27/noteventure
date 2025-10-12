@@ -49,7 +49,7 @@ func Load() *Config {
 		},
 		JWT: JWTConfig{
 			Secret:          getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
-			AccessTokenTTL:  getEnv("JWT_ACCESS_TTL", "15m"),
+			AccessTokenTTL:  getEnv("JWT_ACCESS_TTL", "1d"),
 			RefreshTokenTTL: getEnv("JWT_REFRESH_TTL", "7d"),
 		},
 	}

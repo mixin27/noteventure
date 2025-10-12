@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:core/core.dart';
 import 'package:notes/notes.dart' as notes;
 import 'package:progress/progress.dart' as progress;
@@ -95,7 +97,16 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
   // ============================================================================
   @override
   Future<void> saveNotesFromSync(List<notes.Note> notesFromServer) async {
+    developer.log(
+      '[SYNC] Received ${notesFromServer.length} notes from server',
+    );
+
     for (final serverNote in notesFromServer) {
+      developer.log(
+        '[SYNC] Processing note: ${serverNote.id} - ${serverNote.title}',
+      );
+      developer.log('[SYNC]   UpdatedAt: ${serverNote.updatedAt}');
+
       // Get existing note by ID
       final existingNoteResult = await _notesRepository.getNoteById(
         serverNote.id,
@@ -104,9 +115,15 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
       await existingNoteResult.fold(
         // Note doesn't exist locally
         (failure) async {
+          developer.log('[SYNC]   Note ${serverNote.id} NOT found locally');
+
           // Only insert if it's truly a new note from another device
           // Check by serverUuid if available
           if (serverNote.serverUuid != null) {
+            developer.log(
+              '[SYNC]   Checking by serverUuid: ${serverNote.serverUuid}',
+            );
+
             // Check if we already have a note with this serverUuid
             final allNotesResult = await _notesRepository.getAllNotes();
             final allNotes = allNotesResult.getOrElse(() => []);
@@ -116,6 +133,12 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
             );
 
             if (existingByServerUuid) {
+              developer.log(
+                '[SYNC]   Found by serverUuid! Local ID: $existingByServerUuid',
+              );
+              developer.log(
+                '[SYNC]   SKIPPING insertion (already exists with different local ID)',
+              );
               // We already have this note, just different local ID
               // Skip insertion to avoid duplicate
               return;
@@ -123,6 +146,7 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
           }
 
           // Truly new note from server - insert it
+          developer.log('[SYNC]   INSERTING new note from server');
           await _notesRepository.createNote(
             title: serverNote.title,
             content: serverNote.content,
@@ -132,11 +156,18 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
             // isPinned: serverNote.isPinned,
             // isFavorite: serverNote.isFavorite,
           );
+          developer.log('[SYNC]   Successfully inserted');
         },
         // Note exists locally
         (existingNote) async {
+          developer.log('[SYNC]   Note ${serverNote.id} FOUND locally');
+          developer.log('[SYNC]   Local updatedAt: ${existingNote.updatedAt}');
+          developer.log('[SYNC]   Server updatedAt: ${serverNote.updatedAt}');
+
           // Compare timestamps - only update if server version is newer
           if (serverNote.updatedAt.isAfter(existingNote.updatedAt)) {
+            developer.log('[SYNC]   Server is NEWER - UPDATING local note');
+
             // Server has newer version - update local
             await _notesRepository.updateNote(
               id: existingNote.id,
@@ -147,14 +178,20 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
               // isPinned: serverNote.isPinned,
               // isFavorite: serverNote.isFavorite,
             );
+            developer.log('[SYNC]   Successfully updated');
           } else if (serverNote.updatedAt.isBefore(existingNote.updatedAt)) {
+            developer.log('[SYNC]   Local is NEWER - SKIPPING update');
             // Local version is newer - skip (it will be synced on next push)
             return;
+          } else {
+            // If timestamps are equal, no action needed (already synced)
+            developer.log('[SYNC]   Timestamps are EQUAL - SKIPPING update');
           }
-          // If timestamps are equal, no action needed (already synced)
         },
       );
     }
+
+    developer.log('[SYNC] Finished processing all notes from server');
   }
 
   @override
