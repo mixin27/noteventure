@@ -1,5 +1,6 @@
 import 'package:achievements/achievements.dart';
 import 'package:auth/auth.dart';
+import 'package:background_sync/background_sync.dart';
 import 'package:challenges/challenges.dart';
 import 'package:chaos/chaos.dart';
 import 'package:core/core.dart';
@@ -27,6 +28,7 @@ class _NoteventureAppState extends State<NoteventureApp>
     with WidgetsBindingObserver {
   late final AuthBloc _authBloc;
   late final SyncBloc _syncBloc;
+  late final SyncHistoryBloc _syncHistoryBloc;
   late final AuthStateNotifier _authStateNotifier;
   late final AppRouter _appRouter;
 
@@ -37,6 +39,7 @@ class _NoteventureAppState extends State<NoteventureApp>
 
     _authBloc = getIt<AuthBloc>();
     _syncBloc = getIt<SyncBloc>();
+    _syncHistoryBloc = getIt<SyncHistoryBloc>()..add(LoadSyncHistory());
 
     _authStateNotifier = getIt<AuthStateNotifier>();
     _appRouter = getIt<AppRouter>();
@@ -85,6 +88,7 @@ class _NoteventureAppState extends State<NoteventureApp>
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: _authBloc),
+        BlocProvider.value(value: _syncHistoryBloc),
         BlocProvider.value(value: _syncBloc),
         BlocProvider(create: (context) => getIt<NotesBloc>()..add(NotesLoad())),
         BlocProvider(
@@ -110,6 +114,11 @@ class _NoteventureAppState extends State<NoteventureApp>
         ),
         BlocProvider(
           create: (context) => getIt<SettingsBloc>()..add(LoadSettings()),
+        ),
+        BlocProvider<BackgroundSyncBloc>(
+          create: (_) =>
+              getIt<BackgroundSyncBloc>()
+                ..add(const InitializeBackgroundSyncEvent()),
         ),
       ],
 

@@ -9,11 +9,11 @@ class DioClient {
   late Dio _dio;
   final TokenStorage _tokenStorage;
 
-  DioClient._internal({TokenStorage? tokenStorage})
+  DioClient._internal({TokenStorage? tokenStorage, String? baseUrl})
     : _tokenStorage = tokenStorage ?? TokenStorage() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: ApiConfig.baseUrl,
+        baseUrl: baseUrl ?? ApiConfig.baseUrl,
         connectTimeout: ApiConfig.connectTimeout,
         receiveTimeout: ApiConfig.receiveTimeout,
         sendTimeout: ApiConfig.sendTimeout,
@@ -24,8 +24,11 @@ class DioClient {
     _setupInterceptors();
   }
 
-  factory DioClient({TokenStorage? tokenStorage}) {
-    _instance ??= DioClient._internal(tokenStorage: tokenStorage);
+  factory DioClient({TokenStorage? tokenStorage, String? baseUrl}) {
+    _instance ??= DioClient._internal(
+      tokenStorage: tokenStorage,
+      baseUrl: baseUrl,
+    );
     return _instance!;
   }
 

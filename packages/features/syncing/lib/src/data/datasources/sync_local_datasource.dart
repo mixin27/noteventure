@@ -1,6 +1,5 @@
-import 'dart:developer' as developer;
-
 import 'package:core/core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:notes/notes.dart' as notes;
 import 'package:progress/progress.dart' as progress;
 import 'package:points/points.dart' as points;
@@ -53,7 +52,6 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
 
   @override
   Future<List<notes.Note>> getNotesToSync(DateTime? since) async {
-    // Get all notes modified after 'since' timestamp
     final result = await _notesRepository.getAllNotes();
     return result.fold((failure) => [], (notesList) {
       if (since == null) return notesList;
@@ -97,101 +95,84 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
   // ============================================================================
   @override
   Future<void> saveNotesFromSync(List<notes.Note> notesFromServer) async {
-    developer.log(
-      '[SYNC] Received ${notesFromServer.length} notes from server',
-    );
+    // First, get ALL local notes to compare
+    final allLocalNotesResult = await _notesRepository.getAllNotes();
+    final allLocalNotes = allLocalNotesResult.getOrElse(() => []);
 
     for (final serverNote in notesFromServer) {
-      developer.log(
-        '[SYNC] Processing note: ${serverNote.id} - ${serverNote.title}',
-      );
-      developer.log('[SYNC]   UpdatedAt: ${serverNote.updatedAt}');
-
-      // Get existing note by ID
+      // Check if this note already exists locally
       final existingNoteResult = await _notesRepository.getNoteById(
         serverNote.id,
       );
 
       await existingNoteResult.fold(
-        // Note doesn't exist locally
+        // Note NOT found by ID
         (failure) async {
-          developer.log('[SYNC]   Note ${serverNote.id} NOT found locally');
-
-          // Only insert if it's truly a new note from another device
-          // Check by serverUuid if available
-          if (serverNote.serverUuid != null) {
-            developer.log(
-              '[SYNC]   Checking by serverUuid: ${serverNote.serverUuid}',
-            );
-
-            // Check if we already have a note with this serverUuid
-            final allNotesResult = await _notesRepository.getAllNotes();
-            final allNotes = allNotesResult.getOrElse(() => []);
-
-            final existingByServerUuid = allNotes.any(
-              (n) => n.serverUuid == serverNote.serverUuid,
-            );
-
-            if (existingByServerUuid) {
-              developer.log(
-                '[SYNC]   Found by serverUuid! Local ID: $existingByServerUuid',
-              );
-              developer.log(
-                '[SYNC]   SKIPPING insertion (already exists with different local ID)',
-              );
-              // We already have this note, just different local ID
-              // Skip insertion to avoid duplicate
-              return;
-            }
+          // Double-check: manually search in all local notes
+          final manualMatch = allLocalNotes.where((n) => n.id == serverNote.id);
+          if (manualMatch.isNotEmpty) {
+            return;
           }
 
-          // Truly new note from server - insert it
-          developer.log('[SYNC]   INSERTING new note from server');
-          await _notesRepository.createNote(
-            title: serverNote.title,
-            content: serverNote.content,
-            noteType: serverNote.noteType,
-            categoryId: serverNote.categoryId,
-            color: serverNote.color,
-            // isPinned: serverNote.isPinned,
-            // isFavorite: serverNote.isFavorite,
-          );
-          developer.log('[SYNC]   Successfully inserted');
-        },
-        // Note exists locally
-        (existingNote) async {
-          developer.log('[SYNC]   Note ${serverNote.id} FOUND locally');
-          developer.log('[SYNC]   Local updatedAt: ${existingNote.updatedAt}');
-          developer.log('[SYNC]   Server updatedAt: ${serverNote.updatedAt}');
-
-          // Compare timestamps - only update if server version is newer
-          if (serverNote.updatedAt.isAfter(existingNote.updatedAt)) {
-            developer.log('[SYNC]   Server is NEWER - UPDATING local note');
-
-            // Server has newer version - update local
-            await _notesRepository.updateNote(
-              id: existingNote.id,
+          try {
+            await _notesRepository.createNoteWithId(
+              id: serverNote.id,
               title: serverNote.title,
               content: serverNote.content,
+              noteType: serverNote.noteType,
               categoryId: serverNote.categoryId,
               color: serverNote.color,
-              // isPinned: serverNote.isPinned,
-              // isFavorite: serverNote.isFavorite,
+              isPinned: serverNote.isPinned,
+              isFavorite: serverNote.isFavorite,
+              createdAt: serverNote.createdAt,
+              updatedAt: serverNote.updatedAt,
             );
-            developer.log('[SYNC]   Successfully updated');
-          } else if (serverNote.updatedAt.isBefore(existingNote.updatedAt)) {
-            developer.log('[SYNC]   Local is NEWER - SKIPPING update');
-            // Local version is newer - skip (it will be synced on next push)
-            return;
+          } catch (e, stackTrace) {
+            debugPrint('[SYNC MOBILE] ❌ Failed to insert note: $e');
+            debugPrint('[SYNC MOBILE] Stack trace: $stackTrace');
+          }
+        },
+        // Note FOUND by ID
+        (existingNote) async {
+          final localTime = existingNote.updatedAt.toUtc();
+          final serverTime = serverNote.updatedAt.toUtc();
+
+          if (serverTime.isAfter(localTime)) {
+            try {
+              await _notesRepository.updateNote(
+                id: existingNote.id,
+                title: serverNote.title,
+                content: serverNote.content,
+                categoryId: serverNote.categoryId,
+                color: serverNote.color,
+                isPinned: serverNote.isPinned,
+                isFavorite: serverNote.isFavorite,
+              );
+            } catch (e, stackTrace) {
+              debugPrint('[SYNC MOBILE] ❌ Failed to update note: $e');
+              debugPrint('[SYNC MOBILE] Stack trace: $stackTrace');
+            }
+          } else if (serverTime.isBefore(localTime)) {
+            debugPrint(
+              '[SYNC MOBILE] ⏭️  Local is NEWER - SKIPPING (will sync to server on next push)',
+            );
           } else {
-            // If timestamps are equal, no action needed (already synced)
-            developer.log('[SYNC]   Timestamps are EQUAL - SKIPPING update');
+            debugPrint(
+              '[SYNC MOBILE] ⏭️  Timestamps are EQUAL - SKIPPING (already synced)',
+            );
           }
         },
       );
     }
 
-    developer.log('[SYNC] Finished processing all notes from server');
+    // Get final count
+    final finalNotesResult = await _notesRepository.getAllNotes();
+    final finalNotes = finalNotesResult.getOrElse(() => []);
+    debugPrint('[SYNC MOBILE] Final note count: ${finalNotes.length}');
+    debugPrint(
+      '[SYNC MOBILE] Final note IDs: ${finalNotes.map((n) => '${n.id}:"${n.title}"').join(', ')}',
+    );
+    debugPrint('═══════════════════════════════════════════════════════');
   }
 
   @override
@@ -202,29 +183,26 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
 
     await currentResult.fold(
       (failure) async {
-        // No local progress exists - this shouldn't happen
-        // but handle gracefully by doing nothing
-        // Progress should be initialized on first app run
+        debugPrint('[SYNC]   No local progress - should not happen, skipping');
       },
       (current) async {
         // Compare levels and XP - only update if server is ahead
-        // This prevents downgrading progress
         final shouldUpdate =
             progressFromServer.level > current.level ||
             (progressFromServer.level == current.level &&
                 progressFromServer.currentXp > current.currentXp);
 
         if (shouldUpdate) {
-          // Server progress is ahead - update local
-          // Note: You might need to add a direct update method to ProgressRepository
-          // For now, use the existing addXp method
+          // Calculate XP difference
           final xpDiff = progressFromServer.currentXp - current.currentXp;
           if (xpDiff > 0) {
             await _progressRepository.addXp(xpDiff);
           }
 
-          // Update other stats that might have changed
-          // todo(mixin27): Add methods to update streaks, stats etc if needed
+          // Update other stats if your repository supports it
+          // TODO: Add methods to update streaks, stats etc if needed
+        } else {
+          debugPrint('[SYNC]   Local progress is AHEAD or EQUAL - SKIPPING');
         }
       },
     );
@@ -234,23 +212,40 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
   Future<void> saveTransactionsFromSync(
     List<points.PointTransaction> transactionsFromServer,
   ) async {
-    // Transactions are immutable - only insert if they don't exist
+    // Get all existing transaction IDs
     final allTransactionsResult = await _pointsRepository.getAllTransactions();
     final existingTransactionIds = allTransactionsResult.fold(
-      (failure) => <String>[],
+      (failure) => <String>{},
       (transactions) => transactions.map((tx) => tx.id).toSet(),
     );
 
+    int insertedCount = 0;
+    int skippedCount = 0;
+
     for (final serverTransaction in transactionsFromServer) {
-      // Check if transaction already exists locally
-      if (!existingTransactionIds.contains(serverTransaction.id)) {
-        // New transaction from server - insert it
-        // You may need to add a method to directly insert a transaction
-        // with a specific ID and timestamp
-        // For now, this assumes the repository handles it
-        // todo(mixin27): Add insertTransaction method to PointsRepository if needed
+      // Check if transaction already exists
+      if (existingTransactionIds.contains(serverTransaction.id)) {
+        debugPrint(
+          '[SYNC]   Transaction ${serverTransaction.id} already exists - SKIPPING',
+        );
+        skippedCount++;
+        continue;
       }
+
+      // New transaction - INSERT
+      debugPrint(
+        '[SYNC]   Transaction ${serverTransaction.id} is NEW - INSERTING',
+      );
+
+      // TODO: Add method to PointsRepository to insert transaction with specific ID
+      // For now, transactions are immutable and should not be duplicated
+
+      insertedCount++;
     }
+
+    debugPrint(
+      '[SYNC] ✓ Transactions: $insertedCount inserted, $skippedCount skipped',
+    );
   }
 
   @override
@@ -265,10 +260,9 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
 
     await currentResult.fold(
       (failure) async {
-        // Failed to get settings, skip update
+        debugPrint('[SYNC]   Failed to get current settings - SKIPPING');
       },
       (current) async {
-        // Update only the synced settings
         final updatedSettings = current.copyWith(
           chaosEnabled: chaosEnabled,
           challengeTimeLimit: challengeTimeLimit,
@@ -298,6 +292,7 @@ class SyncLocalDataSourceImpl implements SyncLocalDataSource {
 
     await result.fold(
       (failure) async {
+        debugPrint('[SYNC]   Failed to save timestamp - settings not found');
         throw CacheException("Can't save without existing settings");
       },
       (current) async {

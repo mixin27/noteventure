@@ -16,6 +16,8 @@ dependencies:
   # Shared
   core:
     path: ../../shared/core
+  database:
+    path: ../../shared/database
 
   # Features
   notes:
@@ -26,6 +28,8 @@ dependencies:
     path: ../points
   settings:
     path: ../settings
+
+  drift: ^2.28.2
 
   # State Management
   flutter_bloc: ^9.1.1
@@ -41,6 +45,9 @@ dependencies:
   device_info_plus: ^12.1.0
   dio: ^5.9.0
   uuid: ^4.5.1
+
+  workmanager: ^0.8.0
+  connectivity_plus: ^7.0.0
 
 dev_dependencies:
   flutter_test:

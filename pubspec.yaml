@@ -18,3 +18,4 @@ workspace:
   - packages/features/chaos
   - packages/features/themes
   - packages/features/syncing
+  - packages/features/background_sync

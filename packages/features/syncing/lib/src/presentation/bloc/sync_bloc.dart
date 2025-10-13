@@ -1,7 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../domain/repositories/sync_repository.dart';
+import '../../domain/entities/sync_result.dart';
 import '../../domain/usecases/get_last_sync_time.dart';
 import '../../domain/usecases/pull_from_server.dart';
 import '../../domain/usecases/push_to_server.dart';

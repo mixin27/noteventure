@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:syncing/syncing.dart';
 import 'package:ui/ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -112,7 +111,7 @@ class SettingsView extends StatelessWidget {
                   const SizedBox(height: AppSpacing.lg),
 
                   // Sync Section
-                  _buildSectionTitle(context, 'Sync'),
+                  _buildSectionTitle(context, 'Cloud Sync'),
                   const SizedBox(height: AppSpacing.sm),
                   _buildSyncSection(context),
                   const SizedBox(height: AppSpacing.lg),
@@ -335,43 +334,18 @@ class SettingsView extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
+            onTap: () {
+              GoRouter.of(context).push(RouteConstants.syncSettings);
+            },
             leading: const Icon(Icons.cloud_sync),
             title: const Text('Data Sync'),
-            subtitle: BlocBuilder<SyncBloc, SyncState>(
-              builder: (context, state) {
-                if (state is LastSyncLoaded && state.lastSyncTime != null) {
-                  return Text('Last synced: ${state.lastSyncTime!.timeAgo}');
-                }
-                return const Text('Never synced');
+            subtitle: const Text("Manual and background sync settings"),
+            trailing: IconButton(
+              onPressed: () {
+                GoRouter.of(context).push(RouteConstants.syncSettings);
               },
+              icon: const Icon(Icons.chevron_right),
             ),
-            trailing: BlocBuilder<SyncBloc, SyncState>(
-              builder: (context, state) {
-                final isSyncing = state is SyncInProgress;
-
-                if (isSyncing) {
-                  return const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  );
-                }
-
-                return IconButton(
-                  icon: const Icon(Icons.sync),
-                  onPressed: () {
-                    context.read<SyncBloc>().add(SyncRequested());
-                  },
-                );
-              },
-            ),
-            onTap: () {
-              // Show sync details dialog
-              showDialog(
-                context: context,
-                builder: (context) => const SyncDetailsDialog(),
-              );
-            },
           ),
         ],
       ),

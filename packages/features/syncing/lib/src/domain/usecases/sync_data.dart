@@ -1,6 +1,7 @@
 import 'package:core/core.dart';
 import 'package:dartz/dartz.dart';
 
+import '../entities/sync_result.dart';
 import '../repositories/sync_repository.dart';
 
 class SyncData {

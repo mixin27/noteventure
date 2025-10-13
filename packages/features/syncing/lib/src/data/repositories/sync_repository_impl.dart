@@ -1,10 +1,10 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:core/core.dart';
 import 'package:dartz/dartz.dart';
 
+import '../../domain/entities/sync_log.dart';
+import '../../domain/entities/sync_result.dart';
 import '../../domain/repositories/sync_repository.dart';
+import '../datasources/sync_history_local_datasource.dart';
 import '../datasources/sync_local_datasource.dart';
 import '../datasources/sync_remote_datasource.dart';
 import '../mappers/sync_mappers.dart';
@@ -12,15 +12,20 @@ import '../mappers/sync_mappers.dart';
 class SyncRepositoryImpl implements SyncRepository {
   final SyncRemoteDataSource _remoteDataSource;
   final SyncLocalDataSource _localDataSource;
+  final SyncHistoryLocalDataSource _syncHistoryLocalDataSource;
 
   SyncRepositoryImpl({
     required SyncRemoteDataSource remoteDataSource,
     required SyncLocalDataSource localDataSource,
+    required SyncHistoryLocalDataSource syncHistoryLocalDataSource,
   }) : _remoteDataSource = remoteDataSource,
-       _localDataSource = localDataSource;
+       _localDataSource = localDataSource,
+       _syncHistoryLocalDataSource = syncHistoryLocalDataSource;
 
   @override
   Future<Either<Failure, SyncResult>> sync() async {
+    final startTime = DateTime.now();
+
     try {
       // Get device ID
       final deviceId = await DeviceInfoHelper.getDeviceId();
@@ -65,8 +70,6 @@ class SyncRepositoryImpl implements SyncRepository {
         transactions: transactionDtos.isNotEmpty ? transactionDtos : null,
       );
 
-      log(jsonEncode(request.toJson()));
-
       // Perform sync
       final response = await _remoteDataSource.syncData(request: request);
 
@@ -104,17 +107,31 @@ class SyncRepositoryImpl implements SyncRepository {
 
       // Create result
       final result = SyncResult(
-        notesSynced: 0,
-        transactionsSynced: 0,
+        notesSynced: response.notes.length,
+        transactionsSynced: response.transactions.length,
         progressSynced: response.progress != null,
         conflictsFound: response.conflicts.length,
         syncedAt: response.syncedAt,
+      );
+
+      await _logSync(
+        syncType: SyncType.manual,
+        success: true,
+        result: result,
+        duration: DateTime.now().difference(startTime),
       );
 
       return Right(result);
     } on ApiException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
+      // Log failed sync
+      await _logSync(
+        syncType: SyncType.manual,
+        success: false,
+        error: e.toString(),
+        duration: DateTime.now().difference(startTime),
+      );
       return Left(ServerFailure('Sync failed: $e'));
     }
   }
@@ -241,6 +258,28 @@ class SyncRepositoryImpl implements SyncRepository {
       return Right(lastSync);
     } catch (e) {
       return Left(CacheFailure('Failed to get last sync time: $e'));
+    }
+  }
+
+  Future<void> _logSync({
+    required SyncType syncType,
+    required bool success,
+    SyncResult? result,
+    String? error,
+    required Duration duration,
+  }) async {
+    try {
+      await _syncHistoryLocalDataSource.createSync(
+        syncType: syncType,
+        success: success,
+        duration: duration,
+        result: result,
+        error: error,
+      );
+    } on DatabaseException catch (e) {
+      throw DatabaseFailure(e.message);
+    } catch (e) {
+      throw UnknownFailure(e.toString());
     }
   }
 }

@@ -1,5 +1,8 @@
 library;
 
+export 'src/data/datasources/notes_local_datasource.dart';
+export 'src/data/repositories/notes_repository_impl.dart';
+
 // Domain - Repositories
 export 'src/domain/repositories/notes_repository.dart';
 

@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 import '../app_database.dart';
 import '../daos/app_settings_dao.dart';
 import '../daos/notes_dao.dart';
+import '../daos/sync_logs_dao.dart';
 import '../daos/user_progress_dao.dart';
 import '../daos/point_transactions_dao.dart';
 import '../daos/achievements_dao.dart';
@@ -31,4 +32,7 @@ abstract class DatabaseModule {
 
   @singleton
   AppSettingsDao appSettingsDao(AppDatabase db) => AppSettingsDao(db);
+
+  @singleton
+  SyncLogsDao syncLogsDao(AppDatabase db) => SyncLogsDao(db);
 }

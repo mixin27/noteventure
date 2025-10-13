@@ -45,5 +45,18 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+    <!-- <key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+    </array> -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>processing</string>
+    </array>
+
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.noteventure.sync</string>
+    </array>
 </dict>
 </plist>

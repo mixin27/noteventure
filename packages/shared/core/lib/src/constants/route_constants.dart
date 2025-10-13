@@ -15,6 +15,7 @@ class RouteConstants {
   static const String chaos = '/chaos';
   static const String login = '/login';
   static const String register = '/register';
+  static const String syncSettings = '/sync-settings';
 
   // Route names
   static const String splashName = 'splash';
@@ -30,6 +31,7 @@ class RouteConstants {
   static const String chaosName = 'chaos';
   static const String loginName = 'login';
   static const String registerName = 'register';
+  static const String syncSettingsName = 'sync-settings';
 
   static const String debug = '/debug';
   static const String debugName = 'debug';

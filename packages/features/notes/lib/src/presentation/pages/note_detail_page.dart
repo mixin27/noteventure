@@ -199,6 +199,8 @@ class NoteDetailView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
+                  _buildInfoRow(context, 'ID', note.id, Icons.numbers),
+                  const SizedBox(height: AppSpacing.sm),
                   _buildInfoRow(
                     context,
                     'Created',

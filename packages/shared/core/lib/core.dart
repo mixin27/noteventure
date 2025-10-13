@@ -4,6 +4,7 @@ library;
 export 'src/constants/app_constants.dart';
 export 'src/constants/point_costs.dart';
 export 'src/constants/challenge_config.dart';
+export 'src/constants/route_constants.dart';
 
 // Errors
 export 'src/errors/failures.dart';

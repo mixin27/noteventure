@@ -25,5 +25,6 @@ export 'src/daos/achievements_dao.dart';
 export 'src/daos/themes_dao.dart';
 export 'src/daos/app_settings_dao.dart';
 export 'src/daos/chaos_events_dao.dart';
+export 'src/daos/sync_logs_dao.dart';
 
 export 'src/di/database_module.dart';

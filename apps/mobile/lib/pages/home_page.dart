@@ -10,8 +10,6 @@ import 'package:ui/ui.dart';
 import 'package:core/core.dart';
 import 'package:notes/notes.dart';
 
-import '../routes/route_constants.dart';
-
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 

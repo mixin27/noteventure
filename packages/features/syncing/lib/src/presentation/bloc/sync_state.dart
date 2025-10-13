@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../../domain/repositories/sync_repository.dart';
+import '../../domain/entities/sync_result.dart';
 
 sealed class SyncState extends Equatable {
   const SyncState();

@@ -29,6 +29,22 @@ abstract class NotesRepository {
     NoteType noteType = NoteType.standard,
     String? categoryId,
     String? color,
+    bool isPinned,
+    bool isFavorite,
+  });
+
+  /// Create note with predefined ID
+  Future<Either<Failure, Note>> createNoteWithId({
+    required String id, // UUID from server
+    required String title,
+    required String content,
+    required NoteType noteType,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    String? categoryId,
+    String? color,
+    bool isPinned,
+    bool isFavorite,
   });
 
   /// Update note
@@ -38,6 +54,8 @@ abstract class NotesRepository {
     String? content,
     String? categoryId,
     String? color,
+    bool? isPinned,
+    bool? isFavorite,
   });
 
   /// Delete note (soft delete)

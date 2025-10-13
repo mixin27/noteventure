@@ -2,6 +2,7 @@ import 'package:achievements/achievements.dart';
 import 'package:auth/auth.dart';
 import 'package:challenges/challenges.dart';
 import 'package:chaos/chaos.dart';
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:notes/notes.dart';
@@ -13,7 +14,6 @@ import '../pages/debug/debug_page.dart';
 import '../pages/home_page.dart';
 import '../pages/notes_page.dart';
 import '../pages/splash_page.dart';
-import 'route_constants.dart';
 import 'router_refresh_stream.dart';
 
 class AppRouter {
@@ -165,6 +165,11 @@ class AppRouter {
       path: RouteConstants.chaos,
       name: RouteConstants.chaosName,
       builder: (context, state) => const ChaosHistoryPage(),
+    ),
+    GoRoute(
+      path: RouteConstants.syncSettings,
+      name: RouteConstants.syncSettingsName,
+      builder: (context, state) => const SyncSettingsPage(),
     ),
   ];
 }

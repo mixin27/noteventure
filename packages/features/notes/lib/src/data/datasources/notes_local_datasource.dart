@@ -14,11 +14,16 @@ abstract class NotesLocalDataSource {
   Future<List<NoteModel>> getFavoriteNotes();
   Future<List<NoteModel>> searchNotes(String query);
   Future<NoteModel> createNote({
+    String? id,
     required String title,
     required String content,
     NoteType noteType = NoteType.standard,
     String? categoryId,
     String? color,
+    bool isPinned = false,
+    bool isFavorite = false,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   });
   Future<NoteModel> updateNote({
     required String id,
@@ -26,6 +31,8 @@ abstract class NotesLocalDataSource {
     String? content,
     String? categoryId,
     String? color,
+    bool? isPinned,
+    bool? isFavorite,
   });
   Future<void> deleteNote(String id);
   Future<NoteModel> togglePin(String id);
@@ -93,20 +100,29 @@ class NotesLocalDataSourceImpl implements NotesLocalDataSource {
 
   @override
   Future<NoteModel> createNote({
+    String? id,
     required String title,
     required String content,
     NoteType noteType = NoteType.standard,
     String? categoryId,
     String? color,
+    bool isPinned = false,
+    bool isFavorite = false,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) async {
     final noteId = uuid.v4();
     final companion = NotesCompanion.insert(
-      id: Value(noteId),
+      id: id.isNullOrEmpty ? Value(noteId) : Value(id!),
       title: title,
       content: content,
       noteType: Value(noteType.name),
       categoryId: Value(categoryId),
       color: Value(color),
+      isPinned: Value(isPinned),
+      isFavorite: Value(isFavorite),
+      createdAt: createdAt != null ? Value(createdAt) : Value.absent(),
+      updatedAt: updatedAt != null ? Value(updatedAt) : Value.absent(),
     );
 
     await notesDao.createNote(companion);
@@ -126,6 +142,8 @@ class NotesLocalDataSourceImpl implements NotesLocalDataSource {
     String? content,
     String? categoryId,
     String? color,
+    bool? isPinned,
+    bool? isFavorite,
   }) async {
     final companion = NotesCompanion(
       id: Value(id),
@@ -133,6 +151,8 @@ class NotesLocalDataSourceImpl implements NotesLocalDataSource {
       content: content != null ? Value(content) : const Value.absent(),
       categoryId: categoryId != null ? Value(categoryId) : const Value.absent(),
       color: color != null ? Value(color) : const Value.absent(),
+      isPinned: Value(isPinned ?? false),
+      isFavorite: Value(isFavorite ?? false),
       updatedAt: Value(DateTime.now()),
       editCount:
           const Value.absent(), // Will be incremented by trigger or manually

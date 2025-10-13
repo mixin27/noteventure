@@ -1,17 +1,15 @@
-import 'dart:io';
-
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
+import 'package:drift_flutter/drift_flutter.dart';
 import 'package:injectable/injectable.dart';
 import 'package:uuid/uuid.dart';
 
+import 'app_database.steps.dart';
 import 'daos/achievements_dao.dart';
 import 'daos/app_settings_dao.dart';
 import 'daos/chaos_events_dao.dart';
 import 'daos/notes_dao.dart';
 import 'daos/point_transactions_dao.dart';
+import 'daos/sync_logs_dao.dart';
 import 'daos/themes_dao.dart';
 import 'daos/user_progress_dao.dart';
 import 'tables/achievements_table.dart';
@@ -24,6 +22,7 @@ import 'tables/chaos_events_table.dart';
 import 'tables/daily_challenges_table.dart';
 import 'tables/notes_table.dart';
 import 'tables/point_transactions_table.dart';
+import 'tables/sync_logs_table.dart';
 import 'tables/themes_table.dart';
 import 'tables/user_progress_table.dart';
 
@@ -46,6 +45,7 @@ final uuid = Uuid();
     DailyChallenges,
     ChallengeQuestions,
     AppSettings,
+    SyncLogs,
   ],
   daos: [
     NotesDao,
@@ -55,6 +55,7 @@ final uuid = Uuid();
     ChaosEventsDao,
     ThemesDao,
     AppSettingsDao,
+    SyncLogsDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -65,7 +66,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(QueryExecutor e) : super(e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
@@ -74,6 +75,11 @@ class AppDatabase extends _$AppDatabase {
         await m.createAll();
         await _insertInitialData();
       },
+      onUpgrade: stepByStep(
+        from1To2: (m, schema) async {
+          await m.create(syncLogs);
+        },
+      ),
     );
   }
 
@@ -91,10 +97,11 @@ class AppDatabase extends _$AppDatabase {
   }
 }
 
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'noteventure.db'));
-    return NativeDatabase(file);
-  });
+QueryExecutor _openConnection() {
+  return driftDatabase(name: 'noteventure', native: const DriftNativeOptions());
+  // return LazyDatabase(() async {
+  //   final dbFolder = await getApplicationDocumentsDirectory();
+  //   final file = File(p.join(dbFolder.path, 'noteventure.db'));
+  //   return NativeDatabase(file);
+  // });
 }

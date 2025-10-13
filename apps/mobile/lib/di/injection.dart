@@ -1,5 +1,6 @@
 import 'package:achievements/achievements.dart';
 import 'package:auth/auth.dart';
+import 'package:background_sync/background_sync.dart';
 import 'package:challenges/challenges.dart';
 import 'package:chaos/chaos.dart';
 import 'package:core/core.dart';
@@ -29,6 +30,7 @@ Future<void> configureDependencies() async {
   getIt.registerSingleton<ChaosEventsDao>(ChaosEventsDao(database));
   getIt.registerSingleton<ThemesDao>(ThemesDao(database));
   getIt.registerSingleton<AppSettingsDao>(AppSettingsDao(database));
+  getIt.registerSingleton<SyncLogsDao>(SyncLogsDao(database));
 
   // Core
   initCoreInjection();
@@ -44,6 +46,7 @@ Future<void> configureDependencies() async {
   initThemesFeature();
   initSettingsDependencies();
   initSyncingFeature();
+  configureBackgroundSyncDependencies();
 
   // Router
   getIt.registerLazySingleton(() => AppRouter(getIt()));

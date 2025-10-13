@@ -8,16 +8,12 @@ class Categories extends Table with TableInfo<Categories, CategoriesData> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   Categories(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
     'name',
@@ -83,7 +79,7 @@ class Categories extends Table with TableInfo<Categories, CategoriesData> {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return CategoriesData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       name: attachedDatabase.typeMapping.read(
@@ -116,7 +112,7 @@ class Categories extends Table with TableInfo<Categories, CategoriesData> {
 }
 
 class CategoriesData extends DataClass implements Insertable<CategoriesData> {
-  final int id;
+  final String id;
   final String name;
   final String color;
   final String? icon;
@@ -133,7 +129,7 @@ class CategoriesData extends DataClass implements Insertable<CategoriesData> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
     map['color'] = Variable<String>(color);
     if (!nullToAbsent || icon != null) {
@@ -161,7 +157,7 @@ class CategoriesData extends DataClass implements Insertable<CategoriesData> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return CategoriesData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       color: serializer.fromJson<String>(json['color']),
       icon: serializer.fromJson<String?>(json['icon']),
@@ -173,7 +169,7 @@ class CategoriesData extends DataClass implements Insertable<CategoriesData> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'color': serializer.toJson<String>(color),
       'icon': serializer.toJson<String?>(icon),
@@ -183,7 +179,7 @@ class CategoriesData extends DataClass implements Insertable<CategoriesData> {
   }
 
   CategoriesData copyWith({
-    int? id,
+    String? id,
     String? name,
     String? color,
     Value<String?> icon = const Value.absent(),
@@ -236,12 +232,13 @@ class CategoriesData extends DataClass implements Insertable<CategoriesData> {
 }
 
 class CategoriesCompanion extends UpdateCompanion<CategoriesData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> name;
   final Value<String> color;
   final Value<String?> icon;
   final Value<DateTime> createdAt;
   final Value<int> sortOrder;
+  final Value<int> rowid;
   const CategoriesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -249,23 +246,27 @@ class CategoriesCompanion extends UpdateCompanion<CategoriesData> {
     this.icon = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.sortOrder = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   CategoriesCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required String name,
     required String color,
     this.icon = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.sortOrder = const Value.absent(),
-  }) : name = Value(name),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
        color = Value(color);
   static Insertable<CategoriesData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? name,
     Expression<String>? color,
     Expression<String>? icon,
     Expression<DateTime>? createdAt,
     Expression<int>? sortOrder,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -274,16 +275,18 @@ class CategoriesCompanion extends UpdateCompanion<CategoriesData> {
       if (icon != null) 'icon': icon,
       if (createdAt != null) 'created_at': createdAt,
       if (sortOrder != null) 'sort_order': sortOrder,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   CategoriesCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<String>? name,
     Value<String>? color,
     Value<String?>? icon,
     Value<DateTime>? createdAt,
     Value<int>? sortOrder,
+    Value<int>? rowid,
   }) {
     return CategoriesCompanion(
       id: id ?? this.id,
@@ -292,6 +295,7 @@ class CategoriesCompanion extends UpdateCompanion<CategoriesData> {
       icon: icon ?? this.icon,
       createdAt: createdAt ?? this.createdAt,
       sortOrder: sortOrder ?? this.sortOrder,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -299,7 +303,7 @@ class CategoriesCompanion extends UpdateCompanion<CategoriesData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -316,6 +320,9 @@ class CategoriesCompanion extends UpdateCompanion<CategoriesData> {
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -327,7 +334,8 @@ class CategoriesCompanion extends UpdateCompanion<CategoriesData> {
           ..write('color: $color, ')
           ..write('icon: $icon, ')
           ..write('createdAt: $createdAt, ')
-          ..write('sortOrder: $sortOrder')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -338,16 +346,12 @@ class Notes extends Table with TableInfo<Notes, NotesData> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   Notes(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
     'title',
@@ -421,11 +425,11 @@ class Notes extends Table with TableInfo<Notes, NotesData> {
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
-  late final GeneratedColumn<int> categoryId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> categoryId = GeneratedColumn<String>(
     'category_id',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES categories (id) ON DELETE SET NULL',
@@ -533,7 +537,7 @@ class Notes extends Table with TableInfo<Notes, NotesData> {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return NotesData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       title: attachedDatabase.typeMapping.read(
@@ -569,7 +573,7 @@ class Notes extends Table with TableInfo<Notes, NotesData> {
         data['${effectivePrefix}unlock_date'],
       ),
       categoryId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}category_id'],
       ),
       sortOrder: attachedDatabase.typeMapping.read(
@@ -614,7 +618,7 @@ class Notes extends Table with TableInfo<Notes, NotesData> {
 }
 
 class NotesData extends DataClass implements Insertable<NotesData> {
-  final int id;
+  final String id;
   final String title;
   final String content;
   final DateTime createdAt;
@@ -623,7 +627,7 @@ class NotesData extends DataClass implements Insertable<NotesData> {
   final String noteType;
   final bool isLocked;
   final DateTime? unlockDate;
-  final int? categoryId;
+  final String? categoryId;
   final int sortOrder;
   final String? color;
   final bool isPinned;
@@ -655,7 +659,7 @@ class NotesData extends DataClass implements Insertable<NotesData> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['title'] = Variable<String>(title);
     map['content'] = Variable<String>(content);
     map['created_at'] = Variable<DateTime>(createdAt);
@@ -667,7 +671,7 @@ class NotesData extends DataClass implements Insertable<NotesData> {
       map['unlock_date'] = Variable<DateTime>(unlockDate);
     }
     if (!nullToAbsent || categoryId != null) {
-      map['category_id'] = Variable<int>(categoryId);
+      map['category_id'] = Variable<String>(categoryId);
     }
     map['sort_order'] = Variable<int>(sortOrder);
     if (!nullToAbsent || color != null) {
@@ -729,7 +733,7 @@ class NotesData extends DataClass implements Insertable<NotesData> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return NotesData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       title: serializer.fromJson<String>(json['title']),
       content: serializer.fromJson<String>(json['content']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -738,7 +742,7 @@ class NotesData extends DataClass implements Insertable<NotesData> {
       noteType: serializer.fromJson<String>(json['noteType']),
       isLocked: serializer.fromJson<bool>(json['isLocked']),
       unlockDate: serializer.fromJson<DateTime?>(json['unlockDate']),
-      categoryId: serializer.fromJson<int?>(json['categoryId']),
+      categoryId: serializer.fromJson<String?>(json['categoryId']),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
       color: serializer.fromJson<String?>(json['color']),
       isPinned: serializer.fromJson<bool>(json['isPinned']),
@@ -755,7 +759,7 @@ class NotesData extends DataClass implements Insertable<NotesData> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'title': serializer.toJson<String>(title),
       'content': serializer.toJson<String>(content),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -764,7 +768,7 @@ class NotesData extends DataClass implements Insertable<NotesData> {
       'noteType': serializer.toJson<String>(noteType),
       'isLocked': serializer.toJson<bool>(isLocked),
       'unlockDate': serializer.toJson<DateTime?>(unlockDate),
-      'categoryId': serializer.toJson<int?>(categoryId),
+      'categoryId': serializer.toJson<String?>(categoryId),
       'sortOrder': serializer.toJson<int>(sortOrder),
       'color': serializer.toJson<String?>(color),
       'isPinned': serializer.toJson<bool>(isPinned),
@@ -777,7 +781,7 @@ class NotesData extends DataClass implements Insertable<NotesData> {
   }
 
   NotesData copyWith({
-    int? id,
+    String? id,
     String? title,
     String? content,
     DateTime? createdAt,
@@ -786,7 +790,7 @@ class NotesData extends DataClass implements Insertable<NotesData> {
     String? noteType,
     bool? isLocked,
     Value<DateTime?> unlockDate = const Value.absent(),
-    Value<int?> categoryId = const Value.absent(),
+    Value<String?> categoryId = const Value.absent(),
     int? sortOrder,
     Value<String?> color = const Value.absent(),
     bool? isPinned,
@@ -921,7 +925,7 @@ class NotesData extends DataClass implements Insertable<NotesData> {
 }
 
 class NotesCompanion extends UpdateCompanion<NotesData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> title;
   final Value<String> content;
   final Value<DateTime> createdAt;
@@ -930,7 +934,7 @@ class NotesCompanion extends UpdateCompanion<NotesData> {
   final Value<String> noteType;
   final Value<bool> isLocked;
   final Value<DateTime?> unlockDate;
-  final Value<int?> categoryId;
+  final Value<String?> categoryId;
   final Value<int> sortOrder;
   final Value<String?> color;
   final Value<bool> isPinned;
@@ -939,6 +943,7 @@ class NotesCompanion extends UpdateCompanion<NotesData> {
   final Value<bool> isDeleted;
   final Value<DateTime?> deletedAt;
   final Value<String?> serverUuid;
+  final Value<int> rowid;
   const NotesCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -958,9 +963,10 @@ class NotesCompanion extends UpdateCompanion<NotesData> {
     this.isDeleted = const Value.absent(),
     this.deletedAt = const Value.absent(),
     this.serverUuid = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   NotesCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required String title,
     required String content,
     this.createdAt = const Value.absent(),
@@ -978,10 +984,12 @@ class NotesCompanion extends UpdateCompanion<NotesData> {
     this.isDeleted = const Value.absent(),
     this.deletedAt = const Value.absent(),
     this.serverUuid = const Value.absent(),
-  }) : title = Value(title),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       title = Value(title),
        content = Value(content);
   static Insertable<NotesData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? title,
     Expression<String>? content,
     Expression<DateTime>? createdAt,
@@ -990,7 +998,7 @@ class NotesCompanion extends UpdateCompanion<NotesData> {
     Expression<String>? noteType,
     Expression<bool>? isLocked,
     Expression<DateTime>? unlockDate,
-    Expression<int>? categoryId,
+    Expression<String>? categoryId,
     Expression<int>? sortOrder,
     Expression<String>? color,
     Expression<bool>? isPinned,
@@ -999,6 +1007,7 @@ class NotesCompanion extends UpdateCompanion<NotesData> {
     Expression<bool>? isDeleted,
     Expression<DateTime>? deletedAt,
     Expression<String>? serverUuid,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1020,11 +1029,12 @@ class NotesCompanion extends UpdateCompanion<NotesData> {
       if (isDeleted != null) 'is_deleted': isDeleted,
       if (deletedAt != null) 'deleted_at': deletedAt,
       if (serverUuid != null) 'server_uuid': serverUuid,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   NotesCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<String>? title,
     Value<String>? content,
     Value<DateTime>? createdAt,
@@ -1033,7 +1043,7 @@ class NotesCompanion extends UpdateCompanion<NotesData> {
     Value<String>? noteType,
     Value<bool>? isLocked,
     Value<DateTime?>? unlockDate,
-    Value<int?>? categoryId,
+    Value<String?>? categoryId,
     Value<int>? sortOrder,
     Value<String?>? color,
     Value<bool>? isPinned,
@@ -1042,6 +1052,7 @@ class NotesCompanion extends UpdateCompanion<NotesData> {
     Value<bool>? isDeleted,
     Value<DateTime?>? deletedAt,
     Value<String?>? serverUuid,
+    Value<int>? rowid,
   }) {
     return NotesCompanion(
       id: id ?? this.id,
@@ -1063,6 +1074,7 @@ class NotesCompanion extends UpdateCompanion<NotesData> {
       isDeleted: isDeleted ?? this.isDeleted,
       deletedAt: deletedAt ?? this.deletedAt,
       serverUuid: serverUuid ?? this.serverUuid,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1070,7 +1082,7 @@ class NotesCompanion extends UpdateCompanion<NotesData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (title.present) {
       map['title'] = Variable<String>(title.value);
@@ -1097,7 +1109,7 @@ class NotesCompanion extends UpdateCompanion<NotesData> {
       map['unlock_date'] = Variable<DateTime>(unlockDate.value);
     }
     if (categoryId.present) {
-      map['category_id'] = Variable<int>(categoryId.value);
+      map['category_id'] = Variable<String>(categoryId.value);
     }
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
@@ -1125,6 +1137,9 @@ class NotesCompanion extends UpdateCompanion<NotesData> {
     if (serverUuid.present) {
       map['server_uuid'] = Variable<String>(serverUuid.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -1148,7 +1163,8 @@ class NotesCompanion extends UpdateCompanion<NotesData> {
           ..write('requiredChallengeLevel: $requiredChallengeLevel, ')
           ..write('isDeleted: $isDeleted, ')
           ..write('deletedAt: $deletedAt, ')
-          ..write('serverUuid: $serverUuid')
+          ..write('serverUuid: $serverUuid, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1160,16 +1176,12 @@ class ChallengeHistory extends Table
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   ChallengeHistory(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   late final GeneratedColumn<String> challengeType = GeneratedColumn<String>(
     'challenge_type',
@@ -1332,7 +1344,7 @@ class ChallengeHistory extends Table
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ChallengeHistoryData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       challengeType: attachedDatabase.typeMapping.read(
@@ -1410,7 +1422,7 @@ class ChallengeHistory extends Table
 
 class ChallengeHistoryData extends DataClass
     implements Insertable<ChallengeHistoryData> {
-  final int id;
+  final String id;
   final String challengeType;
   final String difficulty;
   final int difficultyLevel;
@@ -1449,7 +1461,7 @@ class ChallengeHistoryData extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['challenge_type'] = Variable<String>(challengeType);
     map['difficulty'] = Variable<String>(difficulty);
     map['difficulty_level'] = Variable<int>(difficultyLevel);
@@ -1513,7 +1525,7 @@ class ChallengeHistoryData extends DataClass
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ChallengeHistoryData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       challengeType: serializer.fromJson<String>(json['challengeType']),
       difficulty: serializer.fromJson<String>(json['difficulty']),
       difficultyLevel: serializer.fromJson<int>(json['difficultyLevel']),
@@ -1536,7 +1548,7 @@ class ChallengeHistoryData extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'challengeType': serializer.toJson<String>(challengeType),
       'difficulty': serializer.toJson<String>(difficulty),
       'difficultyLevel': serializer.toJson<int>(difficultyLevel),
@@ -1557,7 +1569,7 @@ class ChallengeHistoryData extends DataClass
   }
 
   ChallengeHistoryData copyWith({
-    int? id,
+    String? id,
     String? challengeType,
     String? difficulty,
     int? difficultyLevel,
@@ -1717,7 +1729,7 @@ class ChallengeHistoryData extends DataClass
 }
 
 class ChallengeHistoryCompanion extends UpdateCompanion<ChallengeHistoryData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> challengeType;
   final Value<String> difficulty;
   final Value<int> difficultyLevel;
@@ -1734,6 +1746,7 @@ class ChallengeHistoryCompanion extends UpdateCompanion<ChallengeHistoryData> {
   final Value<DateTime> completedAt;
   final Value<String> triggerReason;
   final Value<int?> relatedNoteId;
+  final Value<int> rowid;
   const ChallengeHistoryCompanion({
     this.id = const Value.absent(),
     this.challengeType = const Value.absent(),
@@ -1752,9 +1765,10 @@ class ChallengeHistoryCompanion extends UpdateCompanion<ChallengeHistoryData> {
     this.completedAt = const Value.absent(),
     this.triggerReason = const Value.absent(),
     this.relatedNoteId = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   ChallengeHistoryCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required String challengeType,
     required String difficulty,
     required int difficultyLevel,
@@ -1771,7 +1785,9 @@ class ChallengeHistoryCompanion extends UpdateCompanion<ChallengeHistoryData> {
     this.completedAt = const Value.absent(),
     required String triggerReason,
     this.relatedNoteId = const Value.absent(),
-  }) : challengeType = Value(challengeType),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       challengeType = Value(challengeType),
        difficulty = Value(difficulty),
        difficultyLevel = Value(difficultyLevel),
        question = Value(question),
@@ -1781,7 +1797,7 @@ class ChallengeHistoryCompanion extends UpdateCompanion<ChallengeHistoryData> {
        xpEarned = Value(xpEarned),
        triggerReason = Value(triggerReason);
   static Insertable<ChallengeHistoryData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? challengeType,
     Expression<String>? difficulty,
     Expression<int>? difficultyLevel,
@@ -1798,6 +1814,7 @@ class ChallengeHistoryCompanion extends UpdateCompanion<ChallengeHistoryData> {
     Expression<DateTime>? completedAt,
     Expression<String>? triggerReason,
     Expression<int>? relatedNoteId,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1818,11 +1835,12 @@ class ChallengeHistoryCompanion extends UpdateCompanion<ChallengeHistoryData> {
       if (completedAt != null) 'completed_at': completedAt,
       if (triggerReason != null) 'trigger_reason': triggerReason,
       if (relatedNoteId != null) 'related_note_id': relatedNoteId,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   ChallengeHistoryCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<String>? challengeType,
     Value<String>? difficulty,
     Value<int>? difficultyLevel,
@@ -1839,6 +1857,7 @@ class ChallengeHistoryCompanion extends UpdateCompanion<ChallengeHistoryData> {
     Value<DateTime>? completedAt,
     Value<String>? triggerReason,
     Value<int?>? relatedNoteId,
+    Value<int>? rowid,
   }) {
     return ChallengeHistoryCompanion(
       id: id ?? this.id,
@@ -1858,6 +1877,7 @@ class ChallengeHistoryCompanion extends UpdateCompanion<ChallengeHistoryData> {
       completedAt: completedAt ?? this.completedAt,
       triggerReason: triggerReason ?? this.triggerReason,
       relatedNoteId: relatedNoteId ?? this.relatedNoteId,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1865,7 +1885,7 @@ class ChallengeHistoryCompanion extends UpdateCompanion<ChallengeHistoryData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (challengeType.present) {
       map['challenge_type'] = Variable<String>(challengeType.value);
@@ -1915,6 +1935,9 @@ class ChallengeHistoryCompanion extends UpdateCompanion<ChallengeHistoryData> {
     if (relatedNoteId.present) {
       map['related_note_id'] = Variable<int>(relatedNoteId.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -1937,7 +1960,8 @@ class ChallengeHistoryCompanion extends UpdateCompanion<ChallengeHistoryData> {
           ..write('wasPartOfStreak: $wasPartOfStreak, ')
           ..write('completedAt: $completedAt, ')
           ..write('triggerReason: $triggerReason, ')
-          ..write('relatedNoteId: $relatedNoteId')
+          ..write('relatedNoteId: $relatedNoteId, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1948,16 +1972,12 @@ class ChaosEvents extends Table with TableInfo<ChaosEvents, ChaosEventsData> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   ChaosEvents(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   late final GeneratedColumn<String> eventKey = GeneratedColumn<String>(
     'event_key',
@@ -2039,7 +2059,7 @@ class ChaosEvents extends Table with TableInfo<ChaosEvents, ChaosEventsData> {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ChaosEventsData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       eventKey: attachedDatabase.typeMapping.read(
@@ -2080,7 +2100,7 @@ class ChaosEvents extends Table with TableInfo<ChaosEvents, ChaosEventsData> {
 }
 
 class ChaosEventsData extends DataClass implements Insertable<ChaosEventsData> {
-  final int id;
+  final String id;
   final String eventKey;
   final String eventType;
   final String title;
@@ -2101,7 +2121,7 @@ class ChaosEventsData extends DataClass implements Insertable<ChaosEventsData> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['event_key'] = Variable<String>(eventKey);
     map['event_type'] = Variable<String>(eventType);
     map['title'] = Variable<String>(title);
@@ -2131,7 +2151,7 @@ class ChaosEventsData extends DataClass implements Insertable<ChaosEventsData> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ChaosEventsData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       eventKey: serializer.fromJson<String>(json['eventKey']),
       eventType: serializer.fromJson<String>(json['eventType']),
       title: serializer.fromJson<String>(json['title']),
@@ -2145,7 +2165,7 @@ class ChaosEventsData extends DataClass implements Insertable<ChaosEventsData> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'eventKey': serializer.toJson<String>(eventKey),
       'eventType': serializer.toJson<String>(eventType),
       'title': serializer.toJson<String>(title),
@@ -2157,7 +2177,7 @@ class ChaosEventsData extends DataClass implements Insertable<ChaosEventsData> {
   }
 
   ChaosEventsData copyWith({
-    int? id,
+    String? id,
     String? eventKey,
     String? eventType,
     String? title,
@@ -2235,7 +2255,7 @@ class ChaosEventsData extends DataClass implements Insertable<ChaosEventsData> {
 }
 
 class ChaosEventsCompanion extends UpdateCompanion<ChaosEventsData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> eventKey;
   final Value<String> eventType;
   final Value<String> title;
@@ -2243,6 +2263,7 @@ class ChaosEventsCompanion extends UpdateCompanion<ChaosEventsData> {
   final Value<DateTime> triggeredAt;
   final Value<bool> wasResolved;
   final Value<int> pointsAwarded;
+  final Value<int> rowid;
   const ChaosEventsCompanion({
     this.id = const Value.absent(),
     this.eventKey = const Value.absent(),
@@ -2252,9 +2273,10 @@ class ChaosEventsCompanion extends UpdateCompanion<ChaosEventsData> {
     this.triggeredAt = const Value.absent(),
     this.wasResolved = const Value.absent(),
     this.pointsAwarded = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   ChaosEventsCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required String eventKey,
     required String eventType,
     required String title,
@@ -2262,12 +2284,14 @@ class ChaosEventsCompanion extends UpdateCompanion<ChaosEventsData> {
     this.triggeredAt = const Value.absent(),
     this.wasResolved = const Value.absent(),
     this.pointsAwarded = const Value.absent(),
-  }) : eventKey = Value(eventKey),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       eventKey = Value(eventKey),
        eventType = Value(eventType),
        title = Value(title),
        message = Value(message);
   static Insertable<ChaosEventsData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? eventKey,
     Expression<String>? eventType,
     Expression<String>? title,
@@ -2275,6 +2299,7 @@ class ChaosEventsCompanion extends UpdateCompanion<ChaosEventsData> {
     Expression<DateTime>? triggeredAt,
     Expression<bool>? wasResolved,
     Expression<int>? pointsAwarded,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2285,11 +2310,12 @@ class ChaosEventsCompanion extends UpdateCompanion<ChaosEventsData> {
       if (triggeredAt != null) 'triggered_at': triggeredAt,
       if (wasResolved != null) 'was_resolved': wasResolved,
       if (pointsAwarded != null) 'points_awarded': pointsAwarded,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   ChaosEventsCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<String>? eventKey,
     Value<String>? eventType,
     Value<String>? title,
@@ -2297,6 +2323,7 @@ class ChaosEventsCompanion extends UpdateCompanion<ChaosEventsData> {
     Value<DateTime>? triggeredAt,
     Value<bool>? wasResolved,
     Value<int>? pointsAwarded,
+    Value<int>? rowid,
   }) {
     return ChaosEventsCompanion(
       id: id ?? this.id,
@@ -2307,6 +2334,7 @@ class ChaosEventsCompanion extends UpdateCompanion<ChaosEventsData> {
       triggeredAt: triggeredAt ?? this.triggeredAt,
       wasResolved: wasResolved ?? this.wasResolved,
       pointsAwarded: pointsAwarded ?? this.pointsAwarded,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -2314,7 +2342,7 @@ class ChaosEventsCompanion extends UpdateCompanion<ChaosEventsData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (eventKey.present) {
       map['event_key'] = Variable<String>(eventKey.value);
@@ -2337,6 +2365,9 @@ class ChaosEventsCompanion extends UpdateCompanion<ChaosEventsData> {
     if (pointsAwarded.present) {
       map['points_awarded'] = Variable<int>(pointsAwarded.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -2350,7 +2381,8 @@ class ChaosEventsCompanion extends UpdateCompanion<ChaosEventsData> {
           ..write('message: $message, ')
           ..write('triggeredAt: $triggeredAt, ')
           ..write('wasResolved: $wasResolved, ')
-          ..write('pointsAwarded: $pointsAwarded')
+          ..write('pointsAwarded: $pointsAwarded, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -2362,16 +2394,12 @@ class PointTransactions extends Table
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   PointTransactions(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   late final GeneratedColumn<int> amount = GeneratedColumn<int>(
     'amount',
@@ -2404,31 +2432,32 @@ class PointTransactions extends Table
       'CAST(strftime(\'%s\', CURRENT_TIMESTAMP) AS INTEGER)',
     ),
   );
-  late final GeneratedColumn<int> relatedNoteId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> relatedNoteId = GeneratedColumn<String>(
     'related_note_id',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES notes (id) ON DELETE SET NULL',
     ),
   );
-  late final GeneratedColumn<int> relatedChallengeId = GeneratedColumn<int>(
-    'related_challenge_id',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES challenge_history (id) ON DELETE SET NULL',
-    ),
-  );
-  late final GeneratedColumn<int> relatedEventId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> relatedChallengeId =
+      GeneratedColumn<String>(
+        'related_challenge_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES challenge_history (id) ON DELETE SET NULL',
+        ),
+      );
+  late final GeneratedColumn<String> relatedEventId = GeneratedColumn<String>(
     'related_event_id',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES chaos_events (id) ON DELETE SET NULL',
@@ -2473,7 +2502,7 @@ class PointTransactions extends Table
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return PointTransactionsData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       amount: attachedDatabase.typeMapping.read(
@@ -2493,15 +2522,15 @@ class PointTransactions extends Table
         data['${effectivePrefix}timestamp'],
       )!,
       relatedNoteId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}related_note_id'],
       ),
       relatedChallengeId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}related_challenge_id'],
       ),
       relatedEventId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}related_event_id'],
       ),
       balanceAfter: attachedDatabase.typeMapping.read(
@@ -2523,14 +2552,14 @@ class PointTransactions extends Table
 
 class PointTransactionsData extends DataClass
     implements Insertable<PointTransactionsData> {
-  final int id;
+  final String id;
   final int amount;
   final String reason;
   final String? description;
   final DateTime timestamp;
-  final int? relatedNoteId;
-  final int? relatedChallengeId;
-  final int? relatedEventId;
+  final String? relatedNoteId;
+  final String? relatedChallengeId;
+  final String? relatedEventId;
   final int balanceAfter;
   final String? serverUuid;
   const PointTransactionsData({
@@ -2548,7 +2577,7 @@ class PointTransactionsData extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['amount'] = Variable<int>(amount);
     map['reason'] = Variable<String>(reason);
     if (!nullToAbsent || description != null) {
@@ -2556,13 +2585,13 @@ class PointTransactionsData extends DataClass
     }
     map['timestamp'] = Variable<DateTime>(timestamp);
     if (!nullToAbsent || relatedNoteId != null) {
-      map['related_note_id'] = Variable<int>(relatedNoteId);
+      map['related_note_id'] = Variable<String>(relatedNoteId);
     }
     if (!nullToAbsent || relatedChallengeId != null) {
-      map['related_challenge_id'] = Variable<int>(relatedChallengeId);
+      map['related_challenge_id'] = Variable<String>(relatedChallengeId);
     }
     if (!nullToAbsent || relatedEventId != null) {
-      map['related_event_id'] = Variable<int>(relatedEventId);
+      map['related_event_id'] = Variable<String>(relatedEventId);
     }
     map['balance_after'] = Variable<int>(balanceAfter);
     if (!nullToAbsent || serverUuid != null) {
@@ -2602,14 +2631,16 @@ class PointTransactionsData extends DataClass
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return PointTransactionsData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       amount: serializer.fromJson<int>(json['amount']),
       reason: serializer.fromJson<String>(json['reason']),
       description: serializer.fromJson<String?>(json['description']),
       timestamp: serializer.fromJson<DateTime>(json['timestamp']),
-      relatedNoteId: serializer.fromJson<int?>(json['relatedNoteId']),
-      relatedChallengeId: serializer.fromJson<int?>(json['relatedChallengeId']),
-      relatedEventId: serializer.fromJson<int?>(json['relatedEventId']),
+      relatedNoteId: serializer.fromJson<String?>(json['relatedNoteId']),
+      relatedChallengeId: serializer.fromJson<String?>(
+        json['relatedChallengeId'],
+      ),
+      relatedEventId: serializer.fromJson<String?>(json['relatedEventId']),
       balanceAfter: serializer.fromJson<int>(json['balanceAfter']),
       serverUuid: serializer.fromJson<String?>(json['serverUuid']),
     );
@@ -2618,28 +2649,28 @@ class PointTransactionsData extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'amount': serializer.toJson<int>(amount),
       'reason': serializer.toJson<String>(reason),
       'description': serializer.toJson<String?>(description),
       'timestamp': serializer.toJson<DateTime>(timestamp),
-      'relatedNoteId': serializer.toJson<int?>(relatedNoteId),
-      'relatedChallengeId': serializer.toJson<int?>(relatedChallengeId),
-      'relatedEventId': serializer.toJson<int?>(relatedEventId),
+      'relatedNoteId': serializer.toJson<String?>(relatedNoteId),
+      'relatedChallengeId': serializer.toJson<String?>(relatedChallengeId),
+      'relatedEventId': serializer.toJson<String?>(relatedEventId),
       'balanceAfter': serializer.toJson<int>(balanceAfter),
       'serverUuid': serializer.toJson<String?>(serverUuid),
     };
   }
 
   PointTransactionsData copyWith({
-    int? id,
+    String? id,
     int? amount,
     String? reason,
     Value<String?> description = const Value.absent(),
     DateTime? timestamp,
-    Value<int?> relatedNoteId = const Value.absent(),
-    Value<int?> relatedChallengeId = const Value.absent(),
-    Value<int?> relatedEventId = const Value.absent(),
+    Value<String?> relatedNoteId = const Value.absent(),
+    Value<String?> relatedChallengeId = const Value.absent(),
+    Value<String?> relatedEventId = const Value.absent(),
     int? balanceAfter,
     Value<String?> serverUuid = const Value.absent(),
   }) => PointTransactionsData(
@@ -2735,16 +2766,17 @@ class PointTransactionsData extends DataClass
 
 class PointTransactionsCompanion
     extends UpdateCompanion<PointTransactionsData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<int> amount;
   final Value<String> reason;
   final Value<String?> description;
   final Value<DateTime> timestamp;
-  final Value<int?> relatedNoteId;
-  final Value<int?> relatedChallengeId;
-  final Value<int?> relatedEventId;
+  final Value<String?> relatedNoteId;
+  final Value<String?> relatedChallengeId;
+  final Value<String?> relatedEventId;
   final Value<int> balanceAfter;
   final Value<String?> serverUuid;
+  final Value<int> rowid;
   const PointTransactionsCompanion({
     this.id = const Value.absent(),
     this.amount = const Value.absent(),
@@ -2756,9 +2788,10 @@ class PointTransactionsCompanion
     this.relatedEventId = const Value.absent(),
     this.balanceAfter = const Value.absent(),
     this.serverUuid = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   PointTransactionsCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required int amount,
     required String reason,
     this.description = const Value.absent(),
@@ -2768,20 +2801,23 @@ class PointTransactionsCompanion
     this.relatedEventId = const Value.absent(),
     required int balanceAfter,
     this.serverUuid = const Value.absent(),
-  }) : amount = Value(amount),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       amount = Value(amount),
        reason = Value(reason),
        balanceAfter = Value(balanceAfter);
   static Insertable<PointTransactionsData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<int>? amount,
     Expression<String>? reason,
     Expression<String>? description,
     Expression<DateTime>? timestamp,
-    Expression<int>? relatedNoteId,
-    Expression<int>? relatedChallengeId,
-    Expression<int>? relatedEventId,
+    Expression<String>? relatedNoteId,
+    Expression<String>? relatedChallengeId,
+    Expression<String>? relatedEventId,
     Expression<int>? balanceAfter,
     Expression<String>? serverUuid,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2795,20 +2831,22 @@ class PointTransactionsCompanion
       if (relatedEventId != null) 'related_event_id': relatedEventId,
       if (balanceAfter != null) 'balance_after': balanceAfter,
       if (serverUuid != null) 'server_uuid': serverUuid,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   PointTransactionsCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<int>? amount,
     Value<String>? reason,
     Value<String?>? description,
     Value<DateTime>? timestamp,
-    Value<int?>? relatedNoteId,
-    Value<int?>? relatedChallengeId,
-    Value<int?>? relatedEventId,
+    Value<String?>? relatedNoteId,
+    Value<String?>? relatedChallengeId,
+    Value<String?>? relatedEventId,
     Value<int>? balanceAfter,
     Value<String?>? serverUuid,
+    Value<int>? rowid,
   }) {
     return PointTransactionsCompanion(
       id: id ?? this.id,
@@ -2821,6 +2859,7 @@ class PointTransactionsCompanion
       relatedEventId: relatedEventId ?? this.relatedEventId,
       balanceAfter: balanceAfter ?? this.balanceAfter,
       serverUuid: serverUuid ?? this.serverUuid,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -2828,7 +2867,7 @@ class PointTransactionsCompanion
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (amount.present) {
       map['amount'] = Variable<int>(amount.value);
@@ -2843,19 +2882,22 @@ class PointTransactionsCompanion
       map['timestamp'] = Variable<DateTime>(timestamp.value);
     }
     if (relatedNoteId.present) {
-      map['related_note_id'] = Variable<int>(relatedNoteId.value);
+      map['related_note_id'] = Variable<String>(relatedNoteId.value);
     }
     if (relatedChallengeId.present) {
-      map['related_challenge_id'] = Variable<int>(relatedChallengeId.value);
+      map['related_challenge_id'] = Variable<String>(relatedChallengeId.value);
     }
     if (relatedEventId.present) {
-      map['related_event_id'] = Variable<int>(relatedEventId.value);
+      map['related_event_id'] = Variable<String>(relatedEventId.value);
     }
     if (balanceAfter.present) {
       map['balance_after'] = Variable<int>(balanceAfter.value);
     }
     if (serverUuid.present) {
       map['server_uuid'] = Variable<String>(serverUuid.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -2872,7 +2914,8 @@ class PointTransactionsCompanion
           ..write('relatedChallengeId: $relatedChallengeId, ')
           ..write('relatedEventId: $relatedEventId, ')
           ..write('balanceAfter: $balanceAfter, ')
-          ..write('serverUuid: $serverUuid')
+          ..write('serverUuid: $serverUuid, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -2884,16 +2927,12 @@ class UserProgress extends Table
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   UserProgress(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   late final GeneratedColumn<int> totalPoints = GeneratedColumn<int>(
     'total_points',
@@ -3093,7 +3132,7 @@ class UserProgress extends Table
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return UserProgressData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       totalPoints: attachedDatabase.typeMapping.read(
@@ -3183,7 +3222,7 @@ class UserProgress extends Table
 
 class UserProgressData extends DataClass
     implements Insertable<UserProgressData> {
-  final int id;
+  final String id;
   final int totalPoints;
   final int lifetimePointsEarned;
   final int lifetimePointsSpent;
@@ -3228,7 +3267,7 @@ class UserProgressData extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['total_points'] = Variable<int>(totalPoints);
     map['lifetime_points_earned'] = Variable<int>(lifetimePointsEarned);
     map['lifetime_points_spent'] = Variable<int>(lifetimePointsSpent);
@@ -3286,7 +3325,7 @@ class UserProgressData extends DataClass
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return UserProgressData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       totalPoints: serializer.fromJson<int>(json['totalPoints']),
       lifetimePointsEarned: serializer.fromJson<int>(
         json['lifetimePointsEarned'],
@@ -3324,7 +3363,7 @@ class UserProgressData extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'totalPoints': serializer.toJson<int>(totalPoints),
       'lifetimePointsEarned': serializer.toJson<int>(lifetimePointsEarned),
       'lifetimePointsSpent': serializer.toJson<int>(lifetimePointsSpent),
@@ -3348,7 +3387,7 @@ class UserProgressData extends DataClass
   }
 
   UserProgressData copyWith({
-    int? id,
+    String? id,
     int? totalPoints,
     int? lifetimePointsEarned,
     int? lifetimePointsSpent,
@@ -3526,7 +3565,7 @@ class UserProgressData extends DataClass
 }
 
 class UserProgressCompanion extends UpdateCompanion<UserProgressData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<int> totalPoints;
   final Value<int> lifetimePointsEarned;
   final Value<int> lifetimePointsSpent;
@@ -3546,6 +3585,7 @@ class UserProgressCompanion extends UpdateCompanion<UserProgressData> {
   final Value<bool> soundEnabled;
   final Value<bool> notificationsEnabled;
   final Value<DateTime> updatedAt;
+  final Value<int> rowid;
   const UserProgressCompanion({
     this.id = const Value.absent(),
     this.totalPoints = const Value.absent(),
@@ -3567,9 +3607,10 @@ class UserProgressCompanion extends UpdateCompanion<UserProgressData> {
     this.soundEnabled = const Value.absent(),
     this.notificationsEnabled = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   UserProgressCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     this.totalPoints = const Value.absent(),
     this.lifetimePointsEarned = const Value.absent(),
     this.lifetimePointsSpent = const Value.absent(),
@@ -3589,9 +3630,10 @@ class UserProgressCompanion extends UpdateCompanion<UserProgressData> {
     this.soundEnabled = const Value.absent(),
     this.notificationsEnabled = const Value.absent(),
     this.updatedAt = const Value.absent(),
-  });
+    this.rowid = const Value.absent(),
+  }) : id = Value(id);
   static Insertable<UserProgressData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<int>? totalPoints,
     Expression<int>? lifetimePointsEarned,
     Expression<int>? lifetimePointsSpent,
@@ -3611,6 +3653,7 @@ class UserProgressCompanion extends UpdateCompanion<UserProgressData> {
     Expression<bool>? soundEnabled,
     Expression<bool>? notificationsEnabled,
     Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3639,11 +3682,12 @@ class UserProgressCompanion extends UpdateCompanion<UserProgressData> {
       if (notificationsEnabled != null)
         'notifications_enabled': notificationsEnabled,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   UserProgressCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<int>? totalPoints,
     Value<int>? lifetimePointsEarned,
     Value<int>? lifetimePointsSpent,
@@ -3663,6 +3707,7 @@ class UserProgressCompanion extends UpdateCompanion<UserProgressData> {
     Value<bool>? soundEnabled,
     Value<bool>? notificationsEnabled,
     Value<DateTime>? updatedAt,
+    Value<int>? rowid,
   }) {
     return UserProgressCompanion(
       id: id ?? this.id,
@@ -3687,6 +3732,7 @@ class UserProgressCompanion extends UpdateCompanion<UserProgressData> {
       soundEnabled: soundEnabled ?? this.soundEnabled,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -3694,7 +3740,7 @@ class UserProgressCompanion extends UpdateCompanion<UserProgressData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (totalPoints.present) {
       map['total_points'] = Variable<int>(totalPoints.value);
@@ -3757,6 +3803,9 @@ class UserProgressCompanion extends UpdateCompanion<UserProgressData> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -3782,7 +3831,8 @@ class UserProgressCompanion extends UpdateCompanion<UserProgressData> {
           ..write('personalityTone: $personalityTone, ')
           ..write('soundEnabled: $soundEnabled, ')
           ..write('notificationsEnabled: $notificationsEnabled, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -3794,16 +3844,12 @@ class Achievements extends Table
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   Achievements(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   late final GeneratedColumn<String> achievementKey = GeneratedColumn<String>(
     'achievement_key',
@@ -3909,7 +3955,7 @@ class Achievements extends Table
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return AchievementsData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       achievementKey: attachedDatabase.typeMapping.read(
@@ -3963,7 +4009,7 @@ class Achievements extends Table
 
 class AchievementsData extends DataClass
     implements Insertable<AchievementsData> {
-  final int id;
+  final String id;
   final String achievementKey;
   final String name;
   final String description;
@@ -3990,7 +4036,7 @@ class AchievementsData extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['achievement_key'] = Variable<String>(achievementKey);
     map['name'] = Variable<String>(name);
     map['description'] = Variable<String>(description);
@@ -4030,7 +4076,7 @@ class AchievementsData extends DataClass
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return AchievementsData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       achievementKey: serializer.fromJson<String>(json['achievementKey']),
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String>(json['description']),
@@ -4047,7 +4093,7 @@ class AchievementsData extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'achievementKey': serializer.toJson<String>(achievementKey),
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String>(description),
@@ -4062,7 +4108,7 @@ class AchievementsData extends DataClass
   }
 
   AchievementsData copyWith({
-    int? id,
+    String? id,
     String? achievementKey,
     String? name,
     String? description,
@@ -4166,7 +4212,7 @@ class AchievementsData extends DataClass
 }
 
 class AchievementsCompanion extends UpdateCompanion<AchievementsData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> achievementKey;
   final Value<String> name;
   final Value<String> description;
@@ -4177,6 +4223,7 @@ class AchievementsCompanion extends UpdateCompanion<AchievementsData> {
   final Value<DateTime?> unlockedAt;
   final Value<int> pointReward;
   final Value<String> rarity;
+  final Value<int> rowid;
   const AchievementsCompanion({
     this.id = const Value.absent(),
     this.achievementKey = const Value.absent(),
@@ -4189,9 +4236,10 @@ class AchievementsCompanion extends UpdateCompanion<AchievementsData> {
     this.unlockedAt = const Value.absent(),
     this.pointReward = const Value.absent(),
     this.rarity = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   AchievementsCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required String achievementKey,
     required String name,
     required String description,
@@ -4202,13 +4250,15 @@ class AchievementsCompanion extends UpdateCompanion<AchievementsData> {
     this.unlockedAt = const Value.absent(),
     this.pointReward = const Value.absent(),
     this.rarity = const Value.absent(),
-  }) : achievementKey = Value(achievementKey),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       achievementKey = Value(achievementKey),
        name = Value(name),
        description = Value(description),
        iconName = Value(iconName),
        targetValue = Value(targetValue);
   static Insertable<AchievementsData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? achievementKey,
     Expression<String>? name,
     Expression<String>? description,
@@ -4219,6 +4269,7 @@ class AchievementsCompanion extends UpdateCompanion<AchievementsData> {
     Expression<DateTime>? unlockedAt,
     Expression<int>? pointReward,
     Expression<String>? rarity,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -4232,11 +4283,12 @@ class AchievementsCompanion extends UpdateCompanion<AchievementsData> {
       if (unlockedAt != null) 'unlocked_at': unlockedAt,
       if (pointReward != null) 'point_reward': pointReward,
       if (rarity != null) 'rarity': rarity,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   AchievementsCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<String>? achievementKey,
     Value<String>? name,
     Value<String>? description,
@@ -4247,6 +4299,7 @@ class AchievementsCompanion extends UpdateCompanion<AchievementsData> {
     Value<DateTime?>? unlockedAt,
     Value<int>? pointReward,
     Value<String>? rarity,
+    Value<int>? rowid,
   }) {
     return AchievementsCompanion(
       id: id ?? this.id,
@@ -4260,6 +4313,7 @@ class AchievementsCompanion extends UpdateCompanion<AchievementsData> {
       unlockedAt: unlockedAt ?? this.unlockedAt,
       pointReward: pointReward ?? this.pointReward,
       rarity: rarity ?? this.rarity,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -4267,7 +4321,7 @@ class AchievementsCompanion extends UpdateCompanion<AchievementsData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (achievementKey.present) {
       map['achievement_key'] = Variable<String>(achievementKey.value);
@@ -4299,6 +4353,9 @@ class AchievementsCompanion extends UpdateCompanion<AchievementsData> {
     if (rarity.present) {
       map['rarity'] = Variable<String>(rarity.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -4315,7 +4372,8 @@ class AchievementsCompanion extends UpdateCompanion<AchievementsData> {
           ..write('isUnlocked: $isUnlocked, ')
           ..write('unlockedAt: $unlockedAt, ')
           ..write('pointReward: $pointReward, ')
-          ..write('rarity: $rarity')
+          ..write('rarity: $rarity, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -4327,16 +4385,12 @@ class ActiveEffects extends Table
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   ActiveEffects(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   late final GeneratedColumn<String> effectType = GeneratedColumn<String>(
     'effect_type',
@@ -4421,7 +4475,7 @@ class ActiveEffects extends Table
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ActiveEffectsData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       effectType: attachedDatabase.typeMapping.read(
@@ -4463,7 +4517,7 @@ class ActiveEffects extends Table
 
 class ActiveEffectsData extends DataClass
     implements Insertable<ActiveEffectsData> {
-  final int id;
+  final String id;
   final String effectType;
   final double multiplier;
   final DateTime startedAt;
@@ -4484,7 +4538,7 @@ class ActiveEffectsData extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['effect_type'] = Variable<String>(effectType);
     map['multiplier'] = Variable<double>(multiplier);
     map['started_at'] = Variable<DateTime>(startedAt);
@@ -4518,7 +4572,7 @@ class ActiveEffectsData extends DataClass
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ActiveEffectsData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       effectType: serializer.fromJson<String>(json['effectType']),
       multiplier: serializer.fromJson<double>(json['multiplier']),
       startedAt: serializer.fromJson<DateTime>(json['startedAt']),
@@ -4532,7 +4586,7 @@ class ActiveEffectsData extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'effectType': serializer.toJson<String>(effectType),
       'multiplier': serializer.toJson<double>(multiplier),
       'startedAt': serializer.toJson<DateTime>(startedAt),
@@ -4544,7 +4598,7 @@ class ActiveEffectsData extends DataClass
   }
 
   ActiveEffectsData copyWith({
-    int? id,
+    String? id,
     String? effectType,
     double? multiplier,
     DateTime? startedAt,
@@ -4626,7 +4680,7 @@ class ActiveEffectsData extends DataClass
 }
 
 class ActiveEffectsCompanion extends UpdateCompanion<ActiveEffectsData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> effectType;
   final Value<double> multiplier;
   final Value<DateTime> startedAt;
@@ -4634,6 +4688,7 @@ class ActiveEffectsCompanion extends UpdateCompanion<ActiveEffectsData> {
   final Value<bool> isActive;
   final Value<String> description;
   final Value<int?> relatedEventId;
+  final Value<int> rowid;
   const ActiveEffectsCompanion({
     this.id = const Value.absent(),
     this.effectType = const Value.absent(),
@@ -4643,9 +4698,10 @@ class ActiveEffectsCompanion extends UpdateCompanion<ActiveEffectsData> {
     this.isActive = const Value.absent(),
     this.description = const Value.absent(),
     this.relatedEventId = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   ActiveEffectsCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required String effectType,
     this.multiplier = const Value.absent(),
     this.startedAt = const Value.absent(),
@@ -4653,11 +4709,13 @@ class ActiveEffectsCompanion extends UpdateCompanion<ActiveEffectsData> {
     this.isActive = const Value.absent(),
     required String description,
     this.relatedEventId = const Value.absent(),
-  }) : effectType = Value(effectType),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       effectType = Value(effectType),
        expiresAt = Value(expiresAt),
        description = Value(description);
   static Insertable<ActiveEffectsData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? effectType,
     Expression<double>? multiplier,
     Expression<DateTime>? startedAt,
@@ -4665,6 +4723,7 @@ class ActiveEffectsCompanion extends UpdateCompanion<ActiveEffectsData> {
     Expression<bool>? isActive,
     Expression<String>? description,
     Expression<int>? relatedEventId,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -4675,11 +4734,12 @@ class ActiveEffectsCompanion extends UpdateCompanion<ActiveEffectsData> {
       if (isActive != null) 'is_active': isActive,
       if (description != null) 'description': description,
       if (relatedEventId != null) 'related_event_id': relatedEventId,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   ActiveEffectsCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<String>? effectType,
     Value<double>? multiplier,
     Value<DateTime>? startedAt,
@@ -4687,6 +4747,7 @@ class ActiveEffectsCompanion extends UpdateCompanion<ActiveEffectsData> {
     Value<bool>? isActive,
     Value<String>? description,
     Value<int?>? relatedEventId,
+    Value<int>? rowid,
   }) {
     return ActiveEffectsCompanion(
       id: id ?? this.id,
@@ -4697,6 +4758,7 @@ class ActiveEffectsCompanion extends UpdateCompanion<ActiveEffectsData> {
       isActive: isActive ?? this.isActive,
       description: description ?? this.description,
       relatedEventId: relatedEventId ?? this.relatedEventId,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -4704,7 +4766,7 @@ class ActiveEffectsCompanion extends UpdateCompanion<ActiveEffectsData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (effectType.present) {
       map['effect_type'] = Variable<String>(effectType.value);
@@ -4727,6 +4789,9 @@ class ActiveEffectsCompanion extends UpdateCompanion<ActiveEffectsData> {
     if (relatedEventId.present) {
       map['related_event_id'] = Variable<int>(relatedEventId.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -4740,7 +4805,8 @@ class ActiveEffectsCompanion extends UpdateCompanion<ActiveEffectsData> {
           ..write('expiresAt: $expiresAt, ')
           ..write('isActive: $isActive, ')
           ..write('description: $description, ')
-          ..write('relatedEventId: $relatedEventId')
+          ..write('relatedEventId: $relatedEventId, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -4751,16 +4817,12 @@ class Themes extends Table with TableInfo<Themes, ThemesData> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   Themes(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   late final GeneratedColumn<String> themeKey = GeneratedColumn<String>(
     'theme_key',
@@ -4883,7 +4945,7 @@ class Themes extends Table with TableInfo<Themes, ThemesData> {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ThemesData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       themeKey: attachedDatabase.typeMapping.read(
@@ -4944,7 +5006,7 @@ class Themes extends Table with TableInfo<Themes, ThemesData> {
 }
 
 class ThemesData extends DataClass implements Insertable<ThemesData> {
-  final int id;
+  final String id;
   final String themeKey;
   final String name;
   final String description;
@@ -4975,7 +5037,7 @@ class ThemesData extends DataClass implements Insertable<ThemesData> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['theme_key'] = Variable<String>(themeKey);
     map['name'] = Variable<String>(name);
     map['description'] = Variable<String>(description);
@@ -5019,7 +5081,7 @@ class ThemesData extends DataClass implements Insertable<ThemesData> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ThemesData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       themeKey: serializer.fromJson<String>(json['themeKey']),
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String>(json['description']),
@@ -5038,7 +5100,7 @@ class ThemesData extends DataClass implements Insertable<ThemesData> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'themeKey': serializer.toJson<String>(themeKey),
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String>(description),
@@ -5055,7 +5117,7 @@ class ThemesData extends DataClass implements Insertable<ThemesData> {
   }
 
   ThemesData copyWith({
-    int? id,
+    String? id,
     String? themeKey,
     String? name,
     String? description,
@@ -5175,7 +5237,7 @@ class ThemesData extends DataClass implements Insertable<ThemesData> {
 }
 
 class ThemesCompanion extends UpdateCompanion<ThemesData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> themeKey;
   final Value<String> name;
   final Value<String> description;
@@ -5188,6 +5250,7 @@ class ThemesCompanion extends UpdateCompanion<ThemesData> {
   final Value<String> backgroundColor;
   final Value<String> surfaceColor;
   final Value<String> themeStyle;
+  final Value<int> rowid;
   const ThemesCompanion({
     this.id = const Value.absent(),
     this.themeKey = const Value.absent(),
@@ -5202,9 +5265,10 @@ class ThemesCompanion extends UpdateCompanion<ThemesData> {
     this.backgroundColor = const Value.absent(),
     this.surfaceColor = const Value.absent(),
     this.themeStyle = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   ThemesCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required String themeKey,
     required String name,
     required String description,
@@ -5217,7 +5281,9 @@ class ThemesCompanion extends UpdateCompanion<ThemesData> {
     required String backgroundColor,
     required String surfaceColor,
     required String themeStyle,
-  }) : themeKey = Value(themeKey),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       themeKey = Value(themeKey),
        name = Value(name),
        description = Value(description),
        unlockCost = Value(unlockCost),
@@ -5227,7 +5293,7 @@ class ThemesCompanion extends UpdateCompanion<ThemesData> {
        surfaceColor = Value(surfaceColor),
        themeStyle = Value(themeStyle);
   static Insertable<ThemesData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? themeKey,
     Expression<String>? name,
     Expression<String>? description,
@@ -5240,6 +5306,7 @@ class ThemesCompanion extends UpdateCompanion<ThemesData> {
     Expression<String>? backgroundColor,
     Expression<String>? surfaceColor,
     Expression<String>? themeStyle,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -5255,11 +5322,12 @@ class ThemesCompanion extends UpdateCompanion<ThemesData> {
       if (backgroundColor != null) 'background_color': backgroundColor,
       if (surfaceColor != null) 'surface_color': surfaceColor,
       if (themeStyle != null) 'theme_style': themeStyle,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   ThemesCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<String>? themeKey,
     Value<String>? name,
     Value<String>? description,
@@ -5272,6 +5340,7 @@ class ThemesCompanion extends UpdateCompanion<ThemesData> {
     Value<String>? backgroundColor,
     Value<String>? surfaceColor,
     Value<String>? themeStyle,
+    Value<int>? rowid,
   }) {
     return ThemesCompanion(
       id: id ?? this.id,
@@ -5287,6 +5356,7 @@ class ThemesCompanion extends UpdateCompanion<ThemesData> {
       backgroundColor: backgroundColor ?? this.backgroundColor,
       surfaceColor: surfaceColor ?? this.surfaceColor,
       themeStyle: themeStyle ?? this.themeStyle,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -5294,7 +5364,7 @@ class ThemesCompanion extends UpdateCompanion<ThemesData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (themeKey.present) {
       map['theme_key'] = Variable<String>(themeKey.value);
@@ -5332,6 +5402,9 @@ class ThemesCompanion extends UpdateCompanion<ThemesData> {
     if (themeStyle.present) {
       map['theme_style'] = Variable<String>(themeStyle.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -5350,7 +5423,8 @@ class ThemesCompanion extends UpdateCompanion<ThemesData> {
           ..write('secondaryColor: $secondaryColor, ')
           ..write('backgroundColor: $backgroundColor, ')
           ..write('surfaceColor: $surfaceColor, ')
-          ..write('themeStyle: $themeStyle')
+          ..write('themeStyle: $themeStyle, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -5362,16 +5436,12 @@ class DailyChallenges extends Table
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   DailyChallenges(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
     'date',
@@ -5466,7 +5536,7 @@ class DailyChallenges extends Table
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return DailyChallengesData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       date: attachedDatabase.typeMapping.read(
@@ -5516,7 +5586,7 @@ class DailyChallenges extends Table
 
 class DailyChallengesData extends DataClass
     implements Insertable<DailyChallengesData> {
-  final int id;
+  final String id;
   final DateTime date;
   final String challengeType;
   final String title;
@@ -5541,7 +5611,7 @@ class DailyChallengesData extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['date'] = Variable<DateTime>(date);
     map['challenge_type'] = Variable<String>(challengeType);
     map['title'] = Variable<String>(title);
@@ -5579,7 +5649,7 @@ class DailyChallengesData extends DataClass
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return DailyChallengesData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       date: serializer.fromJson<DateTime>(json['date']),
       challengeType: serializer.fromJson<String>(json['challengeType']),
       title: serializer.fromJson<String>(json['title']),
@@ -5595,7 +5665,7 @@ class DailyChallengesData extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'date': serializer.toJson<DateTime>(date),
       'challengeType': serializer.toJson<String>(challengeType),
       'title': serializer.toJson<String>(title),
@@ -5609,7 +5679,7 @@ class DailyChallengesData extends DataClass
   }
 
   DailyChallengesData copyWith({
-    int? id,
+    String? id,
     DateTime? date,
     String? challengeType,
     String? title,
@@ -5707,7 +5777,7 @@ class DailyChallengesData extends DataClass
 }
 
 class DailyChallengesCompanion extends UpdateCompanion<DailyChallengesData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<DateTime> date;
   final Value<String> challengeType;
   final Value<String> title;
@@ -5717,6 +5787,7 @@ class DailyChallengesCompanion extends UpdateCompanion<DailyChallengesData> {
   final Value<int> pointReward;
   final Value<bool> isCompleted;
   final Value<DateTime?> completedAt;
+  final Value<int> rowid;
   const DailyChallengesCompanion({
     this.id = const Value.absent(),
     this.date = const Value.absent(),
@@ -5728,9 +5799,10 @@ class DailyChallengesCompanion extends UpdateCompanion<DailyChallengesData> {
     this.pointReward = const Value.absent(),
     this.isCompleted = const Value.absent(),
     this.completedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   DailyChallengesCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required DateTime date,
     required String challengeType,
     required String title,
@@ -5740,14 +5812,16 @@ class DailyChallengesCompanion extends UpdateCompanion<DailyChallengesData> {
     required int pointReward,
     this.isCompleted = const Value.absent(),
     this.completedAt = const Value.absent(),
-  }) : date = Value(date),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       date = Value(date),
        challengeType = Value(challengeType),
        title = Value(title),
        description = Value(description),
        targetCount = Value(targetCount),
        pointReward = Value(pointReward);
   static Insertable<DailyChallengesData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<DateTime>? date,
     Expression<String>? challengeType,
     Expression<String>? title,
@@ -5757,6 +5831,7 @@ class DailyChallengesCompanion extends UpdateCompanion<DailyChallengesData> {
     Expression<int>? pointReward,
     Expression<bool>? isCompleted,
     Expression<DateTime>? completedAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -5769,11 +5844,12 @@ class DailyChallengesCompanion extends UpdateCompanion<DailyChallengesData> {
       if (pointReward != null) 'point_reward': pointReward,
       if (isCompleted != null) 'is_completed': isCompleted,
       if (completedAt != null) 'completed_at': completedAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   DailyChallengesCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<DateTime>? date,
     Value<String>? challengeType,
     Value<String>? title,
@@ -5783,6 +5859,7 @@ class DailyChallengesCompanion extends UpdateCompanion<DailyChallengesData> {
     Value<int>? pointReward,
     Value<bool>? isCompleted,
     Value<DateTime?>? completedAt,
+    Value<int>? rowid,
   }) {
     return DailyChallengesCompanion(
       id: id ?? this.id,
@@ -5795,6 +5872,7 @@ class DailyChallengesCompanion extends UpdateCompanion<DailyChallengesData> {
       pointReward: pointReward ?? this.pointReward,
       isCompleted: isCompleted ?? this.isCompleted,
       completedAt: completedAt ?? this.completedAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -5802,7 +5880,7 @@ class DailyChallengesCompanion extends UpdateCompanion<DailyChallengesData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (date.present) {
       map['date'] = Variable<DateTime>(date.value);
@@ -5831,6 +5909,9 @@ class DailyChallengesCompanion extends UpdateCompanion<DailyChallengesData> {
     if (completedAt.present) {
       map['completed_at'] = Variable<DateTime>(completedAt.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -5846,7 +5927,8 @@ class DailyChallengesCompanion extends UpdateCompanion<DailyChallengesData> {
           ..write('currentProgress: $currentProgress, ')
           ..write('pointReward: $pointReward, ')
           ..write('isCompleted: $isCompleted, ')
-          ..write('completedAt: $completedAt')
+          ..write('completedAt: $completedAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -5858,16 +5940,12 @@ class ChallengeQuestions extends Table
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   ChallengeQuestions(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   late final GeneratedColumn<String> challengeType = GeneratedColumn<String>(
     'challenge_type',
@@ -5958,7 +6036,7 @@ class ChallengeQuestions extends Table
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ChallengeQuestionsData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       challengeType: attachedDatabase.typeMapping.read(
@@ -6008,7 +6086,7 @@ class ChallengeQuestions extends Table
 
 class ChallengeQuestionsData extends DataClass
     implements Insertable<ChallengeQuestionsData> {
-  final int id;
+  final String id;
   final String challengeType;
   final String difficulty;
   final String question;
@@ -6033,7 +6111,7 @@ class ChallengeQuestionsData extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['challenge_type'] = Variable<String>(challengeType);
     map['difficulty'] = Variable<String>(difficulty);
     map['question'] = Variable<String>(question);
@@ -6083,7 +6161,7 @@ class ChallengeQuestionsData extends DataClass
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ChallengeQuestionsData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       challengeType: serializer.fromJson<String>(json['challengeType']),
       difficulty: serializer.fromJson<String>(json['difficulty']),
       question: serializer.fromJson<String>(json['question']),
@@ -6099,7 +6177,7 @@ class ChallengeQuestionsData extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'challengeType': serializer.toJson<String>(challengeType),
       'difficulty': serializer.toJson<String>(difficulty),
       'question': serializer.toJson<String>(question),
@@ -6113,7 +6191,7 @@ class ChallengeQuestionsData extends DataClass
   }
 
   ChallengeQuestionsData copyWith({
-    int? id,
+    String? id,
     String? challengeType,
     String? difficulty,
     String? question,
@@ -6208,7 +6286,7 @@ class ChallengeQuestionsData extends DataClass
 
 class ChallengeQuestionsCompanion
     extends UpdateCompanion<ChallengeQuestionsData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> challengeType;
   final Value<String> difficulty;
   final Value<String> question;
@@ -6218,6 +6296,7 @@ class ChallengeQuestionsCompanion
   final Value<String?> category;
   final Value<int> timesUsed;
   final Value<DateTime?> lastUsed;
+  final Value<int> rowid;
   const ChallengeQuestionsCompanion({
     this.id = const Value.absent(),
     this.challengeType = const Value.absent(),
@@ -6229,9 +6308,10 @@ class ChallengeQuestionsCompanion
     this.category = const Value.absent(),
     this.timesUsed = const Value.absent(),
     this.lastUsed = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   ChallengeQuestionsCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required String challengeType,
     required String difficulty,
     required String question,
@@ -6241,12 +6321,14 @@ class ChallengeQuestionsCompanion
     this.category = const Value.absent(),
     this.timesUsed = const Value.absent(),
     this.lastUsed = const Value.absent(),
-  }) : challengeType = Value(challengeType),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       challengeType = Value(challengeType),
        difficulty = Value(difficulty),
        question = Value(question),
        correctAnswer = Value(correctAnswer);
   static Insertable<ChallengeQuestionsData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? challengeType,
     Expression<String>? difficulty,
     Expression<String>? question,
@@ -6256,6 +6338,7 @@ class ChallengeQuestionsCompanion
     Expression<String>? category,
     Expression<int>? timesUsed,
     Expression<DateTime>? lastUsed,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -6268,11 +6351,12 @@ class ChallengeQuestionsCompanion
       if (category != null) 'category': category,
       if (timesUsed != null) 'times_used': timesUsed,
       if (lastUsed != null) 'last_used': lastUsed,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   ChallengeQuestionsCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<String>? challengeType,
     Value<String>? difficulty,
     Value<String>? question,
@@ -6282,6 +6366,7 @@ class ChallengeQuestionsCompanion
     Value<String?>? category,
     Value<int>? timesUsed,
     Value<DateTime?>? lastUsed,
+    Value<int>? rowid,
   }) {
     return ChallengeQuestionsCompanion(
       id: id ?? this.id,
@@ -6294,6 +6379,7 @@ class ChallengeQuestionsCompanion
       category: category ?? this.category,
       timesUsed: timesUsed ?? this.timesUsed,
       lastUsed: lastUsed ?? this.lastUsed,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -6301,7 +6387,7 @@ class ChallengeQuestionsCompanion
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (challengeType.present) {
       map['challenge_type'] = Variable<String>(challengeType.value);
@@ -6330,6 +6416,9 @@ class ChallengeQuestionsCompanion
     if (lastUsed.present) {
       map['last_used'] = Variable<DateTime>(lastUsed.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -6345,7 +6434,8 @@ class ChallengeQuestionsCompanion
           ..write('explanation: $explanation, ')
           ..write('category: $category, ')
           ..write('timesUsed: $timesUsed, ')
-          ..write('lastUsed: $lastUsed')
+          ..write('lastUsed: $lastUsed, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -6356,16 +6446,12 @@ class AppSettings extends Table with TableInfo<AppSettings, AppSettingsData> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   AppSettings(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   late final GeneratedColumn<String> settingKey = GeneratedColumn<String>(
     'setting_key',
@@ -6408,7 +6494,7 @@ class AppSettings extends Table with TableInfo<AppSettings, AppSettingsData> {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return AppSettingsData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       settingKey: attachedDatabase.typeMapping.read(
@@ -6433,7 +6519,7 @@ class AppSettings extends Table with TableInfo<AppSettings, AppSettingsData> {
 }
 
 class AppSettingsData extends DataClass implements Insertable<AppSettingsData> {
-  final int id;
+  final String id;
   final String settingKey;
   final String settingValue;
   final DateTime updatedAt;
@@ -6446,7 +6532,7 @@ class AppSettingsData extends DataClass implements Insertable<AppSettingsData> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['setting_key'] = Variable<String>(settingKey);
     map['setting_value'] = Variable<String>(settingValue);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -6468,7 +6554,7 @@ class AppSettingsData extends DataClass implements Insertable<AppSettingsData> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return AppSettingsData(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       settingKey: serializer.fromJson<String>(json['settingKey']),
       settingValue: serializer.fromJson<String>(json['settingValue']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -6478,7 +6564,7 @@ class AppSettingsData extends DataClass implements Insertable<AppSettingsData> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'settingKey': serializer.toJson<String>(settingKey),
       'settingValue': serializer.toJson<String>(settingValue),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -6486,7 +6572,7 @@ class AppSettingsData extends DataClass implements Insertable<AppSettingsData> {
   }
 
   AppSettingsData copyWith({
-    int? id,
+    String? id,
     String? settingKey,
     String? settingValue,
     DateTime? updatedAt,
@@ -6533,49 +6619,57 @@ class AppSettingsData extends DataClass implements Insertable<AppSettingsData> {
 }
 
 class AppSettingsCompanion extends UpdateCompanion<AppSettingsData> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> settingKey;
   final Value<String> settingValue;
   final Value<DateTime> updatedAt;
+  final Value<int> rowid;
   const AppSettingsCompanion({
     this.id = const Value.absent(),
     this.settingKey = const Value.absent(),
     this.settingValue = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   AppSettingsCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required String settingKey,
     required String settingValue,
     required DateTime updatedAt,
-  }) : settingKey = Value(settingKey),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       settingKey = Value(settingKey),
        settingValue = Value(settingValue),
        updatedAt = Value(updatedAt);
   static Insertable<AppSettingsData> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? settingKey,
     Expression<String>? settingValue,
     Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (settingKey != null) 'setting_key': settingKey,
       if (settingValue != null) 'setting_value': settingValue,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   AppSettingsCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<String>? settingKey,
     Value<String>? settingValue,
     Value<DateTime>? updatedAt,
+    Value<int>? rowid,
   }) {
     return AppSettingsCompanion(
       id: id ?? this.id,
       settingKey: settingKey ?? this.settingKey,
       settingValue: settingValue ?? this.settingValue,
       updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -6583,7 +6677,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (settingKey.present) {
       map['setting_key'] = Variable<String>(settingKey.value);
@@ -6594,6 +6688,9 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsData> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -6603,7 +6700,516 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsData> {
           ..write('id: $id, ')
           ..write('settingKey: $settingKey, ')
           ..write('settingValue: $settingValue, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class SyncLogs extends Table with TableInfo<SyncLogs, SyncLogsData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  SyncLogs(this.attachedDatabase, [this._alias]);
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  late final GeneratedColumn<String> syncType = GeneratedColumn<String>(
+    'sync_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  late final GeneratedColumn<bool> success = GeneratedColumn<bool>(
+    'success',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("success" IN (0, 1))',
+    ),
+  );
+  late final GeneratedColumn<String> errorMessage = GeneratedColumn<String>(
+    'error_message',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  late final GeneratedColumn<int> notesSynced = GeneratedColumn<int>(
+    'notes_synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const CustomExpression('0'),
+  );
+  late final GeneratedColumn<int> transactionsSynced = GeneratedColumn<int>(
+    'transactions_synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const CustomExpression('0'),
+  );
+  late final GeneratedColumn<bool> progressSynced = GeneratedColumn<bool>(
+    'progress_synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("progress_synced" IN (0, 1))',
+    ),
+    defaultValue: const CustomExpression('0'),
+  );
+  late final GeneratedColumn<int> conflictsFound = GeneratedColumn<int>(
+    'conflicts_found',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const CustomExpression('0'),
+  );
+  late final GeneratedColumn<int> durationMs = GeneratedColumn<int>(
+    'duration_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  late final GeneratedColumn<DateTime> syncedAt = GeneratedColumn<DateTime>(
+    'synced_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: const CustomExpression(
+      'CAST(strftime(\'%s\', CURRENT_TIMESTAMP) AS INTEGER)',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    syncType,
+    success,
+    errorMessage,
+    notesSynced,
+    transactionsSynced,
+    progressSynced,
+    conflictsFound,
+    durationMs,
+    syncedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sync_logs';
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SyncLogsData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SyncLogsData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      syncType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_type'],
+      )!,
+      success: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}success'],
+      )!,
+      errorMessage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}error_message'],
+      ),
+      notesSynced: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}notes_synced'],
+      )!,
+      transactionsSynced: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}transactions_synced'],
+      )!,
+      progressSynced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}progress_synced'],
+      )!,
+      conflictsFound: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}conflicts_found'],
+      )!,
+      durationMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}duration_ms'],
+      ),
+      syncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}synced_at'],
+      )!,
+    );
+  }
+
+  @override
+  SyncLogs createAlias(String alias) {
+    return SyncLogs(attachedDatabase, alias);
+  }
+}
+
+class SyncLogsData extends DataClass implements Insertable<SyncLogsData> {
+  final String id;
+  final String syncType;
+  final bool success;
+  final String? errorMessage;
+  final int notesSynced;
+  final int transactionsSynced;
+  final bool progressSynced;
+  final int conflictsFound;
+  final int? durationMs;
+  final DateTime syncedAt;
+  const SyncLogsData({
+    required this.id,
+    required this.syncType,
+    required this.success,
+    this.errorMessage,
+    required this.notesSynced,
+    required this.transactionsSynced,
+    required this.progressSynced,
+    required this.conflictsFound,
+    this.durationMs,
+    required this.syncedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['sync_type'] = Variable<String>(syncType);
+    map['success'] = Variable<bool>(success);
+    if (!nullToAbsent || errorMessage != null) {
+      map['error_message'] = Variable<String>(errorMessage);
+    }
+    map['notes_synced'] = Variable<int>(notesSynced);
+    map['transactions_synced'] = Variable<int>(transactionsSynced);
+    map['progress_synced'] = Variable<bool>(progressSynced);
+    map['conflicts_found'] = Variable<int>(conflictsFound);
+    if (!nullToAbsent || durationMs != null) {
+      map['duration_ms'] = Variable<int>(durationMs);
+    }
+    map['synced_at'] = Variable<DateTime>(syncedAt);
+    return map;
+  }
+
+  SyncLogsCompanion toCompanion(bool nullToAbsent) {
+    return SyncLogsCompanion(
+      id: Value(id),
+      syncType: Value(syncType),
+      success: Value(success),
+      errorMessage: errorMessage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(errorMessage),
+      notesSynced: Value(notesSynced),
+      transactionsSynced: Value(transactionsSynced),
+      progressSynced: Value(progressSynced),
+      conflictsFound: Value(conflictsFound),
+      durationMs: durationMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(durationMs),
+      syncedAt: Value(syncedAt),
+    );
+  }
+
+  factory SyncLogsData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SyncLogsData(
+      id: serializer.fromJson<String>(json['id']),
+      syncType: serializer.fromJson<String>(json['syncType']),
+      success: serializer.fromJson<bool>(json['success']),
+      errorMessage: serializer.fromJson<String?>(json['errorMessage']),
+      notesSynced: serializer.fromJson<int>(json['notesSynced']),
+      transactionsSynced: serializer.fromJson<int>(json['transactionsSynced']),
+      progressSynced: serializer.fromJson<bool>(json['progressSynced']),
+      conflictsFound: serializer.fromJson<int>(json['conflictsFound']),
+      durationMs: serializer.fromJson<int?>(json['durationMs']),
+      syncedAt: serializer.fromJson<DateTime>(json['syncedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'syncType': serializer.toJson<String>(syncType),
+      'success': serializer.toJson<bool>(success),
+      'errorMessage': serializer.toJson<String?>(errorMessage),
+      'notesSynced': serializer.toJson<int>(notesSynced),
+      'transactionsSynced': serializer.toJson<int>(transactionsSynced),
+      'progressSynced': serializer.toJson<bool>(progressSynced),
+      'conflictsFound': serializer.toJson<int>(conflictsFound),
+      'durationMs': serializer.toJson<int?>(durationMs),
+      'syncedAt': serializer.toJson<DateTime>(syncedAt),
+    };
+  }
+
+  SyncLogsData copyWith({
+    String? id,
+    String? syncType,
+    bool? success,
+    Value<String?> errorMessage = const Value.absent(),
+    int? notesSynced,
+    int? transactionsSynced,
+    bool? progressSynced,
+    int? conflictsFound,
+    Value<int?> durationMs = const Value.absent(),
+    DateTime? syncedAt,
+  }) => SyncLogsData(
+    id: id ?? this.id,
+    syncType: syncType ?? this.syncType,
+    success: success ?? this.success,
+    errorMessage: errorMessage.present ? errorMessage.value : this.errorMessage,
+    notesSynced: notesSynced ?? this.notesSynced,
+    transactionsSynced: transactionsSynced ?? this.transactionsSynced,
+    progressSynced: progressSynced ?? this.progressSynced,
+    conflictsFound: conflictsFound ?? this.conflictsFound,
+    durationMs: durationMs.present ? durationMs.value : this.durationMs,
+    syncedAt: syncedAt ?? this.syncedAt,
+  );
+  SyncLogsData copyWithCompanion(SyncLogsCompanion data) {
+    return SyncLogsData(
+      id: data.id.present ? data.id.value : this.id,
+      syncType: data.syncType.present ? data.syncType.value : this.syncType,
+      success: data.success.present ? data.success.value : this.success,
+      errorMessage: data.errorMessage.present
+          ? data.errorMessage.value
+          : this.errorMessage,
+      notesSynced: data.notesSynced.present
+          ? data.notesSynced.value
+          : this.notesSynced,
+      transactionsSynced: data.transactionsSynced.present
+          ? data.transactionsSynced.value
+          : this.transactionsSynced,
+      progressSynced: data.progressSynced.present
+          ? data.progressSynced.value
+          : this.progressSynced,
+      conflictsFound: data.conflictsFound.present
+          ? data.conflictsFound.value
+          : this.conflictsFound,
+      durationMs: data.durationMs.present
+          ? data.durationMs.value
+          : this.durationMs,
+      syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SyncLogsData(')
+          ..write('id: $id, ')
+          ..write('syncType: $syncType, ')
+          ..write('success: $success, ')
+          ..write('errorMessage: $errorMessage, ')
+          ..write('notesSynced: $notesSynced, ')
+          ..write('transactionsSynced: $transactionsSynced, ')
+          ..write('progressSynced: $progressSynced, ')
+          ..write('conflictsFound: $conflictsFound, ')
+          ..write('durationMs: $durationMs, ')
+          ..write('syncedAt: $syncedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    syncType,
+    success,
+    errorMessage,
+    notesSynced,
+    transactionsSynced,
+    progressSynced,
+    conflictsFound,
+    durationMs,
+    syncedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SyncLogsData &&
+          other.id == this.id &&
+          other.syncType == this.syncType &&
+          other.success == this.success &&
+          other.errorMessage == this.errorMessage &&
+          other.notesSynced == this.notesSynced &&
+          other.transactionsSynced == this.transactionsSynced &&
+          other.progressSynced == this.progressSynced &&
+          other.conflictsFound == this.conflictsFound &&
+          other.durationMs == this.durationMs &&
+          other.syncedAt == this.syncedAt);
+}
+
+class SyncLogsCompanion extends UpdateCompanion<SyncLogsData> {
+  final Value<String> id;
+  final Value<String> syncType;
+  final Value<bool> success;
+  final Value<String?> errorMessage;
+  final Value<int> notesSynced;
+  final Value<int> transactionsSynced;
+  final Value<bool> progressSynced;
+  final Value<int> conflictsFound;
+  final Value<int?> durationMs;
+  final Value<DateTime> syncedAt;
+  final Value<int> rowid;
+  const SyncLogsCompanion({
+    this.id = const Value.absent(),
+    this.syncType = const Value.absent(),
+    this.success = const Value.absent(),
+    this.errorMessage = const Value.absent(),
+    this.notesSynced = const Value.absent(),
+    this.transactionsSynced = const Value.absent(),
+    this.progressSynced = const Value.absent(),
+    this.conflictsFound = const Value.absent(),
+    this.durationMs = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SyncLogsCompanion.insert({
+    required String id,
+    required String syncType,
+    required bool success,
+    this.errorMessage = const Value.absent(),
+    this.notesSynced = const Value.absent(),
+    this.transactionsSynced = const Value.absent(),
+    this.progressSynced = const Value.absent(),
+    this.conflictsFound = const Value.absent(),
+    this.durationMs = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       syncType = Value(syncType),
+       success = Value(success);
+  static Insertable<SyncLogsData> custom({
+    Expression<String>? id,
+    Expression<String>? syncType,
+    Expression<bool>? success,
+    Expression<String>? errorMessage,
+    Expression<int>? notesSynced,
+    Expression<int>? transactionsSynced,
+    Expression<bool>? progressSynced,
+    Expression<int>? conflictsFound,
+    Expression<int>? durationMs,
+    Expression<DateTime>? syncedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (syncType != null) 'sync_type': syncType,
+      if (success != null) 'success': success,
+      if (errorMessage != null) 'error_message': errorMessage,
+      if (notesSynced != null) 'notes_synced': notesSynced,
+      if (transactionsSynced != null) 'transactions_synced': transactionsSynced,
+      if (progressSynced != null) 'progress_synced': progressSynced,
+      if (conflictsFound != null) 'conflicts_found': conflictsFound,
+      if (durationMs != null) 'duration_ms': durationMs,
+      if (syncedAt != null) 'synced_at': syncedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SyncLogsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? syncType,
+    Value<bool>? success,
+    Value<String?>? errorMessage,
+    Value<int>? notesSynced,
+    Value<int>? transactionsSynced,
+    Value<bool>? progressSynced,
+    Value<int>? conflictsFound,
+    Value<int?>? durationMs,
+    Value<DateTime>? syncedAt,
+    Value<int>? rowid,
+  }) {
+    return SyncLogsCompanion(
+      id: id ?? this.id,
+      syncType: syncType ?? this.syncType,
+      success: success ?? this.success,
+      errorMessage: errorMessage ?? this.errorMessage,
+      notesSynced: notesSynced ?? this.notesSynced,
+      transactionsSynced: transactionsSynced ?? this.transactionsSynced,
+      progressSynced: progressSynced ?? this.progressSynced,
+      conflictsFound: conflictsFound ?? this.conflictsFound,
+      durationMs: durationMs ?? this.durationMs,
+      syncedAt: syncedAt ?? this.syncedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (syncType.present) {
+      map['sync_type'] = Variable<String>(syncType.value);
+    }
+    if (success.present) {
+      map['success'] = Variable<bool>(success.value);
+    }
+    if (errorMessage.present) {
+      map['error_message'] = Variable<String>(errorMessage.value);
+    }
+    if (notesSynced.present) {
+      map['notes_synced'] = Variable<int>(notesSynced.value);
+    }
+    if (transactionsSynced.present) {
+      map['transactions_synced'] = Variable<int>(transactionsSynced.value);
+    }
+    if (progressSynced.present) {
+      map['progress_synced'] = Variable<bool>(progressSynced.value);
+    }
+    if (conflictsFound.present) {
+      map['conflicts_found'] = Variable<int>(conflictsFound.value);
+    }
+    if (durationMs.present) {
+      map['duration_ms'] = Variable<int>(durationMs.value);
+    }
+    if (syncedAt.present) {
+      map['synced_at'] = Variable<DateTime>(syncedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SyncLogsCompanion(')
+          ..write('id: $id, ')
+          ..write('syncType: $syncType, ')
+          ..write('success: $success, ')
+          ..write('errorMessage: $errorMessage, ')
+          ..write('notesSynced: $notesSynced, ')
+          ..write('transactionsSynced: $transactionsSynced, ')
+          ..write('progressSynced: $progressSynced, ')
+          ..write('conflictsFound: $conflictsFound, ')
+          ..write('durationMs: $durationMs, ')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -6623,6 +7229,7 @@ class DatabaseAtV2 extends GeneratedDatabase {
   late final DailyChallenges dailyChallenges = DailyChallenges(this);
   late final ChallengeQuestions challengeQuestions = ChallengeQuestions(this);
   late final AppSettings appSettings = AppSettings(this);
+  late final SyncLogs syncLogs = SyncLogs(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -6640,6 +7247,7 @@ class DatabaseAtV2 extends GeneratedDatabase {
     dailyChallenges,
     challengeQuestions,
     appSettings,
+    syncLogs,
   ];
   @override
   int get schemaVersion => 2;

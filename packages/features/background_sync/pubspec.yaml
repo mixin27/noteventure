@@ -1,0 +1,56 @@
+name: background_sync
+description: "Background sync functionality using WorkManager"
+version: 0.0.1
+publish_to: none
+
+resolution: workspace
+
+environment:
+  sdk: ^3.9.2
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Shared
+  core:
+    path: ../../shared/core
+  database:
+    path: ../../shared/database
+  syncing:
+    path: ../syncing
+  notes:
+    path: ../notes
+  points:
+    path: ../points
+  progress:
+    path: ../progress
+  settings:
+    path: ../settings
+
+  #  State management
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.7
+
+  #  Navigation
+  go_router: ^16.2.4
+
+  # DI
+  get_it: ^8.2.0
+  injectable: ^2.5.1
+
+  # Utilities
+  dartz: ^0.10.1
+  workmanager: ^0.8.0
+  connectivity_plus: ^7.0.0
+  path: ^1.9.1
+  path_provider: ^2.1.5
+  drift: ^2.28.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.7.1
+  injectable_generator: ^2.8.1

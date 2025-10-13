@@ -93,6 +93,8 @@ class NotesRepositoryImpl implements NotesRepository {
     NoteType noteType = NoteType.standard,
     String? categoryId,
     String? color,
+    bool isPinned = false,
+    bool isFavorite = false,
   }) async {
     try {
       final note = await localDataSource.createNote(
@@ -101,6 +103,8 @@ class NotesRepositoryImpl implements NotesRepository {
         noteType: noteType,
         categoryId: categoryId,
         color: color,
+        isPinned: isPinned,
+        isFavorite: isFavorite,
       );
       return Right(note.toEntity());
     } on DatabaseException catch (e) {
@@ -111,12 +115,46 @@ class NotesRepositoryImpl implements NotesRepository {
   }
 
   @override
+  Future<Either<Failure, Note>> createNoteWithId({
+    required String id,
+    required String title,
+    required String content,
+    required NoteType noteType,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    String? categoryId,
+    String? color,
+    bool isPinned = false,
+    bool isFavorite = false,
+  }) async {
+    try {
+      final note = await localDataSource.createNote(
+        id: id,
+        title: title,
+        content: content,
+        noteType: noteType,
+        categoryId: categoryId,
+        color: color,
+        isPinned: isPinned,
+        isFavorite: isFavorite,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+      );
+      return Right(note.toEntity());
+    } catch (e) {
+      return Left(CacheFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, Note>> updateNote({
     required String id,
     String? title,
     String? content,
     String? categoryId,
     String? color,
+    bool? isPinned,
+    bool? isFavorite,
   }) async {
     try {
       final note = await localDataSource.updateNote(
@@ -125,6 +163,8 @@ class NotesRepositoryImpl implements NotesRepository {
         content: content,
         categoryId: categoryId,
         color: color,
+        isPinned: isPinned,
+        isFavorite: isFavorite,
       );
       return Right(note.toEntity());
     } on NotFoundException catch (e) {

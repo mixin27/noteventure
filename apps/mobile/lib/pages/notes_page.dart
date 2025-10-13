@@ -7,7 +7,6 @@ import 'package:core/core.dart';
 import 'package:notes/notes.dart';
 
 import '../di/injection.dart';
-import '../routes/route_constants.dart';
 
 class NotesPage extends StatelessWidget {
   const NotesPage({super.key});

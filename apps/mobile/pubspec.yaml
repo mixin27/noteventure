@@ -42,6 +42,8 @@ dependencies:
     path: ../../packages/features/settings
   syncing:
     path: ../../packages/features/syncing
+  background_sync:
+    path: ../../packages/features/background_sync
 
   #  State management
   flutter_bloc: ^9.1.1
@@ -56,6 +58,9 @@ dependencies:
   # Audio
   audioplayers: ^6.5.1
   just_audio: ^0.10.5
+
+  workmanager: ^0.8.0
+  connectivity_plus: ^7.0.0
 
 dev_dependencies:
   flutter_test:

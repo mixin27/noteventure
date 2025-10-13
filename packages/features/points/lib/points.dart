@@ -1,5 +1,8 @@
 library;
 
+export 'src/data/datasources/points_local_datasource.dart';
+export 'src/data/repositories/points_repository_impl.dart';
+
 // Domain - Repositories
 export 'src/domain/repositories/points_repository.dart';
 
